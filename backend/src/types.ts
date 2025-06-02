@@ -38,6 +38,36 @@ export const initTempData: TempData = {
     ambientHumidity: null
 }
 
+export type WeatherData = {
+    latitude: number,
+    longitude: number,
+    gridId: string | null,
+    observationStationsURL: string | null,
+    lastCheckTime: Date | null,
+    observationStation: string | null,
+    observationURL: string | null,
+    forecastURL : string | null,
+    currentTemperature: number | null,
+    currentRelativeHumidity: number | null,
+    currentTextDescription: string | null,
+    currentWeatherIconURL: string | null
+}
+
+export const initWeatherData: WeatherData = {
+    latitude: 41.098946,
+    longitude: -81.644569,
+    gridId: null,
+    observationStationsURL: null,
+    lastCheckTime: null,
+    observationStation: null,
+    observationURL: null,
+    forecastURL: null,
+    currentTemperature: null,
+    currentRelativeHumidity: null,
+    currentTextDescription: null,
+    currentWeatherIconURL: null
+}
+
 export type FetchReturn = {
     success: boolean,
     httpCode?: number,

@@ -41,6 +41,8 @@ export async function getAccessToken() : Promise<FetchReturn> {
             method: "POST"
         });
         if (!response.ok) {
+            fetchReturn.httpCode = response.status;
+            fetchReturn.error = "Invalid response for refresh token "+response.status;
             // If the response status code is not in the 200-299 range,
             // throw an error with the status code and message
             throw new Error(`HTTP error! Status: ${response.status}`);
