@@ -13,8 +13,8 @@ export const googleDeviceID = process.env.DEVICE_ID || "";
 const httpPort = Number(process.env.PORT) || 3000;
 
 
-export let tempData: TempData = initTempData;
-export let weatherData: WeatherData = initWeatherData;
+export let tempData: TempData = structuredClone(initTempData);
+export let weatherData: WeatherData = structuredClone(initWeatherData);
 
 const fastify = Fastify({
     logger: true
@@ -68,7 +68,7 @@ type latLongQueryString = FromSchema<typeof latLongQuerySchema>;
 
 fastify.get<{ Querystring: latLongQueryString }> ("/setlatlong",{ schema: { querystring: latLongQuerySchema } },async (request, reply) => {
     const {lat,long} = request.query;
-    weatherData = initWeatherData;
+    weatherData = structuredClone(initWeatherData);
     weatherData.latitude = lat;
     weatherData.longitude = long;
     reply.send("Latitude and Longitude have been updated:"+ JSON.stringify(weatherData));

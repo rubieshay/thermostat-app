@@ -4,6 +4,8 @@ import { weatherData } from "./index";
 
 const weatherBaseURL = "https://api.weather.gov/"
 
+const weatherDataExpireDurationSecs = 180;
+
 async function getStationsFromLatLong(): Promise<FetchReturn> {
     let pointsURL = encodeURI(weatherBaseURL + "/points/"+ weatherData.latitude + "," + weatherData.longitude);
     let fetchReturn: FetchReturn = {success: false};
@@ -93,6 +95,11 @@ export async function getCurrentObservation(): Promise<FetchReturn> {
     let fetchReturn: FetchReturn = {success: false};
     fetchReturn = await checkAndGetObservationStations();
     if (!fetchReturn.success) {return fetchReturn;};
+    if (weatherData.lastCheckTime !== null && new Date() < (new Date(weatherData.lastCheckTime.getTime() + 1000*(weatherDataExpireDurationSecs)))) {
+        console.log("The data is fresh, no need to retrieve.");
+        fetchReturn.httpCode = 302;
+        return fetchReturn;
+    }
     if (weatherData.observationURL === null) {
         fetchReturn.httpCode = 404;
         fetchReturn.error = "Observations URL is null";
@@ -115,9 +122,9 @@ export async function getCurrentObservation(): Promise<FetchReturn> {
     } catch (error) {
         // Handle network errors or errors thrown by the if statement above
         if (error instanceof Error) {
-            fetchReturn.error = "Get Stations Fetch error: " + error.message;
+            fetchReturn.error = "Get Observations Fetch error: " + error.message;
         } else {
-            fetchReturn.error = "Get Stations Unknown fetch error";
+            fetchReturn.error = "Get Observations Unknown fetch error";
         }
     }
     return fetchReturn;

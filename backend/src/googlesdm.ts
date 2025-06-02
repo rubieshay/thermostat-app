@@ -43,9 +43,7 @@ export async function getAccessToken() : Promise<FetchReturn> {
         if (!response.ok) {
             fetchReturn.httpCode = response.status;
             fetchReturn.error = "Invalid response for refresh token "+response.status;
-            // If the response status code is not in the 200-299 range,
-            // throw an error with the status code and message
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            return fetchReturn;
         }
         const data = await response.json(); // Or response.text() for text responses
         fetchReturn.success = true;
@@ -74,7 +72,9 @@ export async function getDeviceInfo() : Promise<FetchReturn> {
         request.headers.set("Authorization", "Bearer " + accessToken);
         const response = await fetch(request);
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            fetchReturn.httpCode = response.status;
+            fetchReturn.error = "Error getting device info: " + response.statusText;
+            return fetchReturn;
         }
         const data = await response.json();
         if (!data || !data.devices) {
