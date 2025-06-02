@@ -3,7 +3,7 @@ import * as utils from "./utils";
 import { TempDataContext } from "./TempContext";
 
 function Dial() {
-    const {tempData, setHeatCelsius, setCoolCelsius} = useContext(TempDataContext);
+    const {tempData, fetchTempData, setHeatCelsius, setCoolCelsius} = useContext(TempDataContext);
     const [dispCoolPoint, setDispCoolPoint] = useState<number | null>(null);
     const [dispHeatPoint, setDispHeatPoint] = useState<number | null>(null);
     const timeoutRef = useRef<number | null>(null);
@@ -29,6 +29,7 @@ function Dial() {
     }, [tempData.heatCelsius, tempData.tempUnits]);
 
     useEffect(() => {
+        fetchTempData();
         return () => {
             if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current);
