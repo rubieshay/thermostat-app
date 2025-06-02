@@ -1,4 +1,5 @@
-export enum TempUnits {celsius="CELSIUS", fahrenheit="FAHRENHEIT"};
+export enum TempUnits {celsius=0, fahrenheit=1};
+export enum TempUnitsName {celsius="CELSIUS", fahrenheit="FAHRENHEIT"};
 export enum TempMode {heat="HEAT", cool="COOL", heatcool="HEATCOOL", off="OFF"};
 export enum HvacStatus {heating="HEATING", cooling="COOLING", off="OFF"};
 export enum EcoMode {on="MANUAL_ECO", off="OFF"};
@@ -22,11 +23,11 @@ export type TempData = {
 }
 
 export const initTempData: TempData = {
-    tempUnits: TempUnits.fahrenheit,
-    ambientTempCelsius: 20,
-    heatCelsius: 17,
-    coolCelsius: 23,
-    tempMode: TempMode.heatcool,
+    tempUnits: TempUnits.celsius,
+    ambientTempCelsius: null,
+    heatCelsius: null,
+    coolCelsius: null,
+    tempMode: TempMode.off,
     hvacStatus: HvacStatus.off,
     ecoMode: EcoMode.off,
     ecoHeatCelsius: null,

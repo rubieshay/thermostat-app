@@ -9,12 +9,13 @@ function Dial() {
     const timeoutRef = useRef<number | null>(null);
     enum SetPointType {heat, cool};
 
-    const dispAmbientTemp: number | null = utils.convertTemp(tempData.ambientTempCelsius, utils.TempUnits.celsius, tempData.tempUnits);
+    const dispAmbientTemp: number | null = utils.roundedTemp(utils.convertTemp(tempData.ambientTempCelsius, utils.TempUnits.celsius, tempData.tempUnits), tempData.tempUnits);
     const maxDialTemp: number = utils.maxDialTemps[tempData.tempUnits];
     const minDialTemp: number = utils.minDialTemps[tempData.tempUnits];
     const midDialTemp: number = (maxDialTemp + minDialTemp) / 2;
     const dialRange: number = maxDialTemp - minDialTemp;
 
+    let ambientThumbAngle: number | null = getThumbAngle(dispAmbientTemp);
     let coolPointThumbAngle: number | null = getThumbAngle(dispCoolPoint);
     let heatPointThumbAngle: number | null = getThumbAngle(dispHeatPoint);
 
@@ -110,18 +111,25 @@ function Dial() {
     return (
         <section id="dial">
             <div className="dial-track" style={{"--used-dial-ratio": utils.usedDialRatio + "turn"} as React.CSSProperties}></div>
-            <div id="heatpoint-thumb-container" className="dial-thumb-container" style={{"--turn-angle": heatPointThumbAngle + "turn"} as React.CSSProperties}>
-                {/* <div className="dial-thumb" style={{"--x-percent": dialThumbX + "%", "--y-percent": dialThumbY + "%"} as React.CSSProperties}></div> */}
+            <div id="ambient-thumb-container"
+                className={"dial-thumb-container" + (dispAmbientTemp === null ? " dial-thumb-hidden" : "")}
+                style={{"--turn-angle": ambientThumbAngle + "turn"} as React.CSSProperties}>
                 <div className="dial-thumb"></div>
             </div>
-            <div id="coolpoint-thumb-container" className="dial-thumb-container" style={{"--turn-angle": coolPointThumbAngle + "turn"} as React.CSSProperties}>
-                {/* <div className="dial-thumb" style={{"--x-percent": dialThumbX + "%", "--y-percent": dialThumbY + "%"} as React.CSSProperties}></div> */}
+            <div id="heatpoint-thumb-container"
+                className={"dial-thumb-container" + (dispHeatPoint === null ? " dial-thumb-hidden" : "")}
+                style={{"--turn-angle": heatPointThumbAngle + "turn"} as React.CSSProperties}>
+                <div className="dial-thumb"></div>
+            </div>
+            <div id="coolpoint-thumb-container"
+                className={"dial-thumb-container" + (dispCoolPoint === null ? " dial-thumb-hidden" : "")}
+                style={{"--turn-angle": coolPointThumbAngle + "turn"} as React.CSSProperties}>
                 <div className="dial-thumb"></div>
             </div>
             <h2 id="ambient-temp">
-                <span>{dispHeatPoint}</span>
-                <span>{dispAmbientTemp}</span>
-                <span>{dispCoolPoint}</span>
+                <span>{(typeof dispHeatPoint === "number") && !isNaN(dispHeatPoint) ? dispHeatPoint : ""}</span>
+                <span>{(typeof dispAmbientTemp === "number") && !isNaN(dispAmbientTemp) ? dispAmbientTemp : ""}</span>
+                <span>{(typeof dispCoolPoint === "number") && !isNaN(dispCoolPoint) ? dispCoolPoint : ""}</span>
             </h2>
             <div className="dial-buttons">
                 <button onClick={() => bumpSetPoint(-utils.decimalPrecision[tempData.tempUnits], SetPointType.cool)}>

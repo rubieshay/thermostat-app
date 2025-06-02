@@ -1,7 +1,7 @@
-import Fastify from 'fastify'
-import { initTempData, TempData, FetchReturn } from './types';
-import 'dotenv/config';
-import { getAccessToken,getDeviceInfo } from './googlesdm';
+import Fastify from "fastify"
+import { initTempData, TempData, FetchReturn } from "./types";
+import "dotenv/config";
+import { getAccessToken,getDeviceInfo } from "./googlesdm";
 
 export const googleClientId  = process.env.CLIENT_ID || "";
 export const googleClientSecret = process.env.CLIENT_SECRET || "";
@@ -17,8 +17,8 @@ const fastify = Fastify({
     logger: true
 })
 
-fastify.get('/', async (request, reply) => {
-    return { hello: 'world2' }
+fastify.get("/", async (request, reply) => {
+    return { hello: "world" }
 })
 
 fastify.get("/renewaccess", async (request, reply) => {

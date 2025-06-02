@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState } from "react";
 import * as utils from "./utils";
 
 export type TempDataType = {
@@ -9,6 +9,8 @@ export type TempDataType = {
     tempMode: utils.TempMode,
     hvacStatus: utils.HvacStatus,
     ecoMode: utils.EcoMode,
+    ecoHeatCelsius: number | null,
+    ecoCoolCelsius: number | null,
     fanTimer: Date | null
     connectivity: utils.Connectivity,
     deviceName: string | null
@@ -17,16 +19,18 @@ export type TempDataType = {
 
 export const initTempData: TempDataType = {
     tempUnits: utils.TempUnits.fahrenheit,
-    ambientTempCelsius: 20,
-    heatCelsius: 17,
-    coolCelsius: 23,
-    tempMode: utils.TempMode.heatcool,
+    ambientTempCelsius: 19.126007,
+    heatCelsius: null,
+    coolCelsius: 20,
+    tempMode: utils.TempMode.cool,
     hvacStatus: utils.HvacStatus.off,
     ecoMode: utils.EcoMode.off,
+    ecoHeatCelsius: 27.777779,
+    ecoCoolCelsius: 13.333333,
     fanTimer: null,
-    connectivity: utils.Connectivity.offline,
-    deviceName: null,
-    ambientHumidity: null
+    connectivity: utils.Connectivity.online,
+    deviceName: "Dining Room Thermostat",
+    ambientHumidity: 50
 }
 
 // export const initTempData: TempDataType = {
@@ -37,6 +41,8 @@ export const initTempData: TempDataType = {
 //     tempMode: utils.TempMode.off,
 //     hvacStatus: utils.HvacStatus.off,
 //     ecoMode: utils.EcoMode.off,
+//     ecoHeatCelsius: null,
+//     ecoCoolCelsius: null,
 //     fanTimer: null,
 //     connectivity: utils.Connectivity.offline,
 //     deviceName: null,
@@ -67,48 +73,48 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
     const [tempData, setTempData] = useState<TempDataType>(initTempData);
 
     async function fetchTempData() {
-        console.log("Fetching temp data from API");
-        console.log("refreshing access token");
-//        let url = utils.DEFAULT_API_URL + "/renewaccess";
-        let url = "/api/renewaccess";
-        try {
-            const response = await fetch(url, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-            if (!response.ok) {
-                return;
-            }
-            const data = await response.json();
-            console.log("Access token refreshed successfully:", data);
-        }
-        catch (error) {
-            console.error("Error refreshing access token:", error);
-            return;
-        }
-        url = "/api/info";
-        try {
-            const response = await fetch(url, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-            if (!response.ok) {
-                return;
-            }
-            const data = await response.json();
-            console.log("Temp data info successfully:", data);
-            if (data && data.tempData) {
-                setTempData(data.tempData);
-            } else {
-                console.error("Invalid temp data format:", data);
-            }
-        } catch (error) {
-            console.error("Error fetching temp data info:", error);
-        }
+        // console.log("Fetching temp data from API");
+        // console.log("refreshing access token");
+        // // let url = utils.DEFAULT_API_URL + "/renewaccess";
+        // let url = "/api/renewaccess";
+        // try {
+        //     const response = await fetch(url, {
+        //         method: "GET",
+        //         headers: {
+        //             "Content-Type": "application/json"
+        //         }
+        //     });
+        //     if (!response.ok) {
+        //         return;
+        //     }
+        //     const data = await response.json();
+        //     console.log("Access token refreshed successfully:", data);
+        // }
+        // catch (error) {
+        //     console.error("Error refreshing access token:", error);
+        //     return;
+        // }
+        // url = "/api/info";
+        // try {
+        //     const response = await fetch(url, {
+        //         method: "GET",
+        //         headers: {
+        //             "Content-Type": "application/json"
+        //         }
+        //     });
+        //     if (!response.ok) {
+        //         return;
+        //     }
+        //     const data = await response.json();
+        //     console.log("Temp data info successfully:", data);
+        //     if (data && data.tempData) {
+        //         setTempData(data.tempData);
+        //     } else {
+        //         console.error("Invalid temp data format:", data);
+        //     }
+        // } catch (error) {
+        //     console.error("Error fetching temp data info:", error);
+        // }
     }
 
     async function setHeatCelsius(newHeatCelsius: number | null) {
@@ -125,12 +131,12 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         setTempData(prevState => ({...prevState, coolCelsius : newCoolCelsius}));
     }
 
-    useEffect(() => {
-        setTempData((prevState) => ({ ...prevState, tempUnits: utils.TempUnits.fahrenheit }))
-        console.log("DEFAULT API URL:",utils.DEFAULT_API_URL);
-    }, []);
+    // useEffect(() => {
+    //     setTempData((prevState) => ({ ...prevState, tempUnits: utils.TempUnits.fahrenheit }))
+    //     console.log("DEFAULT API URL:",utils.DEFAULT_API_URL);
+    // }, []);
 
-    console.log("TempDataProvider: tempData:", tempData);
+    // console.log("TempDataProvider: tempData:", tempData);
 
     let value: TempContextType = {tempData, setTempData, fetchTempData, setHeatCelsius, setCoolCelsius};
 

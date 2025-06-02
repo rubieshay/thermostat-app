@@ -26,11 +26,11 @@ export function convertTemp(tempVal: number | null, inputUnits: TempUnits, outpu
     }
 }
 
-export function roundedTemp(tempVal: number | null, tempunits: TempUnits): number | null {
+export function roundedTemp(tempVal: number | null, tempUnits: TempUnits): number | null {
     if (tempVal === null) {
         return null;
     }
-    return Math.round(tempVal / decimalPrecision[tempunits]) * decimalPrecision[tempunits];
+    return Math.round(tempVal / decimalPrecision[tempUnits]) * decimalPrecision[tempUnits];
 }
 
 export const DEFAULT_API_URL = import.meta.env.VITE_DEFAULT_API_URL === undefined ? "https://thermostat.shaytech.net/api" : import.meta.env.VITE_DEFAULT_API_URL;

@@ -93,8 +93,7 @@ h1 {
 
 section#dial {
     display: grid;
-    align-items: center;
-    justify-items: center;
+    place-items: center;
     grid-template-rows: 1fr;
     grid-template-columns: 1fr;
     width: var(--dial-size);
@@ -104,6 +103,7 @@ section#dial {
     position: relative;
 }
 section#dial > * {
+    position: absolute;
     grid-row: 1;
     grid-column: 1;
 }
@@ -144,6 +144,9 @@ section#dial > * {
     transform: translateY(-50%);
     cursor: pointer;
 }
+.dial-thumb-hidden {
+    display: none;
+}
 #coolpoint-thumb-container .dial-thumb {
     background: #6ea8d8;
 }
@@ -156,7 +159,7 @@ section#dial > * {
     gap: 2rem;
     margin-inline: auto;
     position: relative;
-    bottom: calc(-0.4*var(--dial-size));
+    bottom: calc(0.05*var(--dial-size));
 }
 .dial-buttons button {
     text-align: center;

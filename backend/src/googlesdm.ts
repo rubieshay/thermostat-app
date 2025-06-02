@@ -1,5 +1,5 @@
 import { googleClientSecret, googleRefreshToken, googleClientId, googleProjectId, googleDeviceID } from "./index";
-import { Connectivity, FetchReturn, FanMode, TempMode, HvacStatus } from "./types"; 
+import { Connectivity, FetchReturn, FanMode, TempMode, HvacStatus, EcoMode, TempUnitsName, TempUnits } from "./types"; 
 
 import {tempData} from "./index";
 
@@ -81,7 +81,7 @@ export async function getDeviceInfo() : Promise<FetchReturn> {
         if (!device.traits["sdm.devices.traits.Connectivity"]) {
             fetchReturn.error = "Connectivity trait not found";
         } else {
-            tempData.connectivity = device.traits["sdm.devices.traits.Connectivity"].status || Connectivity;
+            tempData.connectivity = device.traits["sdm.devices.traits.Connectivity"].status || Connectivity.offline;
         }
         if (!device.traits["sdm.devices.traits.Fan"]) {
             fetchReturn.error = "Fan trait not found";
@@ -100,7 +100,7 @@ export async function getDeviceInfo() : Promise<FetchReturn> {
         if (!device.traits["sdm.devices.traits.ThermostatEco"]) {
             fetchReturn.error = "ThermostatEco trait not found";
         } else {
-            tempData.ecoMode = device.traits["sdm.devices.traits.ThermostatEco"].mode || TempMode.off;
+            tempData.ecoMode = device.traits["sdm.devices.traits.ThermostatEco"].mode || EcoMode.off;
             tempData.ecoHeatCelsius = device.traits["sdm.devices.traits.ThermostatEco"].heatCelsius || null;
             tempData.ecoCoolCelsius = device.traits["sdm.devices.traits.ThermostatEco"].coolCelsius || null;
         }
@@ -112,7 +112,12 @@ export async function getDeviceInfo() : Promise<FetchReturn> {
         if (!device.traits["sdm.devices.traits.Settings"]) {
             fetchReturn.error = "Settings trait not found";
         } else {
-            tempData.tempUnits = device.traits["sdm.devices.traits.Settings"].temperatureScale || HvacStatus.off;
+            let tempUnitsName = device.traits["sdm.devices.traits.Settings"].temperatureScale || TempUnitsName.celsius;
+            if (tempUnitsName === TempUnitsName.celsius) {
+                tempData.tempUnits = TempUnits.celsius;
+            } else {
+                tempData.tempUnits = TempUnits.fahrenheit;
+            }
         }
         if (!device.traits["sdm.devices.traits.ThermostatTemperatureSetpoint"]) {
             fetchReturn.error = "ThermostatTemperatureSetpoint trait not found";
