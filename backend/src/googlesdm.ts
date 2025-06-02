@@ -50,8 +50,7 @@ export async function getAccessToken() : Promise<FetchReturn> {
         accessToken = data.access_token; // Assuming the response contains an access token
         accessTokenExpireSeconds = data.expires_in; // Assuming the response contains an expiration time in seconds
         accessTokenExpirationTime = (new Date(new Date().getTime() + 1000*(accessTokenExpireSeconds - TokenExpireBufferSeconds)))
-        console.log("Access Token:", accessToken + " expires in " + accessTokenExpireSeconds + " seconds");
-        console.log("New Expiration Date with buffer:" + accessTokenExpirationTime);
+        console.log("New Access Token retrieved, Expiration Date with buffer:" + accessTokenExpirationTime);
     } catch (error) {
         // Handle network errors or errors thrown by the if statement above
         if (error instanceof Error) {
