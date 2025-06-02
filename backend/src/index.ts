@@ -35,8 +35,8 @@ fastify.get("/renewaccess", async (request, reply) => {
 fastify.get("/info", async (request, reply) => {
     let fetchReturn: FetchReturn;
     fetchReturn = await getDeviceInfo();
-    console.log("Device Info:", fetchReturn);
     if (!fetchReturn.success) {
+        console.log("Got an error in getDeviceInfo:",fetchReturn.error);
         return reply.status(500).send({ error: fetchReturn.error || "Failed to get device info" });
     }
     return { tempData }

@@ -73,48 +73,28 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
     const [tempData, setTempData] = useState<TempDataType>(initTempData);
 
     async function fetchTempData() {
-        // console.log("Fetching temp data from API");
-        // console.log("refreshing access token");
-        // // let url = utils.DEFAULT_API_URL + "/renewaccess";
-        // let url = "/api/renewaccess";
-        // try {
-        //     const response = await fetch(url, {
-        //         method: "GET",
-        //         headers: {
-        //             "Content-Type": "application/json"
-        //         }
-        //     });
-        //     if (!response.ok) {
-        //         return;
-        //     }
-        //     const data = await response.json();
-        //     console.log("Access token refreshed successfully:", data);
-        // }
-        // catch (error) {
-        //     console.error("Error refreshing access token:", error);
-        //     return;
-        // }
-        // url = "/api/info";
-        // try {
-        //     const response = await fetch(url, {
-        //         method: "GET",
-        //         headers: {
-        //             "Content-Type": "application/json"
-        //         }
-        //     });
-        //     if (!response.ok) {
-        //         return;
-        //     }
-        //     const data = await response.json();
-        //     console.log("Temp data info successfully:", data);
-        //     if (data && data.tempData) {
-        //         setTempData(data.tempData);
-        //     } else {
-        //         console.error("Invalid temp data format:", data);
-        //     }
-        // } catch (error) {
-        //     console.error("Error fetching temp data info:", error);
-        // }
+        console.log("Fetching temp data from API");
+        let url = "/api/info";
+        try {
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            if (!response.ok) {
+                return;
+            }
+            const data = await response.json();
+            console.log("Temp data info successfully:", data);
+            if (data && data.tempData) {
+                setTempData(data.tempData);
+            } else {
+                console.error("Invalid temp data format:", data);
+            }
+        } catch (error) {
+            console.error("Error fetching temp data info:", error);
+        }
     }
 
     async function setHeatCelsius(newHeatCelsius: number | null) {

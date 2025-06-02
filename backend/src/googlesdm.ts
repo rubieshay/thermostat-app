@@ -8,6 +8,26 @@ import { URL } from "url";
 let accessToken: string | null = null;
 
 let accessTokenExpireSeconds: number = 0;
+let accessTokenExpirationTime: Date | null = null;
+
+const TokenExpireBufferSeconds = 300;
+
+async function checkAndRenewAccessToken() {
+    let fetchReturn: FetchReturn = {success: false};
+    if (accessToken === null || accessTokenExpirationTime === null) {
+        fetchReturn = await getAccessToken();
+        return fetchReturn;
+    }
+    let currDate = new Date();
+    if (currDate > accessTokenExpirationTime) {
+        fetchReturn = await getAccessToken();
+        return fetchReturn;
+    } 
+    // current token is OK.
+    fetchReturn.success = true;
+    fetchReturn.httpCode = 304;
+    return fetchReturn;
+}
 
 export async function getAccessToken() : Promise<FetchReturn> {
     const url = new URL("https://www.googleapis.com/oauth2/v4/token");
@@ -15,7 +35,6 @@ export async function getAccessToken() : Promise<FetchReturn> {
     url.searchParams.append("client_secret", googleClientSecret);
     url.searchParams.append("refresh_token", googleRefreshToken);
     url.searchParams.append("grant_type", "refresh_token");
-    console.log("URL String:", url.toString());
     const fetchReturn: FetchReturn = {success: false}
     try {
         const response = await fetch(url, {
@@ -30,7 +49,9 @@ export async function getAccessToken() : Promise<FetchReturn> {
         fetchReturn.success = true;
         accessToken = data.access_token; // Assuming the response contains an access token
         accessTokenExpireSeconds = data.expires_in; // Assuming the response contains an expiration time in seconds
+        accessTokenExpirationTime = (new Date(new Date().getTime() + 1000*(accessTokenExpireSeconds - TokenExpireBufferSeconds)))
         console.log("Access Token:", accessToken + " expires in " + accessTokenExpireSeconds + " seconds");
+        console.log("New Expiration Date with buffer:" + accessTokenExpirationTime);
     } catch (error) {
         // Handle network errors or errors thrown by the if statement above
         if (error instanceof Error) {
@@ -43,6 +64,8 @@ export async function getAccessToken() : Promise<FetchReturn> {
 }
 
 export async function getDeviceInfo() : Promise<FetchReturn> {
+    let accessFetchReturn = await checkAndRenewAccessToken();
+    if (!accessFetchReturn.success) {return accessFetchReturn;};
     const urlString = encodeURI("https://smartdevicemanagement.googleapis.com/v1/enterprises/"+encodeURIComponent(googleProjectId)+"/devices");
     const fetchReturn: FetchReturn = {success: false}
     try {
@@ -57,7 +80,6 @@ export async function getDeviceInfo() : Promise<FetchReturn> {
             fetchReturn.error = "No devices found or invalid response format";
             return fetchReturn;
         }
-        console.log("Device Info:", data);
         // Assuming the first device is the one we want
         const device = data.devices.find((d: any) => d.name.includes(googleDeviceID));
         if (!device) {

@@ -40,6 +40,7 @@ export const initTempData: TempData = {
 
 export type FetchReturn = {
     success: boolean,
+    httpCode?: number,
     error?: string,
     data?: any
 }
