@@ -5,7 +5,7 @@ RUN npm ci --only=production=false
 
 FROM node:bullseye-slim AS builder
 WORKDIR /usr/app
-COPY --from=builder /usr/app/backend/node_modules ./node_modules
+COPY --from=deps /usr/app/backend/node_modules ./node_modules
 COPY backend/. .
 RUN npm run build
 
