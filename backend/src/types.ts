@@ -22,37 +22,37 @@ export type TempData = {
     ambientHumidity: number | null
 }
 
-// ACTUAL DEFAULT INIT DATA
-// export const initTempData: TempData = {
-//     tempUnits: TempUnits.celsius,
-//     ambientTempCelsius: null,
-//     heatCelsius: null,
-//     coolCelsius: null,
-//     tempMode: TempMode.off,
-//     hvacStatus: HvacStatus.off,
-//     ecoMode: EcoMode.off,
-//     ecoHeatCelsius: null,
-//     ecoCoolCelsius: null,
-//     fanTimer: null,
-//     connectivity: Connectivity.offline,
-//     deviceName: null,
-//     ambientHumidity: null
-// }
-
-// TESTING DATA
+// DEFAULT INIT DATA
 export const initTempData: TempData = {
-    tempUnits: TempUnits.fahrenheit,
-    ambientTempCelsius: 19.126007,
-    heatCelsius: 17,
+    tempUnits: TempUnits.celsius,
+    ambientTempCelsius: null,
+    heatCelsius: null,
     coolCelsius: null,
-    tempMode: TempMode.heat,
-    hvacStatus: HvacStatus.heating,
+    tempMode: TempMode.off,
+    hvacStatus: HvacStatus.off,
     ecoMode: EcoMode.off,
-    ecoHeatCelsius: 27.777779,
-    ecoCoolCelsius: 13.333333,
+    ecoHeatCelsius: null,
+    ecoCoolCelsius: null,
+    fanTimer: null,
+    connectivity: Connectivity.offline,
+    deviceName: null,
+    ambientHumidity: null
+}
+
+// INIT DATA FOR DEMO MODE
+export const demoTempData: TempData = {
+    tempUnits: TempUnits.fahrenheit,
+    ambientTempCelsius: 20.126007,
+    heatCelsius:18.888889,
+    coolCelsius: 23.333333,
+    tempMode: TempMode.heatcool,
+    hvacStatus: HvacStatus.off,
+    ecoMode: EcoMode.off,
+    ecoHeatCelsius: 27.777778,
+    ecoCoolCelsius: 12.777778,
     fanTimer: null,
     connectivity: Connectivity.online,
-    deviceName: "Dining Room Thermostat",
+    deviceName: "My Demo Thermostat",
     ambientHumidity: 50
 }
 

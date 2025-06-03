@@ -2,33 +2,34 @@ import { type FromSchema } from "json-schema-to-ts";
 import { EcoMode, TempMode } from "./types";
 
 export const setHeatSchema = {
-    type: 'object',
+    type: "object",
     properties: {
         heatCelsius: {
             type: "number"
         }
     },
-    required: ["heatCelsius" ],
+    required: ["heatCelsius"],
     additionalProperties: false
 } as const;
+
 
 export type SetHeatBody = FromSchema<typeof setHeatSchema>;
 
 export const setCoolSchema = {
-    type: 'object',
+    type: "object",
     properties: {
         coolCelsius: {
             type: "number"
         }
     },
-    required: ["coolCelsius" ],
+    required: ["coolCelsius"],
     additionalProperties: false
 } as const;
 
 export type SetCoolBody = FromSchema<typeof setCoolSchema>;
 
 export const setRangeSchema = {
-    type: 'object',
+    type: "object",
     properties: {
         coolCelsius: {
             type: "number"
@@ -37,14 +38,14 @@ export const setRangeSchema = {
             type: "number"
         }
     },
-    required: ["heatCelsius","coolCelsius" ],
+    required: ["heatCelsius", "coolCelsius"],
     additionalProperties: false
 } as const;
 
 export type SetRangeBody = FromSchema<typeof setRangeSchema>;
 
-export const setModeSchema = {
-    type: 'object',
+export const setTempModeSchema = {
+    type: "object",
     properties: {
         mode: {
             type: "string",
@@ -55,10 +56,10 @@ export const setModeSchema = {
     additionalProperties: false
 } as const;
 
-export type SetModeBody = FromSchema<typeof setModeSchema>;
+export type SetTempModeBody = FromSchema<typeof setTempModeSchema>;
 
 export const setEcoModeSchema = {
-    type: 'object',
+    type: "object",
     properties: {
         mode: {
             type: "string",
@@ -72,12 +73,12 @@ export const setEcoModeSchema = {
 export type SetEcoModeBody = FromSchema<typeof setEcoModeSchema>;
 
 export const latLongQuerySchema = {
-    type: 'object',
+    type: "object",
     properties: {
         lat: {type: "number"},
         long: {type: "number"}
     },
-    required: ["lat","long"]
+    required: ["lat", "long"]
 } as const;
 
 export type latLongQueryString = FromSchema<typeof latLongQuerySchema>;

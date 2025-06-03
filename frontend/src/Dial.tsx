@@ -1,15 +1,18 @@
 import { useContext, useEffect, useState, useRef } from "react";
-import { TempUnits, TempMode, HvacStatus, Connectivity } from "./types";
+import { TempUnits, TempMode, EcoMode, HvacStatus, Connectivity } from "./types";
 import { roundedTemp, convertTemp, maxDialTemps, minDialTemps, usedDialRatio, decimalPrecision, debounceTime } from "./utils";
 import { TempDataContext } from "./TempContext";
 
 function Dial() {
+    enum SetPointType {heat, cool};
+
     const {tempData, fetchTempData, setHeatCelsius, setCoolCelsius} = useContext(TempDataContext);
     const [dispCoolPoint, setDispCoolPoint] = useState<number | null>(null);
     const [dispHeatPoint, setDispHeatPoint] = useState<number | null>(null);
-    const timeoutRef = useRef<number | null>(null);
-
-    enum SetPointType {heat, cool};
+    const [activeSetPoint, setActiveSetPoint] = useState<SetPointType | null>(null);
+    const [lastSetPoint, setLastSetPoint] = useState<SetPointType | null>(null);
+    // const setPointFadeDelay: useRef<number | null>(null);
+    const sendDataTimeoutRef = useRef<number | null>(null);
 
     const dispAmbientTemp: number | null = roundedTemp(convertTemp(tempData.ambientTempCelsius, TempUnits.celsius, tempData.tempUnits), tempData.tempUnits);
     const maxDialTemp: number = maxDialTemps[tempData.tempUnits];
@@ -21,6 +24,15 @@ function Dial() {
     let coolPointThumbAngle: number | null = getThumbAngle(dispCoolPoint);
     let heatPointThumbAngle: number | null = getThumbAngle(dispHeatPoint);
     let activeTrackRange: number[] = getTrackRange();
+
+    useEffect (() => {
+        setActiveSetPoint(null);
+        if (tempData.tempMode === TempMode.cool) {
+            setLastSetPoint(SetPointType.cool);
+        } else if (tempData.tempMode === TempMode.heat) {
+            setLastSetPoint(SetPointType.heat);
+        }
+    }, [tempData.tempMode]);
 
     useEffect (() => {
         const unitTemp = convertTemp(tempData.coolCelsius, TempUnits.celsius, tempData.tempUnits);
@@ -35,15 +47,14 @@ function Dial() {
     useEffect(() => {
         fetchTempData();
         return () => {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
+            if (sendDataTimeoutRef.current) {
+                clearTimeout(sendDataTimeoutRef.current);
             }
         };
     }, []);
 
-    function changeTemp(newTemp: number | null, setPointType: SetPointType) {
-        // console.log("In ChangeTemp: " + newTemp + " type:" + setPointType);
-        if (newTemp === null) {
+    function changeTemp(newTemp: number | null, setPointType: SetPointType | null) {
+        if (newTemp === null || setPointType === null) {
             return;
         }
         let fixedTemp = Math.min(Math.max(minDialTemp, newTemp), maxDialTemp);
@@ -54,34 +65,60 @@ function Dial() {
         }
         let celsiusFixedTemp: number | null = convertTemp(fixedTemp, tempData.tempUnits, TempUnits.celsius)
 
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
+        if (sendDataTimeoutRef.current) {
+            clearTimeout(sendDataTimeoutRef.current);
         }
-        timeoutRef.current = setTimeout(() => {
+        sendDataTimeoutRef.current = setTimeout(() => {
             if (setPointType === SetPointType.cool) {
                 setCoolCelsius(celsiusFixedTemp);
+                console.log("call set cool");
             } else {
                 setHeatCelsius(celsiusFixedTemp);
+                console.log("call set heat");
             }
         }, debounceTime);
     }
 
-    function bumpSetPoint(diff: number, setPointType: SetPointType) {
-        let newTemp: number | null;
-        if (setPointType === SetPointType.cool) {
+    function bumpSetPoint(diff: number) {
+        // determine which setpoint to bump, and make active if needed
+        let thisSetPoint = activeSetPoint;
+        // if no last set point, choose based on the button pressed
+        if (lastSetPoint === null) {
+            if (diff > 0) {
+                setLastSetPoint(SetPointType.heat);
+                setActiveSetPoint(SetPointType.heat);
+                thisSetPoint = SetPointType.heat;
+            } else {
+                setLastSetPoint(SetPointType.cool);
+                setActiveSetPoint(SetPointType.cool);
+                thisSetPoint = SetPointType.cool;
+            }
+        } else if (activeSetPoint === null) {
+            setActiveSetPoint(lastSetPoint);
+        }
+        // change corresponding setpoint
+        let newTemp: number | null = null;
+        if (thisSetPoint === SetPointType.cool) {
             if (dispCoolPoint === null) {
                 newTemp = null;
             } else {
                 newTemp = dispCoolPoint + diff;
             }
-        } else {
+        } else if (thisSetPoint === SetPointType.heat) {
             if (dispHeatPoint === null) {
                 newTemp = null;
             } else {
                 newTemp = dispHeatPoint + diff;
             }
         }
-        changeTemp(newTemp, setPointType);
+        changeTemp(newTemp, thisSetPoint);
+    }
+
+    function changeActiveSetpoint(setPointType: SetPointType | null): void {
+        if (setPointType !== null) {
+            setLastSetPoint(setPointType);
+        }
+        setActiveSetPoint(setPointType);
     }
 
     function getThumbAngle(thumbTemp: number | null): number | null {
@@ -108,9 +145,6 @@ function Dial() {
             startRange = heatPointThumbAngle;
             endRange = coolPointThumbAngle;
         }
-        console.log("setpoints", dispCoolPoint, dispHeatPoint);
-        console.log("angles", coolPointThumbAngle, heatPointThumbAngle);
-        console.log("range", startRange, endRange);
         return [startRange, endRange];
     }
 
@@ -145,27 +179,37 @@ function Dial() {
                 <>
                     <section id="dial"
                         className={tempData.hvacStatus === HvacStatus.cooling ? "hvac-status-cooling" :
-                            (tempData.hvacStatus === HvacStatus.heating ? "hvac-status-heating" : "")}>
+                        (tempData.hvacStatus === HvacStatus.heating ? "hvac-status-heating" : "")}>
+                        {/* DIAL TRACK */}
                         <div className="dial-track"
                             style={{"--used-dial-ratio": usedDialRatio + "turn",
-                                    "--start-thumb": activeTrackRange[0] + "turn",
-                                    "--end-thumb": activeTrackRange[1] + "turn"} as React.CSSProperties}>
+                            "--start-thumb": activeTrackRange[0] + "turn",
+                            "--end-thumb": activeTrackRange[1] + "turn"} as React.CSSProperties}>
                         </div>
-                        <div id="ambient-thumb-container"
-                            className={"dial-thumb-container" + (dispAmbientTemp === null ? " dial-thumb-hidden" : "")}
+                        <div className="track-cover" aria-hidden="true"></div>
+                        <div className="track-cap" aria-hidden="true" style={{"--cap-angle": -usedDialRatio/2 + "turn", "--cap-bg": (tempData.tempMode === TempMode.cool ? "var(--cap-bg-in-range)" : "var(--cap-bg-out-range)")} as React.CSSProperties}></div>
+                        <div className="track-cap" aria-hidden="true" style={{"--cap-angle": usedDialRatio/2 + "turn", "--cap-bg": (tempData.tempMode === TempMode.heat ? "var(--cap-bg-in-range)" : "var(--cap-bg-out-range)")} as React.CSSProperties}></div>
+                        {/* DIAL THUMBS */}
+                        <div id="ambient-thumb" className="dial-thumb"
                             style={{"--thumb-angle": ambientThumbAngle + "turn"} as React.CSSProperties}>
-                            <div className="dial-thumb"></div>
                         </div>
-                        <div id="heatpoint-thumb-container"
-                            className={"dial-thumb-container" + (dispHeatPoint === null ? " dial-thumb-hidden" : "")}
-                            style={{"--thumb-angle": heatPointThumbAngle + "turn"} as React.CSSProperties}>
-                            <div className="dial-thumb"></div>
-                        </div>
-                        <div id="coolpoint-thumb-container"
-                            className={"dial-thumb-container" + (dispCoolPoint === null ? " dial-thumb-hidden" : "")}
-                            style={{"--thumb-angle": coolPointThumbAngle + "turn"} as React.CSSProperties}>
-                            <div className="dial-thumb"></div>
-                        </div>
+                        {tempData.tempMode === TempMode.heat || tempData.tempMode === TempMode.heatcool ?
+                            <div id="heatpoint-thumb" className={"dial-thumb dial-thumb-clickable" +
+                                (activeSetPoint === SetPointType.heat ? " dial-thumb-active": "")}
+                                style={{"--thumb-angle": heatPointThumbAngle + "turn"} as React.CSSProperties}>
+                            </div>
+                            :
+                            <></>
+                        }
+                        {tempData.tempMode === TempMode.cool || tempData.tempMode === TempMode.heatcool ?
+                            <div id="coolpoint-thumb" className={"dial-thumb dial-thumb-clickable" +
+                                (activeSetPoint === SetPointType.cool ? " dial-thumb-active": "")}
+                                style={{"--thumb-angle": coolPointThumbAngle + "turn"} as React.CSSProperties}>
+                            </div>
+                            :
+                            <></>
+                        }
+                        {/* CENTER NUMBERS */}
                         <div id="main-numbers">
                             <div id="main-numbers-ambient" className="main-number-group">
                                 <h2>Indoor</h2>
@@ -175,34 +219,40 @@ function Dial() {
                                 <></>
                                 :
                                 <div id="main-numbers-setpoints">
-                                    {(tempData.tempMode === TempMode.heat || tempData.tempMode === TempMode.heatcool) ?
-                                        <div id="main-numbers-heatpoint" className="main-number-group">
+                                    {tempData.tempMode === TempMode.heat || tempData.tempMode === TempMode.heatcool ?
+                                        <button id="main-numbers-heatpoint" className={"main-number-group" + (activeSetPoint === SetPointType.heat ? " setpoint-active" : "")} onClick={() => changeActiveSetpoint(SetPointType.heat)}>
                                             <h2>Heat</h2>
                                             <h3>{(typeof dispHeatPoint === "number") && !isNaN(dispHeatPoint) ? dispHeatPoint : ""}</h3>
-                                        </div>
+                                        </button>
                                         :
                                         <></>
                                     }
-                                    {(tempData.tempMode === TempMode.cool || tempData.tempMode === TempMode.heatcool) ?
-                                        <div id="main-numbers-coolpoint" className="main-number-group">
+                                    {tempData.tempMode === TempMode.cool || tempData.tempMode === TempMode.heatcool ?
+                                        <button id="main-numbers-coolpoint" className={"main-number-group" + (activeSetPoint === SetPointType.cool ? " setpoint-active" : "")} onClick={() => changeActiveSetpoint(SetPointType.cool)}>
                                             <h2>Cool</h2>
                                             <h3>{(typeof dispCoolPoint === "number") && !isNaN(dispCoolPoint) ? dispCoolPoint : ""}</h3>
-                                        </div>
+                                        </button>
                                         :
                                         <></>
                                     }
                                 </div>
                             }
                         </div>
-                        <div className="dial-buttons">
-                            <button className="material-symbols-outlined" onClick={() => bumpSetPoint(-decimalPrecision[tempData.tempUnits], SetPointType.cool)}>
-                                remove
-                            </button>
-                            <button className="material-symbols-outlined" onClick={() => bumpSetPoint(decimalPrecision[tempData.tempUnits], SetPointType.cool)}>
-                                add
-                            </button>
-                        </div>
-                        {/* <span className="material-symbols-outlined">mode_dual</span> */}
+                        {/* PLUS/MINUS BUTTONS */}
+                        {tempData.ecoMode === EcoMode.on ?
+                            <div className="material-symbols-outlined bottom-icon">nest_eco_leaf</div>
+                            :
+                            <div className="dial-buttons">
+                                <button className="material-symbols-outlined"
+                                    onClick={() => bumpSetPoint(-decimalPrecision[tempData.tempUnits])}>
+                                    remove
+                                </button>
+                                <button className="material-symbols-outlined"
+                                    onClick={() => bumpSetPoint(decimalPrecision[tempData.tempUnits])}>
+                                    add
+                                </button>
+                            </div>
+                        }
                     </section>
                     <section id="info">
                         <div>HVAC Status: {tempData.hvacStatus}</div>
@@ -213,7 +263,12 @@ function Dial() {
                 </>
                 :
                 <section id="dial">
-                    <div className="dial-track" style={{"--used-dial-ratio": usedDialRatio + "turn"} as React.CSSProperties}></div>
+                    <div className="dial-track"
+                        style={{"--used-dial-ratio": usedDialRatio + "turn",
+                        "--start-thumb": activeTrackRange[0] + "turn",
+                        "--end-thumb": activeTrackRange[1] + "turn"} as React.CSSProperties}>
+                        <div className="track-cover" aria-hidden="true"></div>
+                    </div>
                     <h2 id="offline-message">OFFLINE</h2>
                 </section>
             }
