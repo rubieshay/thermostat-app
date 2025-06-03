@@ -39,7 +39,9 @@ RUN addgroup -g 1001 -S nodejs && \
 # Change ownership of nginx directories
 RUN chown -R nodejs:nodejs /var/cache/nginx && \
     chown -R nodejs:nodejs /var/log/nginx && \
-    chown -R nodejs:nodejs /etc/nginx/conf.d
+    chown -R nodejs:nodejs /etc/nginx/conf.d \
+    touch /var/run/nginx.pid && \
+    chown -R nodejs:nodejs /var/run/nginx.pid
 
 # Make port 8080 available (non-privileged port)
 # Port change is handled in nginx.conf
