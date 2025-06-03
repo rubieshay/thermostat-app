@@ -18,5 +18,5 @@ FROM node:bullseye-slim AS production
 WORKDIR /usr/app
 COPY --from=prod-deps /usr/app/node_modules ./node_modules
 COPY --from=builder /usr/app/build ./build
-CMD node build/index.js
+CMD ["node","build/index.js"]
 EXPOSE 3000
