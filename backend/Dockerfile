@@ -8,7 +8,7 @@ RUN ls -laRt /usr/app/backend
 
 FROM node:bullseye-slim
 WORKDIR /usr/app
-COPY --from=builder /usr/app/backend/dist ./dist
+COPY --from=builder /usr/app/backend/build ./build
 RUN NODE_ENV=production npm install --omit=dev
-CMD node dist/index.js
+CMD node build/index.js
 EXPOSE 3000
