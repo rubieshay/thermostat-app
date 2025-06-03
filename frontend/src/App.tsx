@@ -5,7 +5,6 @@ function App() {
     return (
         <TempDataProvider>
             <main>
-                <h1>My Thermostat</h1>
                 <Dial/>
             </main>
         </TempDataProvider>

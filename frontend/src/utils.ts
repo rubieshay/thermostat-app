@@ -1,15 +1,11 @@
-export enum TempUnits {celsius=0, fahrenheit=1};
-export enum TempMode {heat="HEAT", cool="COOL", heatcool="HEATCOOL", off="OFF"};
-export enum HvacStatus {heating="HEATING", cooling="COOLING", off="OFF"};
-export enum EcoMode {on="MANUAL_ECO", off="OFF"};
-export enum Connectivity {online="ONLINE", offline="OFFLINE"};
+import { TempUnits } from "./types";
 
-export const debounceTime: number = 3000
+export const debounceTime: number = 3000;
  
 export const minDialTemps: number[] = [9, 50];
 export const maxDialTemps: number[] = [32, 90];
 export const decimalPrecision: number[] = [0.5, 1.0];
-export const usedDialRatio: number = 0.85;
+export const usedDialRatio: number = 5/6;
 
 export function convertTemp(tempVal: number | null, inputUnits: TempUnits, outputUnits: TempUnits): number | null {
     if (tempVal === null){

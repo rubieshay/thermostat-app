@@ -45,11 +45,37 @@
     border-radius: 0;
 }
 
-:root {
-    --dial-size: min(70vh - 8rem, 70vw - 4rem);
+/* TEMPORARY STUFF */
+section#info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
 
-    background: #1b1b1b;
-    color: #c4c4c4;
+:root {
+    /* --dial-size: min(70vh - 7.5rem, 70vw - 4rem); */
+    --dial-size: min(32rem);
+    --color-gray-1: #c4b8b4;
+    --color-gray-2: #736c6a;
+    --color-gray-3: #4c4846;
+    --color-gray-4: #3e3a39;
+    --color-gray-5: #1b1919;
+    --color-heat-1: #e5ab81;
+    --color-heat-2: #bd7957;
+    --color-heat-3: #a15a40;
+    --color-heat-4: #69342b;
+    --color-heat-5: #542822;
+    --color-cool-1: #71acc7;
+    --color-cool-2: #537296;
+    --color-cool-3: #3e5978;
+    --color-cool-4: #283557;
+    --color-cool-5: #1c263f;
+
+    --main-bg: var(--color-gray-5);
+    --main-text: var(--color-gray-1);
+
+    background: var(--main-bg);
+    color: var(--main-text);
     font-family: "Outfit", system-ui, sans-serif;
     font-variation-settings: "wght" 300;
 }
@@ -69,29 +95,52 @@ main {
     gap: 2rem;
     margin: 2rem;
 }
-
-h1 {
-    font-size: 2rem;
+h1, h2, h3, h4, h5, h6 {
+    display: block;
 }
 
-#ambient-temp {
+h1 {
+    font-size: 1.5rem;
+}
+
+h2#offline-message {
+    font-size: calc(0.1*var(--dial-size));
+}
+
+#main-numbers {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: calc(0.05*var(--dial-size));
+}
+.main-numbers-group {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
+    gap: calc(0.05*var(--dial-size));
 }
-#ambient-temp span {
-    font-size: 5rem;
+#main-numbers-setpoints {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(0.05*var(--dial-size));
+}
+#main-numbers h2 {
+    font-size: calc(0.05*var(--dial-size));
+    font-variation-settings: "wght" 100;
     text-align: center;
 }
-#ambient-temp :first-child {
-    color: #e4855c;
+#main-numbers h3 {
+    font-size: calc(0.15*var(--dial-size));
+    text-align: center;
 }
-#ambient-temp :last-child {
-    color: #6ea8d8;
+#main-numbers #main-numbers-ambient h3 {
+    font-size: calc(0.2*var(--dial-size));
 }
 
-section#dial {
+#dial {
+    --dial-bg: var(--color-gray-4);
     display: grid;
     place-items: center;
     grid-template-rows: 1fr;
@@ -99,46 +148,83 @@ section#dial {
     width: var(--dial-size);
     height: var(--dial-size);
     border-radius: 50%;
-    background: #3e3e3e;
+    background: var(--dial-bg);
     position: relative;
 }
-section#dial > * {
+#dial.hvac-status-cooling  {
+    --dial-bg: var(--color-cool-5);
+}
+#dial.hvac-status-heating  {
+    --dial-bg: var(--color-heat-5);
+}
+#dial > * {
     position: absolute;
     grid-row: 1;
     grid-column: 1;
+    z-index: 10;
 }
 
-.dial-track {
-    --start-dial: calc(-1*var(--used-dial-ratio)/2);
-    width: calc(0.9*var(--dial-size));
-    height: calc(0.9*var(--dial-size));
-    border-radius: 50%;
-    margin: calc(0.05*var(--dial-size));
-    background: conic-gradient(from var(--start-dial), #565656 var(--used-dial-ratio), transparent var(--used-dial-ratio));
+@property --start-range {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0turn;
 }
-.dial-track::after {
+@property --end-range {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0turn;
+}
+@property --thumb-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0turn;
+}
+#dial .dial-track {
+    --start-dial: calc(-1*var(--used-dial-ratio)/2);
+    --start-range: calc(var(--start-thumb) - var(--start-dial));
+    --end-range: calc(var(--end-thumb) - var(--start-dial));
+    --track-bg: var(--color-gray-3);
+    --track-range-bg: var(--color-gray-2);
+    width: calc(0.84*var(--dial-size));
+    height: calc(0.84*var(--dial-size));
+    border-radius: 50%;
+    margin: calc(0.08*var(--dial-size));
+    background: conic-gradient(from var(--start-dial), transparent var(--start-range), var(--track-range-bg) var(--start-range), var(--track-range-bg) var(--end-range), transparent var(--end-range)),
+                conic-gradient(from var(--start-dial), var(--track-bg) var(--used-dial-ratio), transparent var(--used-dial-ratio));
+    transition: --start-range 400ms ease-in-out, --end-range 400ms ease-in-out;
+    z-index: 1;
+}
+#dial.hvac-status-cooling .dial-track {
+    --track-bg: var(--color-cool-4);
+    --track-range-bg: var(--color-cool-3);
+}
+#dial.hvac-status-heating .dial-track {
+    --track-bg: var(--color-heat-4);
+    --track-range-bg: var(--color-heat-3);
+}
+#dial::after {
     content: "";
     display: block;
-    background: #3e3e3e;
-    width: calc(0.8*var(--dial-size));
-    height: calc(0.8*var(--dial-size));
-    margin: calc(0.05*var(--dial-size));
+    background: var(--dial-bg);
+    width: calc(0.78*var(--dial-size));
+    height: calc(0.78*var(--dial-size));
+    margin: calc(0.03*var(--dial-size));
     border-radius: 50%;
+    z-index: 5;
 }
 
 .dial-thumb-container {
     width: calc(0.03*var(--dial-size));
-    height: calc(0.85*var(--dial-size));
+    height: calc(0.81*var(--dial-size));
     position: relative;
-    rotate: var(--turn-angle);
-    transition: rotate 400ms ease-in-out;
+    rotate: var(--thumb-angle);
+    transition: --thumb-angle 400ms ease-in-out;
 }
 .dial-thumb {
     width: calc(0.03*var(--dial-size));
     height: calc(0.03*var(--dial-size));
     border-radius: 50%;
     background: #c4c4c4;
-    z-index: 100;
     position: absolute;
     top: 0;
     transform: translateY(-50%);
@@ -148,28 +234,34 @@ section#dial > * {
     display: none;
 }
 #coolpoint-thumb-container .dial-thumb {
-    background: #6ea8d8;
+    background: var(--color-cool-1);
 }
 #heatpoint-thumb-container .dial-thumb {
-    background: #e4855c;
+    background: var(--color-heat-1);
 }
 
 .dial-buttons {
     display: flex;
-    gap: 2rem;
+    gap: calc(0.02*var(--dial-size));
     margin-inline: auto;
     position: relative;
-    bottom: calc(0.05*var(--dial-size));
+    bottom: calc(0.06*var(--dial-size));
 }
 .dial-buttons button {
     text-align: center;
-    font-size: 2rem;
-    width: 3rem;
-    height: 3rem;
-    border-radius: 0.5rem;
-    padding: 0.5rem;
+    font-size: calc(0.06*var(--dial-size));
+    width: calc(0.12*var(--dial-size));
+    height: calc(0.12*var(--dial-size));
+    border-radius: calc(0.03*var(--dial-size));
     cursor: pointer;
 }
 .dial-buttons button:focus-visible, .dial-buttons button:hover {
-    background: #565656;
+    --button-bg: var(--color-gray-3);
+    background: var(--button-bg);
+}
+#dial.hvac-status-cooling .dial-buttons button:focus-visible, #dial.hvac-status-cooling .dial-buttons button:hover {
+    --button-bg: var(--color-cool-3);
+}
+#dial.hvac-status-heating .dial-buttons button:focus-visible, #dial.hvac-status-heating .dial-buttons button:hover {
+    --button-bg: var(--color-heat-3);
 }

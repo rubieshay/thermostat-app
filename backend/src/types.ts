@@ -22,20 +22,38 @@ export type TempData = {
     ambientHumidity: number | null
 }
 
+// ACTUAL DEFAULT INIT DATA
+// export const initTempData: TempData = {
+//     tempUnits: TempUnits.celsius,
+//     ambientTempCelsius: null,
+//     heatCelsius: null,
+//     coolCelsius: null,
+//     tempMode: TempMode.off,
+//     hvacStatus: HvacStatus.off,
+//     ecoMode: EcoMode.off,
+//     ecoHeatCelsius: null,
+//     ecoCoolCelsius: null,
+//     fanTimer: null,
+//     connectivity: Connectivity.offline,
+//     deviceName: null,
+//     ambientHumidity: null
+// }
+
+// TESTING DATA
 export const initTempData: TempData = {
-    tempUnits: TempUnits.celsius,
-    ambientTempCelsius: null,
-    heatCelsius: null,
+    tempUnits: TempUnits.fahrenheit,
+    ambientTempCelsius: 19.126007,
+    heatCelsius: 17,
     coolCelsius: null,
-    tempMode: TempMode.off,
-    hvacStatus: HvacStatus.off,
+    tempMode: TempMode.heat,
+    hvacStatus: HvacStatus.heating,
     ecoMode: EcoMode.off,
-    ecoHeatCelsius: null,
-    ecoCoolCelsius: null,
+    ecoHeatCelsius: 27.777779,
+    ecoCoolCelsius: 13.333333,
     fanTimer: null,
-    connectivity: Connectivity.offline,
-    deviceName: null,
-    ambientHumidity: null
+    connectivity: Connectivity.online,
+    deviceName: "Dining Room Thermostat",
+    ambientHumidity: 50
 }
 
 export type WeatherData = {

@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import { FromSchema } from 'json-schema-to-ts';
+import { FromSchema } from "json-schema-to-ts";
 import { initTempData, TempData, FetchReturn, WeatherData, initWeatherData } from "./types";
 import "dotenv/config";
 import { getAccessToken,getDeviceInfo } from "./googlesdm";
@@ -66,8 +66,8 @@ const latLongQuerySchema = {
 
 type latLongQueryString = FromSchema<typeof latLongQuerySchema>;
 
-fastify.get<{ Querystring: latLongQueryString }> ("/setlatlong",{ schema: { querystring: latLongQuerySchema } },async (request, reply) => {
-    const {lat,long} = request.query;
+fastify.get<{ Querystring: latLongQueryString }> ("/setlatlong",{ schema: { querystring: latLongQuerySchema } }, async (request, reply) => {
+    const {lat, long} = request.query;
     weatherData = initWeatherData;
     weatherData.latitude = lat;
     weatherData.longitude = long;
@@ -78,9 +78,9 @@ const start = async () => {
     try {
         await fastify.listen({ port: httpPort, host: "0.0.0.0" })
     } catch (err) {
-        fastify.log.error(err)
-        process.exit(1)
+        fastify.log.error(err);
+        process.exit(1);
     }
 }
 
-start()
+start();
