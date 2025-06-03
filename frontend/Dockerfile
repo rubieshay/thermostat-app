@@ -15,7 +15,7 @@ RUN npm ci --silent
 # Copy source code
 COPY frontend/. .
 COPY backend/src/types.ts ./src/types.ts
-COPY backend/src/schema.ts ./src/schema.ts
+COPY backend/src/schemas.ts ./src/schemas.ts
 
 # Build the application
 RUN npm run build
