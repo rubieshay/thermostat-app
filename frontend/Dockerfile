@@ -32,25 +32,11 @@ COPY --from=builder /usr/app/frontend/dist /usr/share/nginx/html
 # Copy custom nginx configuration
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Create non-root user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001 -G nodejs
-
-# Change ownership of nginx directories
-RUN chown -R nodejs:nodejs /var/cache/nginx && \
-    chown -R nodejs:nodejs /var/log/nginx && \
-    chown -R nodejs:nodejs /etc/nginx/conf.d \
-    touch /var/run/nginx.pid && \
-    chown -R nodejs:nodejs /var/run/nginx.pid
-
 # Make port 8080 available (non-privileged port)
 # Port change is handled in nginx.conf
 
 # Expose port
 EXPOSE 8080
-
-# Switch to non-root user
-USER nodejs
 
 # Use dumb-init and start nginx
 ENTRYPOINT ["dumb-init", "--"]
