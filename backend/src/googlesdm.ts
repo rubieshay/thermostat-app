@@ -1,6 +1,6 @@
 import { googleClientSecret, googleRefreshToken, googleClientId, googleProjectId, googleDeviceID } from "./index";
 import { Connectivity, FetchReturn, FanMode, TempMode, HvacStatus, EcoMode, TempUnitsName, TempUnits } from "./types"; 
-import { commands } from "./schemas"
+import { commands } from "./utils"
 
 import {tempData} from "./index";
 
