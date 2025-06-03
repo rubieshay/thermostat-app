@@ -4,7 +4,7 @@ import { initTempData, TempData, FetchReturn, WeatherData, initWeatherData } fro
 import { latLongQuerySchema, latLongQueryString, setHeatSchema, SetHeatBody, setCoolSchema, 
     SetCoolBody, setRangeSchema, SetRangeBody, setTempModeSchema, SetTempModeBody, setEcoModeSchema, SetEcoModeBody } from "./schemas";
 import "dotenv/config";
-import { getAccessToken, getDeviceInfo, setHeat, setCool, setRange, setMode, setEcoMode} from "./googlesdm";
+import { getDeviceInfo, setHeat, setCool, setRange, setMode, setEcoMode} from "./googlesdm";
 import { getCurrentObservation } from "./weather";
 
 export const googleClientId  = process.env.CLIENT_ID || "";
