@@ -28,7 +28,7 @@ RUN apk add --no-cache dumb-init
 COPY --from=builder /usr/app/frontend/dist /usr/share/nginx/html
 
 # Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
