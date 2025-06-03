@@ -1,5 +1,6 @@
 import { googleClientSecret, googleRefreshToken, googleClientId, googleProjectId, googleDeviceID } from "./index";
 import { Connectivity, FetchReturn, FanMode, TempMode, HvacStatus, EcoMode, TempUnitsName, TempUnits } from "./types"; 
+import { commands } from "./schemas"
 
 import {tempData} from "./index";
 
@@ -54,9 +55,9 @@ export async function getAccessToken() : Promise<FetchReturn> {
     } catch (error) {
         // Handle network errors or errors thrown by the if statement above
         if (error instanceof Error) {
-            fetchReturn.error = "Fetch error: " + error.message;
+            fetchReturn.error = "Fetch error while getting access token: " + error.message;
         } else {
-            fetchReturn.error = "Unknown fetch error";
+            fetchReturn.error = "Unknown fetch error while getting access token";
         }
     }
     return fetchReturn;
@@ -157,10 +158,193 @@ export async function getDeviceInfo() : Promise<FetchReturn> {
         fetchReturn.data = data;
     } catch (error) {
         if (error instanceof Error) {
-            fetchReturn.error = "Fetch error: " + error.message;
+            fetchReturn.error = "Fetch error while getting device info: " + error.message;
         } else {
-            fetchReturn.error = "Unknown fetch error";
+            fetchReturn.error = "Unknown fetch error while getting device info";
         }
     }
     return fetchReturn;
 }
+
+export async function setHeat(heatCelsius: number): Promise<FetchReturn> {
+    let accessFetchReturn = await checkAndRenewAccessToken();
+    if (!accessFetchReturn.success) {return accessFetchReturn;};
+    const urlString = encodeURI("https://smartdevicemanagement.googleapis.com/v1/enterprises/"+encodeURIComponent(googleProjectId)+"/devices/"+encodeURIComponent(googleDeviceID)+":executeCommand");
+    const fetchReturn: FetchReturn = {success: false}
+    try {
+        const request = new Request(urlString);
+        request.headers.set("Authorization", "Bearer " + accessToken);
+        request.headers.set('Content-Type', 'application/json');
+        let reqBody = {
+            command: commands.setHeat,
+            params: {
+                heatCelsius: heatCelsius
+            }
+        }
+        const response = await fetch(request,{
+            body: JSON.stringify(reqBody),
+            method: "POST",
+        });
+        if (!response.ok) {
+            fetchReturn.httpCode = response.status;
+            fetchReturn.error = "Error setting heat: " + response.statusText;
+            return fetchReturn;
+        }
+        fetchReturn.success = true;
+    } catch (error) {
+        // Handle network errors or errors thrown by the if statement above
+        if (error instanceof Error) {
+            fetchReturn.error = "Fetch error while setting heat: " + error.message;
+        } else {
+            fetchReturn.error = "Unknown fetch error while setting heat";
+        }
+    }
+    return fetchReturn;
+}
+
+export async function setCool(coolCelsius: number): Promise<FetchReturn> {
+    let accessFetchReturn = await checkAndRenewAccessToken();
+    if (!accessFetchReturn.success) {return accessFetchReturn;};
+    const urlString = encodeURI("https://smartdevicemanagement.googleapis.com/v1/enterprises/"+encodeURIComponent(googleProjectId)+"/devices/"+encodeURIComponent(googleDeviceID)+":executeCommand");
+    const fetchReturn: FetchReturn = {success: false}
+    try {
+        const request = new Request(urlString);
+        request.headers.set("Authorization", "Bearer " + accessToken);
+        request.headers.set('Content-Type', 'application/json');
+        let reqBody = {
+            command: commands.setCool,
+            params: {
+                coolCelsius: coolCelsius
+            }
+        }
+        const response = await fetch(request,{
+            body: JSON.stringify(reqBody),
+            method: "POST",
+        });
+        if (!response.ok) {
+            fetchReturn.httpCode = response.status;
+            fetchReturn.error = "Error setting cool: " + response.statusText;
+            return fetchReturn;
+        }
+        fetchReturn.success = true;
+    } catch (error) {
+        // Handle network errors or errors thrown by the if statement above
+        if (error instanceof Error) {
+            fetchReturn.error = "Fetch error while setting cool: " + error.message;
+        } else {
+            fetchReturn.error = "Unknown fetch error while setting cool";
+        }
+    }
+    return fetchReturn;
+}
+
+export async function setRange(heatCelsius: number, coolCelsius: number): Promise<FetchReturn> {
+    let accessFetchReturn = await checkAndRenewAccessToken();
+    if (!accessFetchReturn.success) {return accessFetchReturn;};
+    const urlString = encodeURI("https://smartdevicemanagement.googleapis.com/v1/enterprises/"+encodeURIComponent(googleProjectId)+"/devices/"+encodeURIComponent(googleDeviceID)+":executeCommand");
+    const fetchReturn: FetchReturn = {success: false}
+    try {
+        const request = new Request(urlString);
+        request.headers.set("Authorization", "Bearer " + accessToken);
+        request.headers.set('Content-Type', 'application/json');
+        let reqBody = {
+            command: commands.setRange,
+            params: {
+                heatCelsius: heatCelsius,
+                coolCelsius: coolCelsius
+            }
+        }
+        const response = await fetch(request,{
+            body: JSON.stringify(reqBody),
+            method: "POST",
+        });
+        if (!response.ok) {
+            fetchReturn.httpCode = response.status;
+            fetchReturn.error = "Error setting range: " + response.statusText;
+            return fetchReturn;
+        }
+        fetchReturn.success = true;
+    } catch (error) {
+        // Handle network errors or errors thrown by the if statement above
+        if (error instanceof Error) {
+            fetchReturn.error = "Fetch error while setting range: " + error.message;
+        } else {
+            fetchReturn.error = "Unknown fetch error while setting range";
+        }
+    }
+    return fetchReturn;
+}
+
+export async function setMode(mode: TempMode): Promise<FetchReturn> {
+    let accessFetchReturn = await checkAndRenewAccessToken();
+    if (!accessFetchReturn.success) {return accessFetchReturn;};
+    const urlString = encodeURI("https://smartdevicemanagement.googleapis.com/v1/enterprises/"+encodeURIComponent(googleProjectId)+"/devices/"+encodeURIComponent(googleDeviceID)+":executeCommand");
+    const fetchReturn: FetchReturn = {success: false}
+    try {
+        const request = new Request(urlString);
+        request.headers.set("Authorization", "Bearer " + accessToken);
+        request.headers.set('Content-Type', 'application/json');
+        let reqBody = {
+            command: commands.setMode,
+            params: {
+                mode: mode
+            }
+        }
+        const response = await fetch(request,{
+            body: JSON.stringify(reqBody),
+            method: "POST",
+        });
+        if (!response.ok) {
+            fetchReturn.httpCode = response.status;
+            fetchReturn.error = "Error setting mode: " + response.statusText;
+            return fetchReturn;
+        }
+        fetchReturn.success = true;
+    } catch (error) {
+        // Handle network errors or errors thrown by the if statement above
+        if (error instanceof Error) {
+            fetchReturn.error = "Fetch error while setting mode: " + error.message;
+        } else {
+            fetchReturn.error = "Unknown fetch error while setting mode";
+        }
+    }
+    return fetchReturn;
+}
+
+export async function setEcoMode(mode: EcoMode): Promise<FetchReturn> {
+    let accessFetchReturn = await checkAndRenewAccessToken();
+    if (!accessFetchReturn.success) {return accessFetchReturn;};
+    const urlString = encodeURI("https://smartdevicemanagement.googleapis.com/v1/enterprises/"+encodeURIComponent(googleProjectId)+"/devices/"+encodeURIComponent(googleDeviceID)+":executeCommand");
+    const fetchReturn: FetchReturn = {success: false}
+    try {
+        const request = new Request(urlString);
+        request.headers.set("Authorization", "Bearer " + accessToken);
+        request.headers.set('Content-Type', 'application/json');
+        let reqBody = {
+            command: commands.setEcoMode,
+            params: {
+                mode: mode
+            }
+        }
+        const response = await fetch(request,{
+            body: JSON.stringify(reqBody),
+            method: "POST",
+        });
+        if (!response.ok) {
+            fetchReturn.httpCode = response.status;
+            fetchReturn.error = "Error setting eco mode: " + response.statusText;
+            return fetchReturn;
+        }
+        fetchReturn.success = true;
+    } catch (error) {
+        // Handle network errors or errors thrown by the if statement above
+        if (error instanceof Error) {
+            fetchReturn.error = "Fetch error while setting eco mode: " + error.message;
+        } else {
+            fetchReturn.error = "Unknown fetch error while setting eco mode";
+        }
+    }
+    return fetchReturn;
+}
+
+

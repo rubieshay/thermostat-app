@@ -118,6 +118,7 @@ export async function getCurrentObservation(): Promise<FetchReturn> {
         weatherData.currentTextDescription = data.properties.textDescription;
         weatherData.currentTemperature = data.properties.temperature.value;
         weatherData.currentRelativeHumidity = data.properties.relativeHumidity.value;
+        weatherData.currentWeatherIconURL = data.properties.icon;
         console.log("New weather data retrieved:" + JSON.stringify(weatherData));
     } catch (error) {
         // Handle network errors or errors thrown by the if statement above
