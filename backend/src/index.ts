@@ -1,10 +1,10 @@
 import Fastify from "fastify";
-import { FromSchema } from "json-schema-to-ts";
+import fastifyWebSockets from "@fastify/websocket";
 import { initTempData, TempData, FetchReturn, WeatherData, initWeatherData } from "./types";
 import { latLongQuerySchema, latLongQueryString, setHeatSchema, SetHeatBody, setCoolSchema, 
     SetCoolBody, setRangeSchema, SetRangeBody, setModeSchema, SetModeBody, setEcoModeSchema, SetEcoModeBody } from "./schemas";
 import "dotenv/config";
-import { getAccessToken,getDeviceInfo,setHeat,setCool,setRange, setMode, setEcoMode} from "./googlesdm";
+import { getDeviceInfo,setHeat,setCool,setRange, setMode, setEcoMode} from "./googlesdm";
 import { getCurrentObservation } from "./weather";
 
 export const googleClientId  = process.env.CLIENT_ID || "";
@@ -21,6 +21,30 @@ export let weatherData: WeatherData = structuredClone(initWeatherData);
 const fastify = Fastify({
     logger: false
 })
+
+fastify.register(fastifyWebSockets);
+
+fastify.register( async function (fastify) {
+    fastify.get("/ws", { websocket: true,},
+        (socket, req) => {
+            // TODO : initial connect action -- start regular thermostat polling
+            console.log("Initial WS Connect");
+            let timer = setInterval(() => {
+            socket.send("TEST");
+        }, 1000);
+            socket.on("message", (msg: string) => {
+                socket.send(`Hello from Fastify. Your message is ${msg}`);
+                //TODO -- is there even a need for receiving messages from client?
+                // Those might normally just go over the regular API calls
+            });
+            socket.on("close", () => {
+                console.log("WS closed by client");
+                clearInterval(timer);
+                //TODO : stop regular thermostat polling
+            })
+        }
+    );
+});
 
 fastify.get("/", async (request, reply) => {
     return { hello: "world" }
