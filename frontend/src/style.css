@@ -45,6 +45,10 @@
     border-radius: 0;
 }
 
+button {
+    cursor: pointer;
+}
+
 /* TEMPORARY STUFF */
 section#info {
     display: flex;
@@ -53,19 +57,22 @@ section#info {
 }
 
 :root {
-    /* --dial-size: min(70vh - 7.5rem, 70vw - 4rem); */
-    --dial-size: min(32rem);
+    --dial-size: min(100vh - 10rem, 92vw, 32rem);
+    /* --dial-size: min(32rem); */
+    --color-gray-0: #f4f3f3;
     --color-gray-1: #c4b8b4;
     --color-gray-2: #736c6a;
     --color-gray-3: #4c4846;
     --color-gray-4: #3e3a39;
     --color-gray-5: #1b1919;
+    --color-cool-0: #eecbb2;
     --color-heat-1: #e5ab81;
     --color-heat-2: #bd7957;
     --color-heat-3: #a15a40;
     --color-heat-4: #69342b;
     --color-heat-5: #542822;
-    --color-cool-1: #71acc7;
+    --color-cool-0: #b4d8e5;
+    --color-cool-1: #71a6c7;
     --color-cool-2: #537296;
     --color-cool-3: #3e5978;
     --color-cool-4: #283557;
@@ -80,65 +87,41 @@ section#info {
     font-variation-settings: "wght" 300;
 }
 
+
+
+/* GENERAL  */
+body * {
+    font-variation-settings: "wght" 300;
+}
 .material-symbols-outlined {
   font-variation-settings: "FILL" 0,
-                           "wght" 400,
+                           "wght" 600,
                            "GRAD" 0,
                            "opsz" 24;
 }
-
 main {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     gap: 2rem;
-    margin: 2rem;
+    margin: 2rem 4vw;
 }
 h1, h2, h3, h4, h5, h6 {
     display: block;
 }
-
 h1 {
     font-size: 1.5rem;
+    text-align: center;
+    line-height: 1.25;
 }
-
 h2#offline-message {
     font-size: calc(0.1*var(--dial-size));
 }
 
-#main-numbers {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: calc(0.05*var(--dial-size));
-}
-.main-numbers-group {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: calc(0.05*var(--dial-size));
-}
-#main-numbers-setpoints {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: calc(0.05*var(--dial-size));
-}
-#main-numbers h2 {
-    font-size: calc(0.05*var(--dial-size));
-    font-variation-settings: "wght" 100;
-    text-align: center;
-}
-#main-numbers h3 {
-    font-size: calc(0.15*var(--dial-size));
-    text-align: center;
-}
-#main-numbers #main-numbers-ambient h3 {
-    font-size: calc(0.2*var(--dial-size));
-}
 
+
+/* MAIN DIAL */
 #dial {
     --dial-bg: var(--color-gray-4);
     display: grid;
@@ -164,6 +147,50 @@ h2#offline-message {
     z-index: 10;
 }
 
+
+
+/* CENTER MAIN NUMBERS */
+#main-numbers {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: calc(0.05*var(--dial-size));
+    position: relative;
+    top: calc(-0.02*var(--dial-size));
+}
+.main-numbers-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(0.05*var(--dial-size));
+}
+#main-numbers-setpoints {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(0.075*var(--dial-size));
+}
+.setpoint-active {
+    background: var(--color-gray-2);
+}
+#main-numbers h2 {
+    font-size: calc(0.05*var(--dial-size));
+    font-variation-settings: "wght" 100;
+    text-align: center;
+}
+#main-numbers h3 {
+    font-size: calc(0.125*var(--dial-size));
+    font-variation-settings: "wght" 300;
+    text-align: center;
+}
+#main-numbers #main-numbers-ambient h3 {
+    font-size: calc(0.2*var(--dial-size));
+}
+
+
+
+/* DIAL TRACK AND RANGES */
 @property --start-range {
   syntax: "<angle>";
   inherits: false;
@@ -189,10 +216,11 @@ h2#offline-message {
     height: calc(0.84*var(--dial-size));
     border-radius: 50%;
     margin: calc(0.08*var(--dial-size));
+    position: relative;
     background: conic-gradient(from var(--start-dial), transparent var(--start-range), var(--track-range-bg) var(--start-range), var(--track-range-bg) var(--end-range), transparent var(--end-range)),
                 conic-gradient(from var(--start-dial), var(--track-bg) var(--used-dial-ratio), transparent var(--used-dial-ratio));
     transition: --start-range 400ms ease-in-out, --end-range 400ms ease-in-out;
-    z-index: 1;
+    z-index: 3;
 }
 #dial.hvac-status-cooling .dial-track {
     --track-bg: var(--color-cool-4);
@@ -202,7 +230,7 @@ h2#offline-message {
     --track-bg: var(--color-heat-4);
     --track-range-bg: var(--color-heat-3);
 }
-#dial::after {
+#dial .track-cover {
     content: "";
     display: block;
     background: var(--dial-bg);
@@ -212,8 +240,40 @@ h2#offline-message {
     border-radius: 50%;
     z-index: 5;
 }
+#dial .track-cap {
+    /* angle arm */
+    --cap-bg-out-range: var(--color-gray-3);
+    --cap-bg-in-range: var(--color-gray-2);
+    width: calc(0.03*var(--dial-size));
+    height: calc(0.81*var(--dial-size));
+    rotate: var(--cap-angle);
+    z-index: 1;
+}
+#dial .track-cap::before {
+    /* displayed cap */
+    content: "";
+    display: block;
+    width: calc(0.03*var(--dial-size));
+    height: calc(0.03*var(--dial-size));
+    border-radius: 50%;
+    background: var(--cap-bg);
+    position: absolute;
+    top: 0;
+    transform: translateY(-50%);
+}
 
-.dial-thumb-container {
+#dial.hvac-status-cooling .track-cap {
+    --cap-bg-out-range: var(--color-cool-3);
+    --cap-bg-in-range: var(--color-cool-2);
+}
+#dial.hvac-status-heating .track-cap {
+    --cap-bg-out-range: var(--color-heat-3);
+    --cap-bg-in-range: var(--color-heat-2);
+}
+
+
+/* DIAL THUMBS */
+/* .dial-thumb-container {
     width: calc(0.03*var(--dial-size));
     height: calc(0.81*var(--dial-size));
     position: relative;
@@ -224,7 +284,7 @@ h2#offline-message {
     width: calc(0.03*var(--dial-size));
     height: calc(0.03*var(--dial-size));
     border-radius: 50%;
-    background: #c4c4c4;
+    background: var(--color-gray-1);
     position: absolute;
     top: 0;
     transform: translateY(-50%);
@@ -238,8 +298,51 @@ h2#offline-message {
 }
 #heatpoint-thumb-container .dial-thumb {
     background: var(--color-heat-1);
+} */
+.dial-thumb {
+    /* thumb arm */
+    width: calc(0.03*var(--dial-size));
+    height: calc(0.81*var(--dial-size));
+    rotate: var(--thumb-angle);
+    transition: --thumb-angle 400ms ease-in-out;
+}
+.dial-thumb::before {
+    /* displayed thumb */
+    content: "";
+    display: block;
+    width: calc(0.03*var(--dial-size));
+    height: calc(0.03*var(--dial-size));
+    border-radius: 50%;
+    background: var(--color-gray-1);
+    position: absolute;
+    top: 0;
+    transform: translateY(-50%);
+}
+.dial-thumb.dial-thumb-clickable::after {
+    /* clickable area? */
+    content: "";
+    display: block;
+    width: calc(0.1*var(--dial-size));
+    height: calc(0.1*var(--dial-size));
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+}
+#coolpoint-thumb.dial-thumb::before {
+    background: var(--color-cool-1);
+}
+#heatpoint-thumb.dial-thumb::before {
+    background: var(--color-heat-1);
 }
 
+
+/* BOTTOM BUTTONS/STATUS */
+.bottom-icon {
+    position: relative;
+    bottom: calc(0.08*var(--dial-size));
+}
 .dial-buttons {
     display: flex;
     gap: calc(0.02*var(--dial-size));

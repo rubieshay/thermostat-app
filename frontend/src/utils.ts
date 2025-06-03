@@ -1,6 +1,13 @@
 import { TempUnits } from "./types";
 
+export const demoMode = (import.meta.env.VITE_DEMO_MODE === "TRUE" ||
+                         import.meta.env.VITE_DEMO_MODE === "1" ||
+                         import.meta.env.VITE_DEMO_MODE === "YES") ? true : false;
+
 export const debounceTime: number = 3000;
+export const responseWaitTime: number = 5000;
+export const setPointFadeDelay: number = 3000;
+export const setPointFadeDuration: number = 1000;
  
 export const minDialTemps: number[] = [9, 50];
 export const maxDialTemps: number[] = [32, 90];
