@@ -4,6 +4,7 @@ COPY backend/package.json backend/package-lock.json ./
 RUN npm install
 COPY backend/. /usr/app/backend
 RUN npm run build
+RUN ls -laRt /usr/app/backend
 
 FROM node:bullseye-slim
 WORKDIR /usr/app
