@@ -26,17 +26,6 @@ fastify.get("/", async (request, reply) => {
     return { hello: "world" }
 })
 
-fastify.get("/renewaccess", async (request, reply) => {
-    let fetchReturn: FetchReturn;
-    fetchReturn = await getAccessToken();
-    if (!fetchReturn.success) {
-        return reply.status(500).send({ error: fetchReturn.error || "Failed to get access token" });
-    } else {
-        console.log("Access Token Renewed:", fetchReturn);
-        return { success: true, message: "Access token renewed successfully" };
-    }
-})
-
 fastify.get("/info", async (request, reply) => {
     let fetchReturn: FetchReturn;
     fetchReturn = await getDeviceInfo();
@@ -44,7 +33,7 @@ fastify.get("/info", async (request, reply) => {
         console.log("Got an error in getDeviceInfo:",fetchReturn.error);
         return reply.status(500).send({ error: fetchReturn.error || "Failed to get device info" });
     }
-    return { tempData }
+    reply.send(tempData)
 })
 
 fastify.get("/weather", async (request, reply) => {

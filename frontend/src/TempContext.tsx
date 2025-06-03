@@ -39,8 +39,8 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         //     }
         //     const data = await response.json();
         //     console.log("Temp data info successfully:", data);
-        //     if (data && data.tempData) {
-        //         setTempData(data.tempData);
+        //     if (data) {
+        //         setTempData(data);
         //     } else {
         //         console.error("Invalid temp data format:", data);
         //     }
