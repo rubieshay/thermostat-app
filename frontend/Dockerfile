@@ -29,6 +29,8 @@ RUN apk add --no-cache dumb-init
 # Copy built application from builder stage
 COPY --from=builder /usr/app/frontend/dist /usr/share/nginx/html
 
+WORKDIR /usr/share/nginx/html
+
 # Copy custom nginx configuration
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
