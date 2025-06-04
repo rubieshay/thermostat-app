@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "bin/updateenv.sh && cp env-config.js ./public/env-config.js",
     "dev": "vite",
     "prebuild": "bin/updateenv.sh && cp env-config.js ./public/env-config.js",
     "build": "tsc -b && vite build",
