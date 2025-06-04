@@ -32,6 +32,13 @@ COPY --from=builder /usr/app/frontend/dist /usr/share/nginx/html
 # Copy custom nginx configuration
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
+COPY frontend/bin/updateenv.sh  . 
+
+COPY frontend/env-template ./.env
+
+RUN chmod +x /usr/share/nginx/html/updateenv.sh
+
+
 # Make port 8080 available (non-privileged port)
 # Port change is handled in nginx.conf
 
@@ -40,4 +47,4 @@ EXPOSE 8080
 
 # Use dumb-init and start nginx
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/usr/bin/ash","-c","/usr/share/nginx/html/updateenv.sh && nginx -g \"daemon off;\""]
