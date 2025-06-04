@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState, useRef } from "react";
 import { TempUnits, TempMode, EcoMode, HvacStatus, Connectivity } from "./types";
-import { roundedTemp, convertTemp, maxDialTemps, minDialTemps, usedDialRatio, decimalPrecision, debounceTime } from "./utils";
+import { roundedTemp, convertTemp, maxDialTemps, minDialTemps, usedDialRatio, decimalPrecision, debounceTime, minRangeGap, makeTempInRange } from "./utils";
 import { TempDataContext } from "./TempContext";
 
 function Dial() {
     enum SetPointType {heat, cool};
 
-    const {tempData, fetchTempData, setHeatCelsius, setCoolCelsius} = useContext(TempDataContext);
+    const {tempData, fetchTempData, setHeatCelsius, setCoolCelsius, setRangeCelsius} = useContext(TempDataContext);
     const [dispCoolPoint, setDispCoolPoint] = useState<number | null>(null);
     const [dispHeatPoint, setDispHeatPoint] = useState<number | null>(null);
     const [activeSetPoint, setActiveSetPoint] = useState<SetPointType | null>(null);
@@ -53,38 +53,95 @@ function Dial() {
         };
     }, []);
 
-    function changeTemp(newTemp: number | null, setPointType: SetPointType | null) {
-        if (newTemp === null || setPointType === null) {
-            return;
-        }
-        let fixedTemp = Math.min(Math.max(minDialTemp, newTemp), maxDialTemp);
-        if (setPointType === SetPointType.cool) {
-            setDispCoolPoint(fixedTemp);
-        } else {
+    function changeSingleTemp(newTemp: number, setPointType: SetPointType) {
+        let fixedTemp = makeTempInRange(newTemp, tempData.tempUnits);
+        if (setPointType === SetPointType.heat && tempData.tempMode === TempMode.heat) {
             setDispHeatPoint(fixedTemp);
+        } else if (setPointType === SetPointType.cool && tempData.tempMode === TempMode.cool) {
+            setDispCoolPoint(fixedTemp);
         }
-        let celsiusFixedTemp: number | null = convertTemp(fixedTemp, tempData.tempUnits, TempUnits.celsius)
+        // fix then round then convert
+        let celsiusFixedTemp: number | null = convertTemp(roundedTemp(fixedTemp, tempData.tempUnits), tempData.tempUnits, TempUnits.celsius);
 
         if (sendDataTimeoutRef.current) {
             clearTimeout(sendDataTimeoutRef.current);
         }
         sendDataTimeoutRef.current = setTimeout(() => {
-            if (setPointType === SetPointType.cool) {
-                setCoolCelsius(celsiusFixedTemp);
-                console.log("call set cool");
-            } else {
+            if (tempData.tempMode === TempMode.heat) {
                 setHeatCelsius(celsiusFixedTemp);
                 console.log("call set heat");
+            } else if (tempData.tempMode === TempMode.cool) {
+                setCoolCelsius(celsiusFixedTemp);
+                console.log("call set cool");
             }
         }, debounceTime);
     }
 
-    function bumpSetPoint(diff: number) {
+    function changeRangeTemps(newTemp: number, setPointType: SetPointType) {
+        if (dispHeatPoint === null || dispCoolPoint === null) {
+            return;
+        }
+        // get both temps fixed(range) and rounded but not converted
+        let heatPoint;
+        let coolPoint;
+        if (setPointType === SetPointType.heat) {
+            heatPoint = newTemp;
+            coolPoint = dispCoolPoint
+        } else {
+            heatPoint = dispHeatPoint;
+            coolPoint = newTemp;
+        }
+        heatPoint = roundedTemp(makeTempInRange(heatPoint, tempData.tempUnits), tempData.tempUnits);
+        coolPoint = roundedTemp(makeTempInRange(coolPoint, tempData.tempUnits), tempData.tempUnits);
+        let newHeatPoint = heatPoint;
+        let newCoolPoint = coolPoint;
+        // ensure a large enough gap
+        if (coolPoint! - heatPoint! < minRangeGap[tempData.tempUnits]) {
+            if (setPointType === SetPointType.heat) {
+                newCoolPoint = (heatPoint! + minRangeGap[tempData.tempUnits]);
+                if (newCoolPoint > maxDialTemp) {
+                    newCoolPoint = maxDialTemp;
+                    newHeatPoint = maxDialTemp - minRangeGap[tempData.tempUnits];
+                }
+            } else {
+                newHeatPoint = (coolPoint! - minRangeGap[tempData.tempUnits]);
+                if (newHeatPoint < minDialTemp) {
+                    newHeatPoint = minDialTemp;
+                    newCoolPoint = minDialTemp + minRangeGap[tempData.tempUnits];
+                }
+            }
+        }
+        // set disp points
+        setDispHeatPoint(newHeatPoint);
+        setDispCoolPoint(newCoolPoint);
+        // convert to C and send calls
+        let heatCelsiusFixedTemp = convertTemp(newHeatPoint, tempData.tempUnits, TempUnits.celsius);
+        let coolCelsiusFixedTemp = convertTemp(newCoolPoint, tempData.tempUnits, TempUnits.celsius);
+        if (sendDataTimeoutRef.current) {
+            clearTimeout(sendDataTimeoutRef.current);
+        }
+        sendDataTimeoutRef.current = setTimeout(() => {
+            setRangeCelsius(heatCelsiusFixedTemp, coolCelsiusFixedTemp);
+                console.log("call set range");
+        }, debounceTime);
+    }
+
+    function changeTemp(newTemp: number, setPointType: SetPointType) {
+        if (tempData.tempMode === TempMode.off || tempData.ecoMode === EcoMode.on) {
+            return;
+        } else if (tempData.tempMode === TempMode.heatcool) {
+            changeRangeTemps(newTemp, setPointType);
+        } else {
+            changeSingleTemp(newTemp, setPointType);
+        }
+    }
+
+    function bumpTemp(diff: number) {
         // determine which setpoint to bump, and make active if needed
         let thisSetPoint = activeSetPoint;
-        // if no last set point, choose based on the button pressed
+        // if no last set point, choose based on the tempMode or button pressed if heatcool
         if (lastSetPoint === null) {
-            if (diff > 0) {
+            if (tempData.tempMode === TempMode.heat || (tempData.tempMode === TempMode.heatcool && diff > 0)) {
                 setLastSetPoint(SetPointType.heat);
                 setActiveSetPoint(SetPointType.heat);
                 thisSetPoint = SetPointType.heat;
@@ -95,21 +152,24 @@ function Dial() {
             }
         } else if (activeSetPoint === null) {
             setActiveSetPoint(lastSetPoint);
+            thisSetPoint = lastSetPoint;
         }
         // change corresponding setpoint
-        let newTemp: number | null = null;
+        let newTemp: number;
         if (thisSetPoint === SetPointType.cool) {
             if (dispCoolPoint === null) {
-                newTemp = null;
+                return;
             } else {
                 newTemp = dispCoolPoint + diff;
             }
         } else if (thisSetPoint === SetPointType.heat) {
             if (dispHeatPoint === null) {
-                newTemp = null;
+                return;
             } else {
                 newTemp = dispHeatPoint + diff;
             }
+        } else {
+            return;
         }
         changeTemp(newTemp, thisSetPoint);
     }
@@ -244,11 +304,11 @@ function Dial() {
                             :
                             <div className="dial-buttons">
                                 <button className="material-symbols-outlined"
-                                    onClick={() => bumpSetPoint(-decimalPrecision[tempData.tempUnits])}>
+                                    onClick={() => bumpTemp(-decimalPrecision[tempData.tempUnits])}>
                                     remove
                                 </button>
                                 <button className="material-symbols-outlined"
-                                    onClick={() => bumpSetPoint(decimalPrecision[tempData.tempUnits])}>
+                                    onClick={() => bumpTemp(decimalPrecision[tempData.tempUnits])}>
                                     add
                                 </button>
                             </div>
@@ -265,11 +325,14 @@ function Dial() {
                 <section id="dial">
                     <div className="dial-track"
                         style={{"--used-dial-ratio": usedDialRatio + "turn",
-                        "--start-thumb": activeTrackRange[0] + "turn",
-                        "--end-thumb": activeTrackRange[1] + "turn"} as React.CSSProperties}>
-                        <div className="track-cover" aria-hidden="true"></div>
+                        "--start-thumb": "0turn",
+                        "--end-thumb": "0turn"} as React.CSSProperties}>
                     </div>
+                    <div className="track-cover" aria-hidden="true"></div>
+                    <div className="track-cap" aria-hidden="true" style={{"--cap-angle": -usedDialRatio/2 + "turn", "--cap-bg": (tempData.tempMode === TempMode.cool ? "var(--cap-bg-in-range)" : "var(--cap-bg-out-range)")} as React.CSSProperties}></div>
+                    <div className="track-cap" aria-hidden="true" style={{"--cap-angle": usedDialRatio/2 + "turn", "--cap-bg": (tempData.tempMode === TempMode.heat ? "var(--cap-bg-in-range)" : "var(--cap-bg-out-range)")} as React.CSSProperties}></div>
                     <h2 id="offline-message">OFFLINE</h2>
+                    <div className="material-symbols-outlined bottom-icon">offline_bolt</div>
                 </section>
             }
         </>

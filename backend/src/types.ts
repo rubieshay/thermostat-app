@@ -43,7 +43,7 @@ export const initTempData: TempData = {
 export const demoTempData: TempData = {
     tempUnits: TempUnits.fahrenheit,
     ambientTempCelsius: 20.126007,
-    heatCelsius:18.888889,
+    heatCelsius: 18.888889,
     coolCelsius: 23.333333,
     tempMode: TempMode.heatcool,
     hvacStatus: HvacStatus.off,

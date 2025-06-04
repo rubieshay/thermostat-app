@@ -11,6 +11,7 @@ export const setPointFadeDuration: number = 1000;
  
 export const minDialTemps: number[] = [9, 50];
 export const maxDialTemps: number[] = [32, 90];
+export const minRangeGap: number[] = [1.5, 3]
 export const decimalPrecision: number[] = [0.5, 1.0];
 export const usedDialRatio: number = 5/6;
 
@@ -34,6 +35,13 @@ export function roundedTemp(tempVal: number | null, tempUnits: TempUnits): numbe
         return null;
     }
     return Math.round(tempVal / decimalPrecision[tempUnits]) * decimalPrecision[tempUnits];
+}
+
+export function makeTempInRange(tempVal: number | null, tempUnits: TempUnits): number | null {
+    if (tempVal === null) {
+        return null;
+    }
+    return Math.min(Math.max(minDialTemps[tempUnits], tempVal), maxDialTemps[tempUnits])
 }
 
 export const DEFAULT_API_URL = import.meta.env.VITE_DEFAULT_API_URL === undefined ? "https://thermostat.shaytech.net/api" : import.meta.env.VITE_DEFAULT_API_URL;

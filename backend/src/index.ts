@@ -1,8 +1,7 @@
 import Fastify from "fastify";
 import fastifyWebSockets from "@fastify/websocket";
 import { initTempData, TempData, FetchReturn, WeatherData, initWeatherData } from "./types";
-import { latLongQuerySchema, latLongQueryString, setHeatSchema, SetHeatBody, setCoolSchema, 
-    SetCoolBody, setRangeSchema, SetRangeBody, setTempModeSchema, SetTempModeBody, setEcoModeSchema, SetEcoModeBody } from "./schemas";
+import { latLongQuerySchema, latLongQueryString, setHeatSchema, SetHeatBody, setCoolSchema, SetCoolBody, setRangeSchema, SetRangeBody, setTempModeSchema, SetTempModeBody, setEcoModeSchema, SetEcoModeBody } from "./schemas";
 import "dotenv/config";
 import { getDeviceInfo, setHeat, setCool, setRange, setMode, setEcoMode} from "./googlesdm";
 import { getCurrentObservation } from "./weather";

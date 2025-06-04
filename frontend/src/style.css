@@ -65,7 +65,7 @@ section#info {
     --color-gray-3: #4c4846;
     --color-gray-4: #3e3a39;
     --color-gray-5: #1b1919;
-    --color-cool-0: #eecbb2;
+    --color-heat-0: #eecbb2;
     --color-heat-1: #e5ab81;
     --color-heat-2: #bd7957;
     --color-heat-3: #a15a40;
@@ -159,11 +159,11 @@ h2#offline-message {
     position: relative;
     top: calc(-0.02*var(--dial-size));
 }
-.main-numbers-group {
+.main-number-group {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: calc(0.05*var(--dial-size));
 }
 #main-numbers-setpoints {
     display: flex;
@@ -171,21 +171,32 @@ h2#offline-message {
     justify-content: center;
     gap: calc(0.075*var(--dial-size));
 }
-.setpoint-active {
-    background: var(--color-gray-2);
+#main-numbers h2, #main-numbers h3 {
+    text-align: center;
+    transition: font-variation-settings 400ms ease-in-out, color 400ms ease-in-out;
 }
 #main-numbers h2 {
     font-size: calc(0.05*var(--dial-size));
     font-variation-settings: "wght" 100;
-    text-align: center;
 }
 #main-numbers h3 {
     font-size: calc(0.125*var(--dial-size));
     font-variation-settings: "wght" 300;
-    text-align: center;
 }
 #main-numbers #main-numbers-ambient h3 {
     font-size: calc(0.2*var(--dial-size));
+}
+#main-numbers-heatpoint.setpoint-active {
+    color: var(--color-heat-1);
+}
+#main-numbers-coolpoint.setpoint-active {
+    color: var(--color-cool-1);
+}
+#main-numbers .setpoint-active h2 {
+    font-variation-settings: "wght" 400;
+}
+#main-numbers .setpoint-active h3 {
+    font-variation-settings: "wght" 600;
 }
 
 
@@ -263,12 +274,12 @@ h2#offline-message {
 }
 
 #dial.hvac-status-cooling .track-cap {
-    --cap-bg-out-range: var(--color-cool-3);
-    --cap-bg-in-range: var(--color-cool-2);
+    --cap-bg-out-range: var(--color-cool-4);
+    --cap-bg-in-range: var(--color-cool-3);
 }
 #dial.hvac-status-heating .track-cap {
-    --cap-bg-out-range: var(--color-heat-3);
-    --cap-bg-in-range: var(--color-heat-2);
+    --cap-bg-out-range: var(--color-heat-4);
+    --cap-bg-in-range: var(--color-heat-3);
 }
 
 
