@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "bin/updateenv.sh && cp env-config.js ./public/env-config.js",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
