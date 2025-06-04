@@ -1,8 +1,8 @@
 import { TempUnits } from "./types";
 
-export const demoMode = (import.meta.env.VITE_DEMO_MODE === "TRUE" ||
-                         import.meta.env.VITE_DEMO_MODE === "1" ||
-                         import.meta.env.VITE_DEMO_MODE === "YES") ? true : false;
+export const demoMode = ((window as any)._env_.DEMO_MODE === "TRUE" ||
+                         (window as any)._env_.DEMO_MODE === "1" ||
+                         (window as any)._env_.DEMO_MODE === "YES") ? true : false;
 
 export const debounceTime: number = 3000;
 export const responseWaitTime: number = 5000;
@@ -35,5 +35,3 @@ export function roundedTemp(tempVal: number | null, tempUnits: TempUnits): numbe
     }
     return Math.round(tempVal / decimalPrecision[tempUnits]) * decimalPrecision[tempUnits];
 }
-
-export const DEFAULT_API_URL = import.meta.env.VITE_DEFAULT_API_URL === undefined ? "https://thermostat.shaytech.net/api" : import.meta.env.VITE_DEFAULT_API_URL;
