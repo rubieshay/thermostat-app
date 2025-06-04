@@ -1,8 +1,10 @@
 import { TempUnits } from "./types";
 
-export const demoMode = (import.meta.env.VITE_DEMO_MODE === "TRUE" ||
-                         import.meta.env.VITE_DEMO_MODE === "1" ||
-                         import.meta.env.VITE_DEMO_MODE === "YES") ? true : false;
+console.log( "ENV IS: "+JSON.stringify((window as any)._env_))
+console.log("setting...");
+export const demoMode = ((window as any)._env_.DEMO_MODE === "TRUE" ||
+                         (window as any)._env_.DEMO_MODE === "1" ||
+                         (window as any)._env_.DEMO_MODE === "YES") ? true : false;
 
 export const debounceTime: number = 3000;
 export const responseWaitTime: number = 5000;

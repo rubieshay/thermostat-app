@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for React + Vite + TypeScript Production Build
 
 # Stage 1: Build Stage
-FROM node:18-alpine AS builder
+FROM node:24-bookworm-slim AS builder
 
 # Set working directory
 WORKDIR /usr/app/frontend
@@ -21,16 +21,25 @@ COPY backend/src/schemas.ts ./src/schemas.ts
 RUN npm run build
 
 # Stage 2: Production Stage
-FROM nginx:alpine AS production
+FROM nginx:stable-bookworm AS production
 
 # Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# RUN apk add --no-cache dumb-init
 
 # Copy built application from builder stage
 COPY --from=builder /usr/app/frontend/dist /usr/share/nginx/html
 
+WORKDIR /usr/share/nginx/html
+
 # Copy custom nginx configuration
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+
+COPY frontend/bin/updateenv.sh  . 
+
+COPY frontend/env-template ./.env
+
+RUN chmod +x /usr/share/nginx/html/updateenv.sh
+
 
 # Make port 8080 available (non-privileged port)
 # Port change is handled in nginx.conf
@@ -39,5 +48,5 @@ COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 8080
 
 # Use dumb-init and start nginx
-ENTRYPOINT ["dumb-init", "--"]
-CMD ["nginx", "-g", "daemon off;"]
+#ENTRYPOINT ["dumb-init", "--"]
+CMD ["/bin/bash","-c","/usr/share/nginx/html/updateenv.sh && nginx -g \"daemon off;\""]

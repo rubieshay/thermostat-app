@@ -4,3 +4,4 @@ node_modules
 .vite
 build
 dist
+env-config.js
