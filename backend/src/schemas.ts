@@ -4,25 +4,30 @@ import { EcoMode, TempMode } from "./types";
 export const setHeatSchema = {
     type: "object",
     properties: {
+        deviceID: {
+            type: "string"
+        },
         heatCelsius: {
             type: "number"
         }
     },
-    required: ["heatCelsius"],
+    required: ["deviceID","heatCelsius"],
     additionalProperties: false
 } as const;
-
 
 export type SetHeatBody = FromSchema<typeof setHeatSchema>;
 
 export const setCoolSchema = {
     type: "object",
     properties: {
+        deviceID: {
+            type: "string"
+        },
         coolCelsius: {
             type: "number"
         }
     },
-    required: ["coolCelsius"],
+    required: ["deviceID","coolCelsius"],
     additionalProperties: false
 } as const;
 
@@ -31,6 +36,9 @@ export type SetCoolBody = FromSchema<typeof setCoolSchema>;
 export const setRangeSchema = {
     type: "object",
     properties: {
+        deviceID: {
+            type: "string"
+        },
         coolCelsius: {
             type: "number"
         },
@@ -38,7 +46,7 @@ export const setRangeSchema = {
             type: "number"
         }
     },
-    required: ["heatCelsius", "coolCelsius"],
+    required: ["deviceID","heatCelsius", "coolCelsius"],
     additionalProperties: false
 } as const;
 
@@ -47,12 +55,15 @@ export type SetRangeBody = FromSchema<typeof setRangeSchema>;
 export const setTempModeSchema = {
     type: "object",
     properties: {
+        deviceID: {
+            type: "string"
+        },
         mode: {
             type: "string",
             enum: [TempMode.off, TempMode.heat, TempMode.cool, TempMode.heatcool]
         }
     },
-    required: ["mode"],
+    required: ["deviceID","mode"],
     additionalProperties: false
 } as const;
 
@@ -61,12 +72,15 @@ export type SetTempModeBody = FromSchema<typeof setTempModeSchema>;
 export const setEcoModeSchema = {
     type: "object",
     properties: {
+        deviceID: {
+            type: "string"
+        },
         mode: {
             type: "string",
             enum: [EcoMode.off, EcoMode.on]
         }
     },
-    required: ["mode"],
+    required: ["deviceID","mode"],
     additionalProperties: false
 } as const;
 
@@ -82,3 +96,26 @@ export const latLongQuerySchema = {
 } as const;
 
 export type latLongQueryString = FromSchema<typeof latLongQuerySchema>;
+
+export type HeatParams = {
+    heatCelsius: number
+}
+
+export type CoolParams = {
+    coolCelsius: number
+}
+
+export type RangeParams = {
+    heatCelsius: number,
+    coolCelsius: number
+}
+
+export type HvacModeParams = {
+    mode: TempMode
+}
+
+export type EcoModeParams = {
+    mode: EcoMode
+}
+
+export type APIParams = HeatParams | CoolParams | RangeParams | HvacModeParams | EcoModeParams;

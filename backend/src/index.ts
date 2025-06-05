@@ -1,6 +1,6 @@
 import Fastify from "fastify";
 import fastifyWebSockets from "@fastify/websocket";
-import { initTempData, TempData, FetchReturn, WeatherData, initWeatherData } from "./types";
+import { FetchReturn, WeatherData, initWeatherData } from "./types";
 import { latLongQuerySchema, latLongQueryString, setHeatSchema, SetHeatBody, setCoolSchema, SetCoolBody, setRangeSchema, SetRangeBody, setTempModeSchema, SetTempModeBody, setEcoModeSchema, SetEcoModeBody } from "./schemas";
 import "dotenv/config";
 import { getDeviceInfo, setHeat, setCool, setRange, setMode, setEcoMode} from "./googlesdm";
@@ -10,11 +10,10 @@ export const googleClientId  = process.env.CLIENT_ID || "";
 export const googleClientSecret = process.env.CLIENT_SECRET || "";
 export const googleProjectId = process.env.PROJECT_ID || "";
 export const googleRefreshToken = process.env.REFRESH_TOKEN || "";
-export const googleDeviceID = process.env.DEVICE_ID || "";
+
 const httpPort = Number(process.env.PORT) || 3000;
 
-
-export let tempData: TempData = structuredClone(initTempData);
+import {tempDataInfo} from "./googlesdm";
 export let weatherData: WeatherData = structuredClone(initWeatherData);
 
 const fastify = Fastify({
@@ -56,7 +55,7 @@ fastify.get("/info", async (request, reply) => {
         console.log("Got an error in getDeviceInfo:", fetchReturn.error);
         return reply.status(500).send({ error: fetchReturn.error || "Failed to get device info" });
     }
-    reply.send(tempData);
+    reply.send(tempDataInfo);
 })
 
 fastify.get("/weather", async (request, reply) => {
@@ -78,9 +77,9 @@ fastify.get<{ Querystring: latLongQueryString }> ("/set_lat_long", { schema: { q
 });
 
 fastify.post<{ Body: SetHeatBody }>("/set_heat", {schema: { body: setHeatSchema } }, async (request, reply) => {
-    const { heatCelsius } = request.body;
-    console.log("got a setheat request", heatCelsius);
-    let fetchReturn = await setHeat(heatCelsius);
+    const { deviceID, heatCelsius } = request.body;
+    console.log("got a setheat request", deviceID, heatCelsius);
+    let fetchReturn = await setHeat(deviceID, heatCelsius);
     if (!fetchReturn.success) {
         reply.status(500).send({ error: fetchReturn.error || "Failed to set heat" });
     } else {
@@ -89,8 +88,8 @@ fastify.post<{ Body: SetHeatBody }>("/set_heat", {schema: { body: setHeatSchema 
 });
 
 fastify.post<{Body: SetCoolBody;}>("/set_cool", {schema: { body: setCoolSchema } }, async (request, reply) => {
-    const { coolCelsius } = request.body;
-    let fetchReturn = await setCool(coolCelsius);
+    const { deviceID, coolCelsius } = request.body;
+    let fetchReturn = await setCool(deviceID,coolCelsius);
     if (!fetchReturn.success) {
         reply.status(500).send({ error: fetchReturn.error || "Failed to set cool" });
     } else {
@@ -99,8 +98,8 @@ fastify.post<{Body: SetCoolBody;}>("/set_cool", {schema: { body: setCoolSchema }
 });
 
 fastify.post<{Body: SetRangeBody;}>("/set_range", {schema: { body: setRangeSchema } }, async (request, reply) => {
-    const { heatCelsius, coolCelsius } = request.body;
-    let fetchReturn = await setRange(heatCelsius, coolCelsius);
+    const { deviceID, heatCelsius, coolCelsius } = request.body;
+    let fetchReturn = await setRange(deviceID,heatCelsius, coolCelsius);
     if (!fetchReturn.success) {
         reply.status(500).send({ error: fetchReturn.error || "Failed to set range" });
     } else {
@@ -109,8 +108,8 @@ fastify.post<{Body: SetRangeBody;}>("/set_range", {schema: { body: setRangeSchem
 });
 
 fastify.post<{Body: SetTempModeBody;}>("/set_temp_mode", {schema: { body: setTempModeSchema } }, async (request, reply) => {
-    const { mode } = request.body;
-    let fetchReturn = await setMode(mode);
+    const { deviceID, mode } = request.body;
+    let fetchReturn = await setMode(deviceID,mode);
     if (!fetchReturn.success) {
         reply.status(500).send({ error: fetchReturn.error || "Failed to set mode" });
     } else {
@@ -119,8 +118,8 @@ fastify.post<{Body: SetTempModeBody;}>("/set_temp_mode", {schema: { body: setTem
 });
 
 fastify.post<{Body: SetEcoModeBody;}>("/set_eco_mode", {schema: { body: setEcoModeSchema } }, async (request, reply) => {
-    const { mode } = request.body;
-    let fetchReturn = await setEcoMode(mode);
+    const { deviceID, mode } = request.body;
+    let fetchReturn = await setEcoMode(deviceID,mode);
     if (!fetchReturn.success) {
         reply.status(500).send({ error: fetchReturn.error || "Failed to set eco mode" });
     } else {
