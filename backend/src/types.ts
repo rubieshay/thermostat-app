@@ -7,6 +7,7 @@ export enum Connectivity {online="ONLINE", offline="OFFLINE"};
 export enum FanMode {on="ON", off="OFF"};
 
 export type TempData = {
+    deviceID: string | null,
     tempUnits: TempUnits,
     ambientTempCelsius: number | null,
     heatCelsius: number | null,
@@ -24,6 +25,7 @@ export type TempData = {
 
 // DEFAULT INIT DATA
 export const initTempData: TempData = {
+    deviceID: null,
     tempUnits: TempUnits.celsius,
     ambientTempCelsius: null,
     heatCelsius: null,
@@ -41,6 +43,7 @@ export const initTempData: TempData = {
 
 // INIT DATA FOR DEMO MODE
 export const demoTempData: TempData = {
+    deviceID: null,
     tempUnits: TempUnits.fahrenheit,
     ambientTempCelsius: 20,
     heatCelsius: 18.888889,
