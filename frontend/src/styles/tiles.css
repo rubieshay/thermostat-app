@@ -1,4 +1,15 @@
 /* TEMP TILES STUFF */
+section#info {
+    display: grid;
+    width: var(--dial-size);
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+.tile {
+    background: var(--color-gray-5);
+    padding: 1rem;
+    border-radius: 1rem;
+}
 legend h2 {
     font-variation-settings: "wght" 800;
     margin-bottom: 0.5rem;
@@ -11,4 +22,15 @@ legend h2 {
 .radio-option {
     display: flex;
     gap: 0.5rem;
+}
+fieldset label {
+    display: flex;
+    gap: 0.5rem;
+}
+fieldset label span {
+    display: block;
+    line-height: 1.5;
+}
+fieldset label span.material-symbols {
+    font-size: 1.5rem;
 }

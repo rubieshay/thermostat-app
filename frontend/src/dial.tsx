@@ -1,17 +1,16 @@
 import { useContext, useEffect, useState } from "react";
 import { TempUnits, TempMode, EcoMode, HvacStatus, Connectivity } from "./types";
-import { roundedTemp, convertTemp, maxDialTemps, minDialTemps, usedDialRatio, decimalPrecision, debounceTime, minRangeGap, makeTempInRange } from "./utils";
+import { roundedTemp, convertTemp, maxDialTemps, minDialTemps, usedDialRatio, decimalPrecision, minRangeGap, makeTempInRange } from "./utils";
 import { TempDataContext } from "./temp_context";
 
 function Dial() {
     enum SetPointType {heat, cool};
-    const {fetchTempData, getSelectedTempData, debounceTimeoutRef, setHeatCelsius, setCoolCelsius, setRangeCelsius} = useContext(TempDataContext);
+    const {fetchTempData, getSelectedTempData, debounceTempData, setHeatCelsius, setCoolCelsius, setRangeCelsius} = useContext(TempDataContext);
     const [dispCoolPoint, setDispCoolPoint] = useState<number | null>(null);
     const [dispHeatPoint, setDispHeatPoint] = useState<number | null>(null);
     const [activeSetPoint, setActiveSetPoint] = useState<SetPointType | null>(null);
     const [lastSetPoint, setLastSetPoint] = useState<SetPointType | null>(null);
     // const setPointFadeDelay = useRef<number | null>(null);
-    // const debounceTimeoutRef = useRef<number | null>(null);
 
     const tempData = getSelectedTempData();
 
@@ -36,22 +35,33 @@ function Dial() {
     }, [tempData.tempMode]);
 
     useEffect (() => {
-        const unitTemp = convertTemp(tempData.coolCelsius, TempUnits.celsius, tempData.tempUnits);
+        let baseTemp = null;
+        if (tempData.tempMode === TempMode.cool || tempData.tempMode === TempMode.heatcool) {
+            if (tempData.ecoMode === EcoMode.on) {
+                baseTemp = tempData.ecoCoolCelsius;
+            } else {
+                baseTemp = tempData.coolCelsius;
+            }
+        }
+        const unitTemp = convertTemp(baseTemp, TempUnits.celsius, tempData.tempUnits);
         setDispCoolPoint(roundedTemp(unitTemp, tempData.tempUnits));
-    }, [tempData.coolCelsius, tempData.tempUnits]);
+    }, [tempData.coolCelsius, tempData.tempUnits, tempData.tempMode, tempData.ecoMode]);
 
     useEffect (() => {
-        const unitTemp = convertTemp(tempData.heatCelsius, TempUnits.celsius, tempData.tempUnits);
+        let baseTemp = null;
+        if (tempData.tempMode === TempMode.heat || tempData.tempMode === TempMode.heatcool) {
+            if (tempData.ecoMode === EcoMode.on) {
+                baseTemp = tempData.ecoHeatCelsius;
+            } else {
+                baseTemp = tempData.heatCelsius;
+            }
+        }
+        const unitTemp = convertTemp(baseTemp, TempUnits.celsius, tempData.tempUnits);
         setDispHeatPoint(roundedTemp(unitTemp, tempData.tempUnits));
-    }, [tempData.heatCelsius, tempData.tempUnits]);
+    }, [tempData.heatCelsius, tempData.tempUnits, tempData.tempMode, tempData.ecoMode]);
 
     useEffect(() => {
         fetchTempData();
-        return () => {
-            if (debounceTimeoutRef.current) {
-                clearTimeout(debounceTimeoutRef.current);
-            }
-        };
     }, []);
 
     function changeSingleTemp(newTemp: number, setPointType: SetPointType) {
@@ -64,18 +74,11 @@ function Dial() {
         // fix then round then convert
         let celsiusFixedTemp: number | null = convertTemp(roundedTemp(fixedTemp, tempData.tempUnits), tempData.tempUnits, TempUnits.celsius);
 
-        if (debounceTimeoutRef.current) {
-            clearTimeout(debounceTimeoutRef.current);
+        if (tempData.tempMode === TempMode.heat) {
+            debounceTempData(() => setHeatCelsius(celsiusFixedTemp));
+        } else if (tempData.tempMode === TempMode.cool) {
+            debounceTempData(() => setCoolCelsius(celsiusFixedTemp));
         }
-        debounceTimeoutRef.current = setTimeout(() => {
-            if (tempData.tempMode === TempMode.heat) {
-                setHeatCelsius(celsiusFixedTemp);
-                console.log("call set heat");
-            } else if (tempData.tempMode === TempMode.cool) {
-                setCoolCelsius(celsiusFixedTemp);
-                console.log("call set cool");
-            }
-        }, debounceTime);
     }
 
     function changeRangeTemps(newTemp: number, setPointType: SetPointType) {
@@ -118,13 +121,7 @@ function Dial() {
         // convert to C and send calls
         let heatCelsiusFixedTemp = convertTemp(newHeatPoint, tempData.tempUnits, TempUnits.celsius);
         let coolCelsiusFixedTemp = convertTemp(newCoolPoint, tempData.tempUnits, TempUnits.celsius);
-        if (debounceTimeoutRef.current) {
-            clearTimeout(debounceTimeoutRef.current);
-        }
-        debounceTimeoutRef.current = setTimeout(() => {
-            setRangeCelsius(heatCelsiusFixedTemp, coolCelsiusFixedTemp);
-                console.log("call set range");
-        }, debounceTime);
+        debounceTempData(() => setRangeCelsius(heatCelsiusFixedTemp, coolCelsiusFixedTemp));
     }
 
     function changeTemp(newTemp: number, setPointType: SetPointType) {
@@ -259,8 +256,6 @@ function Dial() {
                     <div className="track-cap track-cap-outer" aria-hidden="true"
                         style={{"--cap-angle": usedDialRatio/2 + "turn"} as React.CSSProperties}>
                     </div>
-                    {/* <div className="track-cap" aria-hidden="true" style={{"--cap-angle": -usedDialRatio/2 + "turn", "--cap-bg": (tempData.tempMode === TempMode.cool ? "var(--cap-bg-in-range)" : "var(--cap-bg-out-range)")} as React.CSSProperties}></div>
-                    <div className="track-cap" aria-hidden="true" style={{"--cap-angle": usedDialRatio/2 + "turn", "--cap-bg": (tempData.tempMode === TempMode.heat ? "var(--cap-bg-in-range)" : "var(--cap-bg-out-range)")} as React.CSSProperties}></div> */}
                     <div className="track-cover" aria-hidden="true"></div>
                     {/* DIAL THUMBS */}
                     <div id="ambient-thumb" className="dial-thumb"
@@ -313,17 +308,17 @@ function Dial() {
                     </div>
                     {/* PLUS/MINUS BUTTONS */}
                     {tempData.ecoMode === EcoMode.on ?
-                        <div className="material-symbols material-symbols-outlined bottom-icon">nest_eco_leaf</div>
+                        <div className="material-symbols material-symbols-rounded bottom-icon">nest_eco_leaf</div>
                         :
                         (tempData.tempMode === TempMode.off ?
-                            <div className="material-symbols material-symbols-outlined bottom-icon">mode_off_on</div>
+                            <div className="material-symbols material-symbols-rounded bottom-icon">mode_off_on</div>
                             : 
                             <div className="dial-buttons">
-                                <button className="material-symbols material-symbols-outlined"
+                                <button className="material-symbols material-symbols-rounded"
                                     onClick={() => bumpTemp(-decimalPrecision[tempData.tempUnits])}>
                                     remove
                                 </button>
-                                <button className="material-symbols material-symbols-outlined"
+                                <button className="material-symbols material-symbols-rounded"
                                     onClick={() => bumpTemp(decimalPrecision[tempData.tempUnits])}>
                                     add
                                 </button>
@@ -342,7 +337,7 @@ function Dial() {
                     <div className="track-cap" aria-hidden="true" style={{"--cap-angle": -usedDialRatio/2 + "turn", "--cap-bg": (tempData.tempMode === TempMode.cool ? "var(--cap-bg-in-range)" : "var(--cap-bg-out-range)")} as React.CSSProperties}></div>
                     <div className="track-cap" aria-hidden="true" style={{"--cap-angle": usedDialRatio/2 + "turn", "--cap-bg": (tempData.tempMode === TempMode.heat ? "var(--cap-bg-in-range)" : "var(--cap-bg-out-range)")} as React.CSSProperties}></div>
                     <h2 id="offline-message">OFFLINE</h2>
-                    <div className="material-symbols material-symbols-outlined bottom-icon">offline_bolt</div>
+                    <div className="material-symbols material-symbols-rounded bottom-icon">offline_bolt</div>
                 </>
             }
         </section>
