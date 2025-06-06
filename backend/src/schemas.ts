@@ -58,12 +58,12 @@ export const setTempModeSchema = {
         deviceID: {
             type: "string"
         },
-        mode: {
+        tempMode: {
             type: "string",
             enum: [TempMode.off, TempMode.heat, TempMode.cool, TempMode.heatcool]
         }
     },
-    required: ["deviceID","mode"],
+    required: ["deviceID","tempMode"],
     additionalProperties: false
 } as const;
 
@@ -75,12 +75,12 @@ export const setEcoModeSchema = {
         deviceID: {
             type: "string"
         },
-        mode: {
+        ecoMode: {
             type: "string",
             enum: [EcoMode.off, EcoMode.on]
         }
     },
-    required: ["deviceID","mode"],
+    required: ["deviceID","ecoMode"],
     additionalProperties: false
 } as const;
 

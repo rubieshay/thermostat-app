@@ -23,6 +23,8 @@ export type TempData = {
     ambientHumidity: number | null
 }
 
+export type TempDataArray = TempData[];
+
 // DEFAULT INIT DATA
 export const initTempData: TempData = {
     deviceID: null,
@@ -42,22 +44,24 @@ export const initTempData: TempData = {
 }
 
 // INIT DATA FOR DEMO MODE
-export const demoTempData: TempData = {
-    deviceID: null,
-    tempUnits: TempUnits.fahrenheit,
-    ambientTempCelsius: 20,
-    heatCelsius: 18.888889,
-    coolCelsius: 22.222222,
-    tempMode: TempMode.heatcool,
-    hvacStatus: HvacStatus.off,
-    ecoMode: EcoMode.off,
-    ecoHeatCelsius: 27.777778,
-    ecoCoolCelsius: 12.777778,
-    fanTimer: null,
-    connectivity: Connectivity.online,
-    deviceName: "My Demo Thermostat",
-    ambientHumidity: 50
-}
+export const demoTempDataArray: TempData[] = [
+    {
+        deviceID: "DEMO",
+        tempUnits: TempUnits.fahrenheit,
+        ambientTempCelsius: 20,
+        heatCelsius: 18.888889,
+        coolCelsius: 22.222222,
+        tempMode: TempMode.heatcool,
+        hvacStatus: HvacStatus.off,
+        ecoMode: EcoMode.off,
+        ecoHeatCelsius: 27.777778,
+        ecoCoolCelsius: 12.777778,
+        fanTimer: null,
+        connectivity: Connectivity.online,
+        deviceName: "My Demo Thermostat",
+        ambientHumidity: 50
+    }
+];
 
 export type SetPointDefaults = {
     heatCelsius: number,

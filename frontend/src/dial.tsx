@@ -1,18 +1,19 @@
-import { useContext, useEffect, useState, useRef } from "react";
+import { useContext, useEffect, useState } from "react";
 import { TempUnits, TempMode, EcoMode, HvacStatus, Connectivity } from "./types";
 import { roundedTemp, convertTemp, maxDialTemps, minDialTemps, usedDialRatio, decimalPrecision, debounceTime, minRangeGap, makeTempInRange } from "./utils";
 import { TempDataContext } from "./temp_context";
 
 function Dial() {
     enum SetPointType {heat, cool};
-
-    const {tempData, fetchTempData, setHeatCelsius, setCoolCelsius, setRangeCelsius} = useContext(TempDataContext);
+    const {fetchTempData, getSelectedTempData, debounceTimeoutRef, setHeatCelsius, setCoolCelsius, setRangeCelsius} = useContext(TempDataContext);
     const [dispCoolPoint, setDispCoolPoint] = useState<number | null>(null);
     const [dispHeatPoint, setDispHeatPoint] = useState<number | null>(null);
     const [activeSetPoint, setActiveSetPoint] = useState<SetPointType | null>(null);
     const [lastSetPoint, setLastSetPoint] = useState<SetPointType | null>(null);
     // const setPointFadeDelay = useRef<number | null>(null);
-    const sendDataTimeoutRef = useRef<number | null>(null);
+    // const debounceTimeoutRef = useRef<number | null>(null);
+
+    const tempData = getSelectedTempData();
 
     const dispAmbientTemp: number | null = roundedTemp(convertTemp(tempData.ambientTempCelsius, TempUnits.celsius, tempData.tempUnits), tempData.tempUnits);
     const maxDialTemp: number = maxDialTemps[tempData.tempUnits];
@@ -47,8 +48,8 @@ function Dial() {
     useEffect(() => {
         fetchTempData();
         return () => {
-            if (sendDataTimeoutRef.current) {
-                clearTimeout(sendDataTimeoutRef.current);
+            if (debounceTimeoutRef.current) {
+                clearTimeout(debounceTimeoutRef.current);
             }
         };
     }, []);
@@ -63,10 +64,10 @@ function Dial() {
         // fix then round then convert
         let celsiusFixedTemp: number | null = convertTemp(roundedTemp(fixedTemp, tempData.tempUnits), tempData.tempUnits, TempUnits.celsius);
 
-        if (sendDataTimeoutRef.current) {
-            clearTimeout(sendDataTimeoutRef.current);
+        if (debounceTimeoutRef.current) {
+            clearTimeout(debounceTimeoutRef.current);
         }
-        sendDataTimeoutRef.current = setTimeout(() => {
+        debounceTimeoutRef.current = setTimeout(() => {
             if (tempData.tempMode === TempMode.heat) {
                 setHeatCelsius(celsiusFixedTemp);
                 console.log("call set heat");
@@ -117,10 +118,10 @@ function Dial() {
         // convert to C and send calls
         let heatCelsiusFixedTemp = convertTemp(newHeatPoint, tempData.tempUnits, TempUnits.celsius);
         let coolCelsiusFixedTemp = convertTemp(newCoolPoint, tempData.tempUnits, TempUnits.celsius);
-        if (sendDataTimeoutRef.current) {
-            clearTimeout(sendDataTimeoutRef.current);
+        if (debounceTimeoutRef.current) {
+            clearTimeout(debounceTimeoutRef.current);
         }
-        sendDataTimeoutRef.current = setTimeout(() => {
+        debounceTimeoutRef.current = setTimeout(() => {
             setRangeCelsius(heatCelsiusFixedTemp, coolCelsiusFixedTemp);
                 console.log("call set range");
         }, debounceTime);

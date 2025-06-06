@@ -3,11 +3,28 @@ import { Connectivity, TempMode } from "./types";
 import { TempDataContext } from "./temp_context";
 
 function Tiles() {
-    const {tempData, fetchTempData, setTempMode} = useContext(TempDataContext);
+    const {getSelectedTempData, fetchTempData, setTempMode} = useContext(TempDataContext);
 
     useEffect(() => {
         fetchTempData();
     }, []);
+
+    const tempData = getSelectedTempData();
+
+    // function {
+    //     if (debounceTimeoutRef.current) {
+    //         clearTimeout(debounceTimeoutRef.current);
+    //     }
+    //     debounceTimeoutRef.current = setTimeout(() => {
+    //         if (tempData.tempMode === TempMode.heat) {
+    //             setHeatCelsius(celsiusFixedTemp);
+    //             console.log("call set heat");
+    //         } else if (tempData.tempMode === TempMode.cool) {
+    //             setCoolCelsius(celsiusFixedTemp);
+    //             console.log("call set cool");
+    //         }
+    //     }, debounceTime);
+    // }
 
     return (
         <section id="info">

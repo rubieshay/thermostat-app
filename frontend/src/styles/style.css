@@ -55,10 +55,11 @@ section#info {
 :root {
     --color-gray-0: #f4f3f3;
     --color-gray-1: #c4b8b4;
-    --color-gray-2: #736c6a;
-    --color-gray-3: #4c4846;
-    --color-gray-4: #3e3a39;
-    --color-gray-5: #1b1919;
+    --color-gray-2: #a69c98;
+    --color-gray-3: #736c6a;
+    --color-gray-4: #4c4846;
+    --color-gray-5: #3e3a39;
+    --color-gray-6: #1b1919;
     --color-heat-0: #eecbb2;
     --color-heat-1: #e5ab81;
     --color-heat-2: #bd7957;
@@ -72,7 +73,7 @@ section#info {
     --color-cool-4: #283557;
     --color-cool-5: #1c263f;
 
-    --main-bg: var(--color-gray-5);
+    --main-bg: var(--color-gray-6);
     --main-text: var(--color-gray-1);
 
     background: var(--main-bg);

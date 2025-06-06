@@ -1,24 +1,31 @@
-import { createContext, useState } from "react";
-import { type TempData, initTempData, demoTempData, HvacStatus, TempMode, demoSetPointDefaults } from "./types";
+import { createContext, useState, useRef, type RefObject, createRef } from "react";
+import { type TempData, type TempDataArray, initTempData, demoTempDataArray, HvacStatus, TempMode, demoSetPointDefaults } from "./types";
+import { type SetHeatBody, type SetCoolBody, type SetRangeBody, type SetTempModeBody } from "./schemas";
 import { demoMode } from "./utils";
 
 export interface TempContextType {
-    tempData: TempData,
-    setTempData: React.Dispatch<React.SetStateAction<TempData>>,
+    tempDataArray: TempData[];
     fetchTempData: () => Promise<void>,
+    getSelectedTempData: () => TempData,
+    debounceTimeoutRef: RefObject<number | null>,
+    selectedDeviceID: string | null,
+    changeDeviceID: (newDeviceID: string) => void,
     setHeatCelsius: (newHeatCelsius: number | null) => void,
     setCoolCelsius: (newCoolCelsius: number | null) => void,
-    setRangeCelsius: (newHeatCelsius: number | null, newCoolCelsius: number | null) => void
+    setRangeCelsius: (newHeatCelsius: number | null, newCoolCelsius: number | null) => void,
     setTempMode: (newTempMode: TempMode) => void
 }
 export const initTempContext: TempContextType = {
-    tempData: initTempData,
-    setTempData: prevState => (prevState),
+    tempDataArray: [],
     fetchTempData: async () => {},
+    getSelectedTempData: () => {return structuredClone(initTempData)},
+    debounceTimeoutRef: createRef(),
+    selectedDeviceID: null,
+    changeDeviceID: () => {},
     setHeatCelsius: async () => {},
     setCoolCelsius: async () => {},
     setRangeCelsius: async () => {},
-    setTempMode: async () => {},
+    setTempMode: async () => {}
 }
 
 export const TempDataContext = createContext(initTempContext);
@@ -28,20 +35,24 @@ type TempDataProviderProps = {
 }
 
 export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDataProviderProps) => {
-    const [tempData, setTempData] = useState<TempData>(initTempData);
+    const [tempDataArray, setTempDataArray] = useState<TempDataArray>([structuredClone(initTempData)]);
+    const [selectedDeviceID, setSelectedDeviceID] = useState<string | null>(null);
+    const debounceTimeoutRef = useRef<number | null>(null);
     // one shared timer for getting data after setting it
     // const getDataTimeoutRef = useRef<number | null>(null);
 
     async function fetchTempData() {
         // DEMO DATA
         if (demoMode) {
-            setTempData(demoTempData);
-            console.log("got demo data");
+            console.log("getting demo data");
+            setTempDataArray(structuredClone(demoTempDataArray));
+            if (selectedDeviceID === null) {
+                setSelectedDeviceID(demoTempDataArray[0].deviceID);
+            }
             return;
         }
         // REAL DATA
-        console.log("got real data");
-        console.log("Fetching temp data from API");
+        console.log("getting real data");
         let url = "/api/info";
         try {
             const response = await fetch(url, {
@@ -56,7 +67,10 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
             const data = await response.json();
             console.log("Temp data info successfully:", data);
             if (data) {
-                setTempData(data);
+                setTempDataArray(data);
+                if (selectedDeviceID === null) {
+                    setSelectedDeviceID(data[0].deviceID);
+                }
             } else {
                 console.error("Invalid temp data format:", data);
             }
@@ -64,6 +78,17 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
             console.error("Error fetching temp data info:", error);
         }
     }
+
+    // useEffect(() => {
+    //     console.log("Detected that Selected device ID changed, now is:"+selectedDeviceID)
+    //     console.log("Current data is: ",getSelectedTempData());
+    // }, [selectedDeviceID])
+
+    // useEffect(() => {
+    //     console.log("Detecting that temp data array changed to:",tempDataArray)
+    //     console.log("Current data is: ",getSelectedTempData());
+    // }, [tempDataArray])
+
 
     async function refreshTempData () {
         // if (getDataTimeoutRef.current) {
@@ -77,18 +102,47 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         console.log("refreshed tempData");
     }
 
+    async function changeDeviceID(selectedDeviceID: string) {
+        setSelectedDeviceID(selectedDeviceID);
+    }
+
+    function getSelectedTempData(): TempData {
+        if (selectedDeviceID === null) {
+            return structuredClone(initTempData);
+        }
+        let selectedTempData = tempDataArray.find((item) => (item.deviceID === selectedDeviceID));
+        if (selectedTempData) {
+            return selectedTempData;
+        } else {
+            return structuredClone(initTempData);
+        }
+    }
+
     async function setHeatCelsius(newHeatCelsius: number | null) {
-        if (newHeatCelsius === null) {
+        if (newHeatCelsius === null || selectedDeviceID === null) {
             return;
         };
         if (demoMode) {
-            setTempData(prevState => ({...prevState, heatCelsius : newHeatCelsius}));
-            if (tempData.ambientTempCelsius !== null) {
+            setTempDataArray((prevState: TempDataArray) => 
+                prevState.map(item => item.deviceID === selectedDeviceID ?
+                { ...item, heatCelsius: newHeatCelsius } :
+                item)
+            );
+            let selectedTempData = getSelectedTempData();
+            if (selectedTempData !== null && selectedTempData.ambientTempCelsius !== null) {
                 // give a 1C degree buffer before hvac
-                if (newHeatCelsius > tempData.ambientTempCelsius + 0.5) {
-                    setTempData(prevState => ({...prevState, hvacStatus : HvacStatus.heating}));
-                } else if (newHeatCelsius < tempData.ambientTempCelsius - 0.5) {
-                    setTempData(prevState => ({...prevState, hvacStatus : HvacStatus.off}));
+                if (newHeatCelsius > selectedTempData.ambientTempCelsius! + 0.5) {
+                    setTempDataArray((prevState: TempDataArray) => 
+                        prevState.map(item => item.deviceID === selectedDeviceID ?
+                        { ...item, hvacStatus: HvacStatus.heating } :
+                        item)
+                    );
+                } else if (newHeatCelsius < selectedTempData.ambientTempCelsius - 0.5) {
+                    setTempDataArray((prevState: TempDataArray) => 
+                        prevState.map(item => item.deviceID === selectedDeviceID ?
+                        { ...item, hvacStatus: HvacStatus.off } :
+                        item)
+                    );
                 }
             }
             console.log("set demo heatpoint");
@@ -97,7 +151,8 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         
         let url = "/api/set_heat";
         try {
-            const reqBody = {
+            const reqBody: SetHeatBody = {
+                deviceID: selectedDeviceID,
                 heatCelsius: newHeatCelsius
             };
             const response = await fetch(url, {
@@ -119,17 +174,28 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
     }
 
     async function setCoolCelsius(newCoolCelsius: number | null) {
-        if (newCoolCelsius === null) {
+        if (newCoolCelsius === null || selectedDeviceID === null) {
             return;
         };
         if (demoMode) {
-            setTempData(prevState => ({...prevState, coolCelsius : newCoolCelsius}));
-            if (tempData.ambientTempCelsius !== null) {
+            setTempDataArray((prevState: TempDataArray) => 
+                prevState.map(item => item.deviceID === selectedDeviceID ?
+                { ...item, coolCelsius: newCoolCelsius } :
+                item)
+            );
+            let selectedTempData = getSelectedTempData();
+            if (selectedTempData.ambientTempCelsius !== null) {
                 // give a 0.5C degree buffer before HVAC changes
-                if (newCoolCelsius < tempData.ambientTempCelsius - 0.5) {
-                    setTempData(prevState => ({...prevState, hvacStatus : HvacStatus.cooling}));
-                } else if (newCoolCelsius > tempData.ambientTempCelsius + 0.5) {
-                    setTempData(prevState => ({...prevState, hvacStatus : HvacStatus.off}));
+                if (newCoolCelsius < selectedTempData.ambientTempCelsius - 0.5) {
+                    setTempDataArray((prevState: TempDataArray) => 
+                        prevState.map(item => item.deviceID === selectedDeviceID ?
+                        { ...item, hvacStatus: HvacStatus.cooling } :
+                        item));
+                } else if (newCoolCelsius > selectedTempData.ambientTempCelsius + 0.5) {
+                    setTempDataArray((prevState: TempDataArray) => 
+                        prevState.map(item => item.deviceID === selectedDeviceID ?
+                        { ...item, hvacStatus: HvacStatus.off } :
+                        item));
                 }
             }
             console.log("set demo coolpoint");
@@ -138,7 +204,8 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         
         let url = "/api/set_cool";
         try {
-            const reqBody = {
+            const reqBody: SetCoolBody = {
+                deviceID: selectedDeviceID,
                 coolCelsius: newCoolCelsius
             };
             const response = await fetch(url, {
@@ -160,20 +227,34 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
     }
 
     async function setRangeCelsius(newHeatCelsius: number | null, newCoolCelsius: number | null) {
-        if (newHeatCelsius === null || newCoolCelsius === null) {
+        if (newHeatCelsius === null || newCoolCelsius === null || selectedDeviceID === null) {
             return;
         };
         if (demoMode) {
-            setTempData(prevState => ({...prevState, heatCelsius : newHeatCelsius, coolCesius: newCoolCelsius}));
-            if (tempData.ambientTempCelsius !== null) {
+            setTempDataArray((prevState: TempDataArray) => 
+                prevState.map(item => item.deviceID === selectedDeviceID ?
+                { ...item, heatCelsius: newHeatCelsius, coolCelsius: newCoolCelsius } :
+                item)
+            );
+            let selectedTempData = getSelectedTempData();
+            if (selectedTempData.ambientTempCelsius !== null) {
                 // give a 0.5C degree buffer before HVAC changes
-                if (newCoolCelsius < tempData.ambientTempCelsius - 0.5) {
-                    setTempData(prevState => ({...prevState, hvacStatus : HvacStatus.cooling}));
-                } else if (newHeatCelsius > tempData.ambientTempCelsius + 0.5) {
-                    setTempData(prevState => ({...prevState, hvacStatus : HvacStatus.heating}));
-                } else if (newCoolCelsius > tempData.ambientTempCelsius + 0.5 ||
-                    newHeatCelsius < tempData.ambientTempCelsius - 0.5) {
-                    setTempData(prevState => ({...prevState, hvacStatus : HvacStatus.off}));
+                if (newCoolCelsius < selectedTempData.ambientTempCelsius - 0.5) {
+                    setTempDataArray((prevState: TempDataArray) => 
+                        prevState.map(item => item.deviceID === selectedDeviceID ?
+                        { ...item, hvacStatus: HvacStatus.cooling } :
+                        item));
+                } else if (newHeatCelsius > selectedTempData.ambientTempCelsius + 0.5) {
+                    setTempDataArray((prevState: TempDataArray) => 
+                        prevState.map(item => item.deviceID === selectedDeviceID ?
+                        { ...item, hvacStatus: HvacStatus.heating } :
+                        item));
+                } else if (newCoolCelsius > selectedTempData.ambientTempCelsius + 0.5 ||
+                    newHeatCelsius < selectedTempData.ambientTempCelsius - 0.5) {
+                    setTempDataArray((prevState: TempDataArray) => 
+                        prevState.map(item => item.deviceID === selectedDeviceID ?
+                        { ...item, hvacStatus: HvacStatus.off } :
+                        item));
                 }
             }
             console.log("set demo range");
@@ -182,7 +263,8 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         
         let url = "/api/set_range";
         try {
-            const reqBody = {
+            const reqBody: SetRangeBody = {
+                deviceID: selectedDeviceID,
                 heatCelsius: newHeatCelsius,
                 coolCelsius: newCoolCelsius
             };
@@ -205,6 +287,9 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
     }
 
     async function setTempMode(newTempMode: TempMode) {
+        if (selectedDeviceID === null) {
+            return;
+        }
         if (demoMode) {
             // because we aren't getting the real tempData, we need to determine new setpoints
             // these will be based on default setpoints
@@ -217,25 +302,32 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
                 newCoolCelsius = demoSetPointDefaults.coolCelsius;
             }
             let newHvacStatus = HvacStatus.off;
-            if (tempData.ambientTempCelsius !== null) {
+            let selectedTempData = getSelectedTempData();
+            if (selectedTempData.ambientTempCelsius !== null) {
                 // give a 0.5C degree buffer for HVAC depending on mode
                 if ((newTempMode === TempMode.heat || newTempMode === TempMode.heatcool) && newHeatCelsius !== null
-                    && tempData.ambientTempCelsius - 0.5 < newHeatCelsius) {
+                    && selectedTempData.ambientTempCelsius - 0.5 < newHeatCelsius) {
                     newHvacStatus = HvacStatus.heating;
                 } else if ((newTempMode === TempMode.cool || newTempMode === TempMode.heatcool) && newCoolCelsius !== null
-                    && tempData.ambientTempCelsius - 0.5 > newCoolCelsius) {
+                    && selectedTempData.ambientTempCelsius - 0.5 > newCoolCelsius) {
                     newHvacStatus = HvacStatus.cooling;
                 }
             }
-            setTempData(prevState => ({...prevState, tempMode : newTempMode, heatCelsius: newHeatCelsius, coolCelsius: newCoolCelsius, hvacStatus: newHvacStatus}));
+            setTempDataArray((prevState: TempDataArray) => 
+                prevState.map(item => item.deviceID === selectedDeviceID ?
+                { ...item, tempMode: newTempMode, heatCelsius: newHeatCelsius, coolCelsius: newCoolCelsius,
+                    hvacStatus: newHvacStatus
+                 } :
+                item));
             console.log("set demo tempMode");
             return;
         }
         
         let url = "/api/set_temp_mode";
         try {
-            const reqBody = {
-                TempMode: newTempMode,
+            const reqBody: SetTempModeBody = {
+                deviceID: selectedDeviceID,
+                tempMode: newTempMode,
             };
             const response = await fetch(url, {
                 method: "POST",
@@ -255,7 +347,7 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         }
     }
 
-    let value: TempContextType = {tempData, setTempData, fetchTempData, setHeatCelsius, setCoolCelsius, setRangeCelsius, setTempMode};
+    let value: TempContextType = {tempDataArray, fetchTempData, getSelectedTempData, debounceTimeoutRef, selectedDeviceID, changeDeviceID, setHeatCelsius, setCoolCelsius, setRangeCelsius, setTempMode};
 
     return (
         <TempDataContext.Provider value={value}>{props.children}</TempDataContext.Provider>

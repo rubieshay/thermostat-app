@@ -108,18 +108,18 @@ fastify.post<{Body: SetRangeBody;}>("/set_range", {schema: { body: setRangeSchem
 });
 
 fastify.post<{Body: SetTempModeBody;}>("/set_temp_mode", {schema: { body: setTempModeSchema } }, async (request, reply) => {
-    const { deviceID, mode } = request.body;
-    let fetchReturn = await setMode(deviceID,mode);
+    const { deviceID, tempMode } = request.body;
+    let fetchReturn = await setMode(deviceID,tempMode);
     if (!fetchReturn.success) {
-        reply.status(500).send({ error: fetchReturn.error || "Failed to set mode" });
+        reply.status(500).send({ error: fetchReturn.error || "Failed to set temp mode" });
     } else {
         reply.send({ success: true, message: "TempMode set successfully", data: fetchReturn.data });
     }
 });
 
 fastify.post<{Body: SetEcoModeBody;}>("/set_eco_mode", {schema: { body: setEcoModeSchema } }, async (request, reply) => {
-    const { deviceID, mode } = request.body;
-    let fetchReturn = await setEcoMode(deviceID,mode);
+    const { deviceID, ecoMode } = request.body;
+    let fetchReturn = await setEcoMode(deviceID,ecoMode);
     if (!fetchReturn.success) {
         reply.status(500).send({ error: fetchReturn.error || "Failed to set eco mode" });
     } else {

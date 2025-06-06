@@ -1,7 +1,7 @@
 /* MAIN DIAL */
 #dial {
-    --spin-time: 1000ms;
-    --dial-bg: var(--color-gray-4);
+    --spin-time: 400ms;
+    --dial-bg: var(--color-gray-5);
     display: grid;
     place-items: center;
     grid-template-rows: 1fr;
@@ -121,8 +121,8 @@ h2#offline-message {
     --start-dial: calc(-1*var(--used-dial-ratio)/2);
     --start-range: calc(var(--start-thumb) - var(--start-dial));
     --end-range: calc(var(--end-thumb) - var(--start-dial));
-    --track-bg: var(--color-gray-3);
-    --track-range-bg: var(--color-gray-2);
+    --track-bg: var(--color-gray-4);
+    --track-range-bg: var(--color-gray-3);
     width: calc(0.84*var(--dial-size));
     height: calc(0.84*var(--dial-size));
     border-radius: 50%;
@@ -182,25 +182,25 @@ h2#offline-message {
     position: absolute;
     top: 0;
     transform: translateY(-50%);
-    transition: --cap-bg var(--spin-time) ease-in-out;
 }
 #dial .track-cap-active::before {
-    --cap-bg: var(--color-gray-2);
+    --cap-bg: var(--color-gray-3);
+    transition: --cap-bg var(--spin-time) ease-in-out;
 }
 #dial .track-cap-outer::before, #dial .track-cap-active-off::before {
-    --cap-bg: var(--color-gray-3);
+    --cap-bg: var(--color-gray-4);
 }
-#dial.hvac-status-cooling .track-cap-active {
-    --cap-bg: var(--color-cool-2);
-}
-#dial.hvac-status-cooling .track-cap-outer, #dial.hvac-status-cooling .track-cap-active-off {
+#dial.hvac-status-cooling .track-cap-active::before {
     --cap-bg: var(--color-cool-3);
 }
-#dial.hvac-status-heating .track-cap-active {
-    --cap-bg: var(--color-heat-2);
+#dial.hvac-status-cooling .track-cap-outer::before, #dial.hvac-status-cooling .track-cap-active-off::before {
+    --cap-bg: var(--color-cool-4);
 }
-#dial.hvac-status-heating .track-cap-outer, #dial.hvac-status-heating .track-cap-active-off {
+#dial.hvac-status-heating .track-cap-active::before {
     --cap-bg: var(--color-heat-3);
+}
+#dial.hvac-status-heating .track-cap-outer::before, #dial.hvac-status-heating .track-cap-active-off::before {
+    --cap-bg: var(--color-heat-4);
 }
 
 
