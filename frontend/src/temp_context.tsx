@@ -1,6 +1,6 @@
-import { createContext, useState, useRef } from "react";
-import { type TempData, initTempData, demoTempData, HvacStatus } from "./types";
-import { demoMode, responseWaitTime } from "./utils";
+import { createContext, useState } from "react";
+import { type TempData, initTempData, demoTempData, HvacStatus, TempMode, demoSetPointDefaults } from "./types";
+import { demoMode } from "./utils";
 
 export interface TempContextType {
     tempData: TempData,
@@ -9,6 +9,7 @@ export interface TempContextType {
     setHeatCelsius: (newHeatCelsius: number | null) => void,
     setCoolCelsius: (newCoolCelsius: number | null) => void,
     setRangeCelsius: (newHeatCelsius: number | null, newCoolCelsius: number | null) => void
+    setTempMode: (newTempMode: TempMode) => void
 }
 export const initTempContext: TempContextType = {
     tempData: initTempData,
@@ -17,6 +18,7 @@ export const initTempContext: TempContextType = {
     setHeatCelsius: async () => {},
     setCoolCelsius: async () => {},
     setRangeCelsius: async () => {},
+    setTempMode: async () => {},
 }
 
 export const TempDataContext = createContext(initTempContext);
@@ -28,7 +30,7 @@ type TempDataProviderProps = {
 export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDataProviderProps) => {
     const [tempData, setTempData] = useState<TempData>(initTempData);
     // one shared timer for getting data after setting it
-    const getDataTimeoutRef = useRef<number | null>(null);
+    // const getDataTimeoutRef = useRef<number | null>(null);
 
     async function fetchTempData() {
         // DEMO DATA
@@ -63,13 +65,25 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         }
     }
 
+    async function refreshTempData () {
+        // if (getDataTimeoutRef.current) {
+        //     clearTimeout(getDataTimeoutRef.current);
+        // }
+        // getDataTimeoutRef.current = setTimeout(() => {
+        //     fetchTempData();
+        //     console.log("refreshed tempData");
+        // }, responseWaitTime);
+        fetchTempData();
+        console.log("refreshed tempData");
+    }
+
     async function setHeatCelsius(newHeatCelsius: number | null) {
         if (newHeatCelsius === null) {
             return;
         };
         if (demoMode) {
             setTempData(prevState => ({...prevState, heatCelsius : newHeatCelsius}));
-            if (newHeatCelsius !== null && tempData.ambientTempCelsius !== null) {
+            if (tempData.ambientTempCelsius !== null) {
                 // give a 1C degree buffer before hvac
                 if (newHeatCelsius > tempData.ambientTempCelsius + 0.5) {
                     setTempData(prevState => ({...prevState, hvacStatus : HvacStatus.heating}));
@@ -98,14 +112,7 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
             }
             const data = await response.json();
             console.log("Set heatpoint successfully:", data);
-            // Set timer to call fetchTempData
-            if (getDataTimeoutRef.current) {
-                clearTimeout(getDataTimeoutRef.current);
-            }
-            getDataTimeoutRef.current = setTimeout(() => {
-                fetchTempData();
-                console.log("refreshed tempData");
-            }, responseWaitTime);
+            refreshTempData();
         } catch (error) {
             console.error("Error setting heatpoint:", error);
         }
@@ -117,7 +124,7 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         };
         if (demoMode) {
             setTempData(prevState => ({...prevState, coolCelsius : newCoolCelsius}));
-            if (newCoolCelsius !== null && tempData.ambientTempCelsius !== null) {
+            if (tempData.ambientTempCelsius !== null) {
                 // give a 0.5C degree buffer before HVAC changes
                 if (newCoolCelsius < tempData.ambientTempCelsius - 0.5) {
                     setTempData(prevState => ({...prevState, hvacStatus : HvacStatus.cooling}));
@@ -146,14 +153,7 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
             }
             const data = await response.json();
             console.log("Set coolpoint successfully:", data);
-            // Set timer to call fetchTempData
-            if (getDataTimeoutRef.current) {
-                clearTimeout(getDataTimeoutRef.current);
-            }
-            getDataTimeoutRef.current = setTimeout(() => {
-                fetchTempData();
-                console.log("refreshed tempData");
-            }, responseWaitTime);
+            refreshTempData();
         } catch (error) {
             console.error("Error setting coolpoint:", error);
         }
@@ -165,9 +165,8 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         };
         if (demoMode) {
             setTempData(prevState => ({...prevState, heatCelsius : newHeatCelsius, coolCesius: newCoolCelsius}));
-            if (newHeatCelsius !== null && newCoolCelsius !== null && tempData.ambientTempCelsius !== null) {
+            if (tempData.ambientTempCelsius !== null) {
                 // give a 0.5C degree buffer before HVAC changes
-                console.log(newHeatCelsius, newCoolCelsius, tempData.ambientTempCelsius);
                 if (newCoolCelsius < tempData.ambientTempCelsius - 0.5) {
                     setTempData(prevState => ({...prevState, hvacStatus : HvacStatus.cooling}));
                 } else if (newHeatCelsius > tempData.ambientTempCelsius + 0.5) {
@@ -199,20 +198,64 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
             }
             const data = await response.json();
             console.log("Set range successfully:", data);
-            // Set timer to call fetchTempData
-            if (getDataTimeoutRef.current) {
-                clearTimeout(getDataTimeoutRef.current);
-            }
-            getDataTimeoutRef.current = setTimeout(() => {
-                fetchTempData();
-                console.log("refreshed tempData");
-            }, responseWaitTime);
+            refreshTempData();
         } catch (error) {
             console.error("Error setting range:", error);
         }
     }
 
-    let value: TempContextType = {tempData, setTempData, fetchTempData, setHeatCelsius, setCoolCelsius, setRangeCelsius};
+    async function setTempMode(newTempMode: TempMode) {
+        if (demoMode) {
+            // because we aren't getting the real tempData, we need to determine new setpoints
+            // these will be based on default setpoints
+            let newHeatCelsius = null;
+            let newCoolCelsius = null;
+            if (newTempMode === TempMode.heat || newTempMode === TempMode.heatcool) {
+                newHeatCelsius = demoSetPointDefaults.heatCelsius;
+            }
+            if (newTempMode === TempMode.cool || newTempMode === TempMode.heatcool) {
+                newCoolCelsius = demoSetPointDefaults.coolCelsius;
+            }
+            let newHvacStatus = HvacStatus.off;
+            if (tempData.ambientTempCelsius !== null) {
+                // give a 0.5C degree buffer for HVAC depending on mode
+                if ((newTempMode === TempMode.heat || newTempMode === TempMode.heatcool) && newHeatCelsius !== null
+                    && tempData.ambientTempCelsius - 0.5 < newHeatCelsius) {
+                    newHvacStatus = HvacStatus.heating;
+                } else if ((newTempMode === TempMode.cool || newTempMode === TempMode.heatcool) && newCoolCelsius !== null
+                    && tempData.ambientTempCelsius - 0.5 > newCoolCelsius) {
+                    newHvacStatus = HvacStatus.cooling;
+                }
+            }
+            setTempData(prevState => ({...prevState, tempMode : newTempMode, heatCelsius: newHeatCelsius, coolCelsius: newCoolCelsius, hvacStatus: newHvacStatus}));
+            console.log("set demo tempMode");
+            return;
+        }
+        
+        let url = "/api/set_temp_mode";
+        try {
+            const reqBody = {
+                TempMode: newTempMode,
+            };
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(reqBody)
+            });
+            if (!response.ok) {
+                return;
+            }
+            const data = await response.json();
+            console.log("Set tempMode successfully:", data);
+            refreshTempData();
+        } catch (error) {
+            console.error("Error setting tempMode:", error);
+        }
+    }
+
+    let value: TempContextType = {tempData, setTempData, fetchTempData, setHeatCelsius, setCoolCelsius, setRangeCelsius, setTempMode};
 
     return (
         <TempDataContext.Provider value={value}>{props.children}</TempDataContext.Provider>

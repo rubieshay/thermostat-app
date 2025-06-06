@@ -114,7 +114,7 @@ fastify.post<{Body: SetTempModeBody;}>("/set_temp_mode", {schema: { body: setTem
     if (!fetchReturn.success) {
         reply.status(500).send({ error: fetchReturn.error || "Failed to set mode" });
     } else {
-        reply.send({ success: true, message: "Mode set successfully", data: fetchReturn.data });
+        reply.send({ success: true, message: "TempMode set successfully", data: fetchReturn.data });
     }
 });
 
@@ -124,7 +124,7 @@ fastify.post<{Body: SetEcoModeBody;}>("/set_eco_mode", {schema: { body: setEcoMo
     if (!fetchReturn.success) {
         reply.status(500).send({ error: fetchReturn.error || "Failed to set eco mode" });
     } else {
-        reply.send({ success: true, message: "Mode set successfully", data: fetchReturn.data });
+        reply.send({ success: true, message: "EcoMode set successfully", data: fetchReturn.data });
     }
 });
 

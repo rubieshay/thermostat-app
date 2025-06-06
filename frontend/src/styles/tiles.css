@@ -1,0 +1,14 @@
+/* TEMP TILES STUFF */
+legend h2 {
+    font-variation-settings: "wght" 800;
+    margin-bottom: 0.5rem;
+}
+.radio-options {
+    display: grid;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.radio-option {
+    display: flex;
+    gap: 0.5rem;
+}

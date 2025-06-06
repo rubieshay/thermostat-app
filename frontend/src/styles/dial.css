@@ -1,128 +1,6 @@
-/* CSS RESET */
-*, *::before, *::after {
-    box-sizing: border-box;
-
-    padding: 0;
-    padding-inline: 0;
-    padding-block: 0;
-    padding-inline-start: 0;
-    padding-inline-end: 0;
-    padding-block-start: 0;
-    padding-block-end: 0;
-    padding-left: 0;
-    padding-right: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-
-    margin: 0;
-    margin-inline: 0;
-    margin-block: 0;
-    margin-inline-start: 0;
-    margin-inline-end: 0;
-    margin-block-start: 0;
-    margin-block-end: 0;
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 0;
-    margin-bottom: 0;
-
-    font-weight: normal;
-    font-weight: 400;
-    font-size: 1rem;
-    line-height: 1;
-    word-spacing: normal;
-    text-wrap-style: pretty;
-    text-decoration: none;
-    text-transform: none;
-    text-align: left;
-    font-family: inherit;
-    list-style: none;
-
-    background: none;
-    border: none;
-    outline: none;
-    color: inherit;
-    border-radius: 0;
-}
-
-button {
-    cursor: pointer;
-}
-
-/* TEMPORARY STUFF */
-section#info {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-:root {
-    --dial-size: min(100vh - 10rem, 92vw, 32rem);
-    /* --dial-size: min(32rem); */
-    --color-gray-0: #f4f3f3;
-    --color-gray-1: #c4b8b4;
-    --color-gray-2: #736c6a;
-    --color-gray-3: #4c4846;
-    --color-gray-4: #3e3a39;
-    --color-gray-5: #1b1919;
-    --color-heat-0: #eecbb2;
-    --color-heat-1: #e5ab81;
-    --color-heat-2: #bd7957;
-    --color-heat-3: #a15a40;
-    --color-heat-4: #69342b;
-    --color-heat-5: #542822;
-    --color-cool-0: #b4d8e5;
-    --color-cool-1: #71a6c7;
-    --color-cool-2: #537296;
-    --color-cool-3: #3e5978;
-    --color-cool-4: #283557;
-    --color-cool-5: #1c263f;
-
-    --main-bg: var(--color-gray-5);
-    --main-text: var(--color-gray-1);
-
-    background: var(--main-bg);
-    color: var(--main-text);
-    font-family: "Outfit", system-ui, sans-serif;
-    font-variation-settings: "wght" 300;
-}
-
-
-
-/* GENERAL  */
-body * {
-    font-variation-settings: "wght" 300;
-}
-.material-symbols-outlined {
-  font-variation-settings: "FILL" 0,
-                           "wght" 600,
-                           "GRAD" 0,
-                           "opsz" 24;
-}
-main {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 2rem;
-    margin: 2rem 4vw;
-}
-h1, h2, h3, h4, h5, h6 {
-    display: block;
-}
-h1 {
-    font-size: 1.5rem;
-    text-align: center;
-    line-height: 1.25;
-}
-h2#offline-message {
-    font-size: calc(0.1*var(--dial-size));
-}
-
-
-
 /* MAIN DIAL */
 #dial {
+    --spin-time: 1000ms;
     --dial-bg: var(--color-gray-4);
     display: grid;
     place-items: center;
@@ -199,6 +77,13 @@ h2#offline-message {
     font-variation-settings: "wght" 600;
 }
 
+h2#offline-message {
+    font-size: calc(0.1*var(--dial-size));
+}
+.material-symbols, #main-numbers * {
+    user-select: none;
+}
+
 
 
 /* DIAL TRACK AND RANGES */
@@ -217,6 +102,21 @@ h2#offline-message {
   inherits: false;
   initial-value: 0turn;
 }
+@property --cap-active-start-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0turn;
+}
+@property --cap-active-end-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0turn;
+}
+@property --cap-bg {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #00000000;
+}
 #dial .dial-track {
     --start-dial: calc(-1*var(--used-dial-ratio)/2);
     --start-range: calc(var(--start-thumb) - var(--start-dial));
@@ -230,8 +130,8 @@ h2#offline-message {
     position: relative;
     background: conic-gradient(from var(--start-dial), transparent var(--start-range), var(--track-range-bg) var(--start-range), var(--track-range-bg) var(--end-range), transparent var(--end-range)),
                 conic-gradient(from var(--start-dial), var(--track-bg) var(--used-dial-ratio), transparent var(--used-dial-ratio));
-    transition: --start-range 400ms ease-in-out, --end-range 400ms ease-in-out;
-    z-index: 3;
+    transition: --start-range var(--spin-time) ease-in-out, --end-range var(--spin-time) ease-in-out;
+    z-index: 2;
 }
 #dial.hvac-status-cooling .dial-track {
     --track-bg: var(--color-cool-4);
@@ -249,16 +149,27 @@ h2#offline-message {
     height: calc(0.78*var(--dial-size));
     margin: calc(0.03*var(--dial-size));
     border-radius: 50%;
-    z-index: 5;
+    z-index: 7;
 }
 #dial .track-cap {
     /* angle arm */
-    --cap-bg-out-range: var(--color-gray-3);
-    --cap-bg-in-range: var(--color-gray-2);
     width: calc(0.03*var(--dial-size));
     height: calc(0.81*var(--dial-size));
+}
+#dial .track-cap-active-start {
+    rotate: var(--cap-active-start-angle);
+    transition: --cap-active-start-angle var(--spin-time) ease-in-out;
+}
+#dial .track-cap-active-end {
+    rotate: var(--cap-active-end-angle);
+    transition: --cap-active-end-angle var(--spin-time) ease-in-out;
+}
+#dial .track-cap-active {
+    z-index: 4;
+}
+#dial .track-cap-outer {
     rotate: var(--cap-angle);
-    z-index: 1;
+    z-index: 3;
 }
 #dial .track-cap::before {
     /* displayed cap */
@@ -271,16 +182,27 @@ h2#offline-message {
     position: absolute;
     top: 0;
     transform: translateY(-50%);
+    transition: --cap-bg var(--spin-time) ease-in-out;
+}
+#dial .track-cap-active::before {
+    --cap-bg: var(--color-gray-2);
+}
+#dial .track-cap-outer::before, #dial .track-cap-active-off::before {
+    --cap-bg: var(--color-gray-3);
+}
+#dial.hvac-status-cooling .track-cap-active {
+    --cap-bg: var(--color-cool-2);
+}
+#dial.hvac-status-cooling .track-cap-outer, #dial.hvac-status-cooling .track-cap-active-off {
+    --cap-bg: var(--color-cool-3);
+}
+#dial.hvac-status-heating .track-cap-active {
+    --cap-bg: var(--color-heat-2);
+}
+#dial.hvac-status-heating .track-cap-outer, #dial.hvac-status-heating .track-cap-active-off {
+    --cap-bg: var(--color-heat-3);
 }
 
-#dial.hvac-status-cooling .track-cap {
-    --cap-bg-out-range: var(--color-cool-4);
-    --cap-bg-in-range: var(--color-cool-3);
-}
-#dial.hvac-status-heating .track-cap {
-    --cap-bg-out-range: var(--color-heat-4);
-    --cap-bg-in-range: var(--color-heat-3);
-}
 
 
 /* DIAL THUMBS */
@@ -289,7 +211,7 @@ h2#offline-message {
     height: calc(0.81*var(--dial-size));
     position: relative;
     rotate: var(--thumb-angle);
-    transition: --thumb-angle 400ms ease-in-out;
+    transition: --thumb-angle var(--spin-time) ease-in-out;
 }
 .dial-thumb {
     width: calc(0.03*var(--dial-size));
@@ -315,7 +237,8 @@ h2#offline-message {
     width: calc(0.03*var(--dial-size));
     height: calc(0.81*var(--dial-size));
     rotate: var(--thumb-angle);
-    transition: --thumb-angle 400ms ease-in-out;
+    transition: --thumb-angle var(--spin-time) ease-in-out;
+    z-index: 5;
 }
 .dial-thumb::before {
     /* displayed thumb */
@@ -341,6 +264,9 @@ h2#offline-message {
     transform: translate(-50%, -50%);
     cursor: pointer;
 }
+#ambient-thumb {
+    z-index: 6;
+}
 #coolpoint-thumb.dial-thumb::before {
     background: var(--color-cool-1);
 }
@@ -349,9 +275,11 @@ h2#offline-message {
 }
 
 
+
 /* BOTTOM BUTTONS/STATUS */
 .bottom-icon {
     position: relative;
+    font-size: calc(0.06*var(--dial-size));
     bottom: calc(0.08*var(--dial-size));
 }
 .dial-buttons {

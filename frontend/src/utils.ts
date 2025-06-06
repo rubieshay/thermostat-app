@@ -7,7 +7,7 @@ export const demoMode = ((window as any)._env_.DEMO_MODE === "TRUE" ||
                          (window as any)._env_.DEMO_MODE === "YES") ? true : false;
 
 export const debounceTime: number = 3000;
-export const responseWaitTime: number = 5000;
+// export const responseWaitTime: number = 5000;
 export const setPointFadeDelay: number = 3000;
 export const setPointFadeDuration: number = 1000;
  

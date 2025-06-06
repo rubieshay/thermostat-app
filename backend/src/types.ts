@@ -42,9 +42,9 @@ export const initTempData: TempData = {
 // INIT DATA FOR DEMO MODE
 export const demoTempData: TempData = {
     tempUnits: TempUnits.fahrenheit,
-    ambientTempCelsius: 20.126007,
+    ambientTempCelsius: 20,
     heatCelsius: 18.888889,
-    coolCelsius: 23.333333,
+    coolCelsius: 22.222222,
     tempMode: TempMode.heatcool,
     hvacStatus: HvacStatus.off,
     ecoMode: EcoMode.off,
@@ -54,6 +54,16 @@ export const demoTempData: TempData = {
     connectivity: Connectivity.online,
     deviceName: "My Demo Thermostat",
     ambientHumidity: 50
+}
+
+export type SetPointDefaults = {
+    heatCelsius: number,
+    coolCelsius: number,
+}
+
+export const demoSetPointDefaults: SetPointDefaults = {
+    heatCelsius: 18.888889,
+    coolCelsius: 22.222222,
 }
 
 export type WeatherData = {
