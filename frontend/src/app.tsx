@@ -1,6 +1,7 @@
 import Title from "./title";
 import Dial from "./dial";
 import Tiles from "./tiles";
+import Error from "./error";
 import { TempDataProvider } from "./temp_context";
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
                 <Title/>
                 <Dial/>
                 <Tiles/>
+                <Error/>
             </main>
         </TempDataProvider>
     )

@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext} from "react";
 import { Connectivity } from "./types";
 import { TempDataContext } from "./temp_context";
 

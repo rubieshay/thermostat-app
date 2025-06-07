@@ -3,14 +3,32 @@ import { type TempData, type TempDataArray, type FetchReturn, initTempData, demo
 import { type SetHeatBody, type SetCoolBody, type SetRangeBody, type SetTempModeBody, type SetEcoModeBody } from "./schemas";
 import { demoMode, debounceTime, defaultAPIURL } from "./utils";
 
+type LastAPIError  = {
+    fetchReturn: FetchReturn,
+    lastErrorWasFetch: boolean;
+    errorSeq: number;
+}
+
+const initLastAPIError: LastAPIError = {
+    fetchReturn : {success: false},
+    lastErrorWasFetch: false,
+    errorSeq: 0,
+}
+
+const noLastAPIError: LastAPIError = {
+    fetchReturn: {success: true},
+    lastErrorWasFetch: false,
+    errorSeq: 0
+}
+
 export interface TempContextType {
     tempDataArray: TempData[];
     fetchTempData: () => Promise<FetchReturn>,
     initialLoadComplete: boolean,
-    lastAPIStatus: FetchReturn | null,
+    lastAPIError: LastAPIError,
+    clearAPIError: () => void,
     getSelectedTempData: () => TempData,
     debounceTempData: (calledFunction: Function) => void,
-    // debounceTimer: RefObject<number | null>,
     selectedDeviceID: string | null,
     changeDeviceID: (newDeviceID: string) => void,
     setHeatCelsius: (newHeatCelsius: number | null) => void,
@@ -23,10 +41,10 @@ export const initTempContext: TempContextType = {
     tempDataArray: [],
     fetchTempData: async () => {return {success: false}},
     initialLoadComplete: false,
-    lastAPIStatus: null,
+    lastAPIError: structuredClone(noLastAPIError),
+    clearAPIError: () => {},
     getSelectedTempData: () => {return structuredClone(initTempData)},
     debounceTempData: () => {},
-    // debounceTimer: createRef(),
     selectedDeviceID: null,
     changeDeviceID: () => {},
     setHeatCelsius: async () => {},
@@ -46,7 +64,7 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
     const [tempDataArray, setTempDataArray] = useState<TempDataArray>([structuredClone(initTempData)]);
     const [selectedDeviceID, setSelectedDeviceID] = useState<string | null>(null);
     const [initialLoadComplete, setInitialLoadComplete] = useState<boolean>(false);
-    const [lastAPIStatus, setLastAPIStatus] = useState<FetchReturn | null>(null);
+    const [lastAPIError, setLastAPIError] = useState<LastAPIError>(noLastAPIError);
     const hasFetchedInitial = useRef<boolean>(false);
     const debounceTimer = useRef<number | null>(null);
     // one shared timer for getting data after setting it
@@ -67,12 +85,13 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
     }, []);
 
     useEffect( () => {
-        console.log("lastAPIStatus changed:", structuredClone(lastAPIStatus));
+        console.log("lastAPIError changed:", structuredClone(lastAPIError));
 
-    },[lastAPIStatus?.error])
+    },[lastAPIError.fetchReturn.success])
 
     async function fetchTempData(): Promise<FetchReturn> {
-        let fetchReturn: FetchReturn = {success: false}
+        let fetchError: LastAPIError = structuredClone(initLastAPIError);
+        fetchError.errorSeq = lastAPIError.errorSeq + 1;
         // DEMO DATA
         if (demoMode) {
             setTempDataArray(structuredClone(demoTempDataArray));
@@ -80,9 +99,8 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
                 setSelectedDeviceID(demoTempDataArray[0].deviceID);
             }
             console.log("got demo data");
-            fetchReturn.success = true;
-            setLastAPIStatus(fetchReturn);
-            return fetchReturn;
+            fetchError.fetchReturn.success = true;
+            return(fetchError.fetchReturn);
         }
         // REAL DATA
         const url = defaultAPIURL + "/info";
@@ -94,10 +112,11 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
                 }
             });
             if (!response.ok) {
-                fetchReturn.error = "Failed to fetch temp data: " + response.statusText;
-                fetchReturn.httpCode = response.status;
-                setLastAPIStatus(fetchReturn)
-                return fetchReturn;
+                fetchError.fetchReturn.error = "Failed to fetch temp data: " + response.statusText;
+                fetchError.fetchReturn.httpCode = response.status;
+                fetchError.lastErrorWasFetch = true;
+                setLastAPIError(fetchError)
+                return fetchError.fetchReturn;
             }
             const data = await response.json();
             console.log("Got temp data successfully:", data);
@@ -106,18 +125,19 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
                 if (selectedDeviceID === null) {
                     setSelectedDeviceID(data[0].deviceID);
                 }
-                fetchReturn.success = true;
+                fetchError.fetchReturn.success = true;
             } else {
-                fetchReturn.error = "Invalid temp data format";
-                fetchReturn.httpCode = 500;
-                setLastAPIStatus(fetchReturn)
+                fetchError.fetchReturn.error = "Invalid temp data format";
+                fetchError.fetchReturn.httpCode = 500;
+                fetchError.lastErrorWasFetch = true;
+                setLastAPIError(fetchError)
                 console.error("Invalid temp data format:", data);
             }
         } catch (error) {
             console.error("Error fetching temp data info:", error);
         }
-        setLastAPIStatus(fetchReturn)
-        return fetchReturn;
+        setLastAPIError(fetchError)
+        return fetchError.fetchReturn;
     }
 
     async function refreshTempData () {
@@ -187,7 +207,8 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         }
         
         const url = defaultAPIURL + "/set_heat";
-        let fetchReturn: FetchReturn = {success: false};
+        let fetchError: LastAPIError = structuredClone(initLastAPIError);
+        fetchError.errorSeq = lastAPIError.errorSeq + 1;
         try {
             const reqBody: SetHeatBody = {
                 deviceID: selectedDeviceID,
@@ -201,16 +222,16 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
                 body: JSON.stringify(reqBody)
             });
             if (!response.ok) {
-                fetchReturn.error = "Failed to set heat: " + response.statusText;
-                setLastAPIStatus(fetchReturn)
+                fetchError.fetchReturn.error = "Failed to set heat: " + response.statusText;
+                setLastAPIError(fetchError)
                 return;
             }
             const data = await response.json();
             console.log("Set heatpoint successfully:", data);
             refreshTempData();
         } catch (error) {
-            fetchReturn.error = "Error setting heatpoint: " + error;
-            setLastAPIStatus(fetchReturn)
+            fetchError.fetchReturn.error = "Error setting heatpoint: " + error;
+            setLastAPIError(fetchError)
             console.error("Error setting heatpoint:", error);
         }
     }
@@ -245,7 +266,8 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         }
         
         const url = defaultAPIURL + "/set_cool";
-        let fetchReturn: FetchReturn = {success: false};
+        let fetchError: LastAPIError = structuredClone(initLastAPIError);
+        fetchError.errorSeq = lastAPIError.errorSeq + 1;
         try {
             const reqBody: SetCoolBody = {
                 deviceID: selectedDeviceID,
@@ -259,17 +281,17 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
                 body: JSON.stringify(reqBody)
             });
             if (!response.ok) {
-                fetchReturn.error = "Failed to set cool: " + response.statusText;
-                fetchReturn.httpCode = response.status;
-                setLastAPIStatus(fetchReturn);
+                fetchError.fetchReturn.error = "Failed to set cool: " + response.statusText;
+                fetchError.fetchReturn.httpCode = response.status;
+                setLastAPIError(fetchError);
                 return;
             }
             const data = await response.json();
             console.log("Set coolpoint successfully:", data);
             refreshTempData();
         } catch (error) {
-            fetchReturn.error = "Error setting coolpoint: " + error;
-            setLastAPIStatus(fetchReturn);
+            fetchError.fetchReturn.error = "Error setting coolpoint: " + error;
+            setLastAPIError(fetchError);
             console.error("Error setting coolpoint:", error);
         }
     }
@@ -310,7 +332,8 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         }
         
         const url = defaultAPIURL + "/set_range";
-        let fetchReturn: FetchReturn = {success: false};
+        let fetchError: LastAPIError = structuredClone(initLastAPIError);
+        fetchError.errorSeq = lastAPIError.errorSeq + 1;
         try {
             const reqBody: SetRangeBody = {
                 deviceID: selectedDeviceID,
@@ -325,17 +348,17 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
                 body: JSON.stringify(reqBody)
             });
             if (!response.ok) {
-                fetchReturn.error = "Failed to set range: " + response.statusText;
-                fetchReturn.httpCode = response.status;
-                setLastAPIStatus(fetchReturn);
+                fetchError.fetchReturn.error = "Failed to set range: " + response.statusText;
+                fetchError.fetchReturn.httpCode = response.status;
+                setLastAPIError(fetchError);
                 return;
             }
             const data = await response.json();
             console.log("Set range successfully:", data);
             refreshTempData();
         } catch (error) {
-            fetchReturn.error = "Error setting range: " + error;
-            setLastAPIStatus(fetchReturn);
+            fetchError.fetchReturn.error = "Error setting range: " + error;
+            setLastAPIError(fetchError);
             console.error("Error setting range:", error);
         }
     }
@@ -378,7 +401,8 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         }
         
         const url = defaultAPIURL + "/set_temp_mode";
-        let fetchReturn: FetchReturn = {success: false};
+        let fetchError: LastAPIError = structuredClone(initLastAPIError);
+        fetchError.errorSeq = lastAPIError.errorSeq + 1;
         try {
             const reqBody: SetTempModeBody = {
                 deviceID: selectedDeviceID,
@@ -392,17 +416,17 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
                 body: JSON.stringify(reqBody)
             });
             if (!response.ok) {
-                fetchReturn.error = "Failed to set tempMode: " + response.statusText;
-                fetchReturn.httpCode = response.status;
-                setLastAPIStatus(fetchReturn);
+                fetchError.fetchReturn.error = "Failed to set tempMode: " + response.statusText;
+                fetchError.fetchReturn.httpCode = response.status;
+                setLastAPIError(fetchError);
                 return;
             }
             const data = await response.json();
             console.log("Set tempMode successfully:", data);
             refreshTempData();
         } catch (error) {
-            fetchReturn.error = "Error setting tempMode: " + error;
-            setLastAPIStatus(fetchReturn);
+            fetchError.fetchReturn.error = "Error setting tempMode: " + error;
+            setLastAPIError(fetchError);
             console.error("Error setting tempMode:", error);
         }
     }
@@ -446,7 +470,8 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         }
         
         const url = defaultAPIURL + "/set_eco_mode";
-        let fetchReturn: FetchReturn = {success: false};
+        let fetchError: LastAPIError = structuredClone(initLastAPIError);
+        fetchError.errorSeq = lastAPIError.errorSeq + 1;
         try {
             const reqBody: SetEcoModeBody = {
                 deviceID: selectedDeviceID,
@@ -460,23 +485,27 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
                 body: JSON.stringify(reqBody)
             });
             if (!response.ok) {
-                fetchReturn.error = "Failed to set ecoMode: " + response.statusText;
-                fetchReturn.httpCode = response.status;
-                setLastAPIStatus(fetchReturn);
-                console.log("Failed to set ecoMode:", fetchReturn.error);
+                fetchError.fetchReturn.error = "Failed to set ecoMode: " + response.statusText;
+                fetchError.fetchReturn.httpCode = response.status;
+                setLastAPIError(fetchError);
+                console.log("Failed to set ecoMode:", fetchError.fetchReturn.error);
                 return;
             }
             const data = await response.json();
             console.log("Set ecoMode successfully:", data);
             refreshTempData();
         } catch (error) {
-            fetchReturn.error = "Error setting ecoMode: " + error;
-            setLastAPIStatus(fetchReturn);
+            fetchError.fetchReturn.error = "Error setting ecoMode: " + error;
+            setLastAPIError(fetchError);
             console.error("Error setting ecoMode:", error);
         }
     }
 
-    const value: TempContextType = {tempDataArray, fetchTempData, initialLoadComplete, lastAPIStatus, getSelectedTempData, debounceTempData, selectedDeviceID, changeDeviceID, setHeatCelsius, setCoolCelsius, setRangeCelsius, setTempMode, setEcoMode};
+    function clearAPIError() {
+        setLastAPIError(structuredClone(noLastAPIError));
+    }
+
+    const value: TempContextType = {tempDataArray, fetchTempData, initialLoadComplete, lastAPIError, clearAPIError, getSelectedTempData, debounceTempData, selectedDeviceID, changeDeviceID, setHeatCelsius, setCoolCelsius, setRangeCelsius, setTempMode, setEcoMode};
 
     return (
         <TempDataContext.Provider value={value}>{props.children}</TempDataContext.Provider>

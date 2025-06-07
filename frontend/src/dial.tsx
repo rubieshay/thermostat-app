@@ -5,7 +5,7 @@ import { TempDataContext } from "./temp_context";
 
 function Dial() {
     enum SetPointType {heat, cool};
-    const {fetchTempData, getSelectedTempData, debounceTempData, setHeatCelsius, setCoolCelsius, setRangeCelsius} = useContext(TempDataContext);
+    const {getSelectedTempData, debounceTempData, setHeatCelsius, setCoolCelsius, setRangeCelsius} = useContext(TempDataContext);
     const [dispCoolPoint, setDispCoolPoint] = useState<number | null>(null);
     const [dispHeatPoint, setDispHeatPoint] = useState<number | null>(null);
     const [activeSetPoint, setActiveSetPoint] = useState<SetPointType | null>(null);
