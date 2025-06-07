@@ -6,10 +6,12 @@ function Error() {
     const [errorText, setErrorText] = useState<string>("");
 
     useEffect( () => {
+        if (lastAPIError.errorSeq = 0) {return;};
+        console.log("Error Sequence incremented... lastAPIError:",structuredClone(lastAPIError));
         setErrorText(String(lastAPIError.fetchReturn.error));
         if (!lastAPIError.lastErrorWasFetch) {
-        clearAPIError();
-        fetchTempData();
+            clearAPIError();
+            fetchTempData();
         }
     },[lastAPIError.errorSeq]);
     

@@ -1,7 +1,8 @@
-import { googleClientSecret, googleRefreshToken, googleClientId, googleProjectId} from "./index";
+import { googleClientSecret, googleRefreshToken, googleClientId, googleProjectId, demoMode } from "./index";
 import { APIParams, CoolParams, EcoModeParams, HeatParams, TempModeParams, RangeParams, FanTimerParams } from "./schemas";
 import { Connectivity, FetchReturn, FanMode, TempMode, HvacStatus, EcoMode,
-        TempUnitsName, TempUnits, TempData, initTempData, FanTimerMode } from "./types"; 
+        TempUnitsName, TempUnits, TempData, initTempData, FanTimerMode, 
+        demoTempDataArray} from "./types"; 
 import { TempCommands, deviceTypeThermostat } from "./utils"
 
 export let tempDataInfo: TempData[] = [];
@@ -16,6 +17,7 @@ const TokenExpireBufferSeconds = 300;
 
 async function checkAndRenewAccessToken() {
     let fetchReturn: FetchReturn = {success: false};
+    if (demoMode) { fetchReturn.success = true; return fetchReturn};
     if (accessToken === null || accessTokenExpirationTime === null) {
         fetchReturn = await getAccessToken();
         return fetchReturn;
@@ -69,6 +71,11 @@ export async function getDeviceInfo() : Promise<FetchReturn> {
     if (!accessFetchReturn.success) {return accessFetchReturn;};
     const urlString = encodeURI("https://smartdevicemanagement.googleapis.com/v1/enterprises/"+encodeURIComponent(googleProjectId)+"/devices");
     const fetchReturn: FetchReturn = {success: false}
+    if (demoMode) {
+        fetchReturn.success = true;
+        tempDataInfo = structuredClone(demoTempDataArray);
+        return fetchReturn;
+    }
     try {
         const request = new Request(urlString);
         request.headers.set("Authorization", "Bearer " + accessToken);
@@ -182,7 +189,8 @@ async function makeGoogleAPICall(url: string, command: TempCommands,params: APIP
     let accessFetchReturn = await checkAndRenewAccessToken();
     if (!accessFetchReturn.success) {return accessFetchReturn;};
     let fetchReturn:FetchReturn = {success: false};
-        try {
+    if (demoMode) { fetchReturn.success = true; return fetchReturn;}
+    try {
         const request = new Request(url);
         request.headers.set("Authorization", "Bearer " + accessToken);
         request.headers.set('Content-Type', 'application/json');
