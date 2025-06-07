@@ -3,7 +3,7 @@ import { APIParams, CoolParams, EcoModeParams, HeatParams, TempModeParams, Range
 import { Connectivity, FetchReturn, FanMode, TempMode, HvacStatus, EcoMode,
         TempUnitsName, TempUnits, TempData, initTempData, FanTimerMode, 
         demoTempDataArray} from "./types"; 
-import { TempCommands, deviceTypeThermostat } from "./utils"
+import { TempCommands, deviceTypeThermostat, sleep } from "./utils"
 
 export let tempDataInfo: TempData[] = [];
 
@@ -74,6 +74,7 @@ export async function getDeviceInfo() : Promise<FetchReturn> {
     if (demoMode) {
         fetchReturn.success = true;
         tempDataInfo = structuredClone(demoTempDataArray);
+        await sleep(4000);
         return fetchReturn;
     }
     try {

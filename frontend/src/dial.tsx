@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { TempUnits, TempMode, EcoMode, HvacStatus, Connectivity } from "./types";
 import { roundedTemp, convertTemp, maxDialTemps, minDialTemps, usedDialRatio, decimalPrecision, minRangeGap, makeTempInRange } from "./utils";
 import { TempDataContext } from "./temp_context";

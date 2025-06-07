@@ -1,8 +1,8 @@
-import { createContext, useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { createContext, useState, useRef, useEffect, useCallback, useMemo} from "react";
 import { type TempData, type TempDataArray, type FetchReturn, 
     type LastAPIError, initLastAPIError, noLastAPIError, initTempData, demoTempDataArray, HvacStatus, TempMode, EcoMode, demoSetPointDefaults } from "./types";
 import { type SetHeatBody, type SetCoolBody, type SetRangeBody, type SetTempModeBody, type SetEcoModeBody } from "./schemas";
-import { demoMode, debounceTime, defaultAPIURL } from "./utils";
+import { demoMode, debounceTime, defaultAPIURL, type ChildrenProviderProps } from "./utils";
 
 
 export interface TempContextType {
@@ -40,11 +40,7 @@ export const initTempContext: TempContextType = {
 
 export const TempDataContext = createContext(initTempContext);
 
-type TempDataProviderProps = {
-    children: React.ReactNode;
-}
-
-export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDataProviderProps) => {
+export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: ChildrenProviderProps) => {
     const [tempDataArray, setTempDataArray] = useState<TempDataArray>([structuredClone(initTempData)]);
     const [selectedDeviceID, setSelectedDeviceID] = useState<string | null>(null);
     const [initialLoadComplete, setInitialLoadComplete] = useState<boolean>(false);
@@ -71,6 +67,10 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
     useEffect ( () => {
         console.log("TempDataArray changed: ",structuredClone(tempDataArray));
     },[tempDataArray[0].deviceID])
+
+    useEffect( () => {
+        console.log("Initial Load Complete changed to:", initialLoadComplete);
+    },[initialLoadComplete])
 
     async function fetchTempData(): Promise<FetchReturn> {
         console.log("in FetchTempData...");

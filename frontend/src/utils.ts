@@ -47,3 +47,7 @@ export function makeTempInRange(tempVal: number | null, tempUnits: TempUnits): n
     return Math.min(Math.max(minDialTemps[tempUnits], tempVal), maxDialTemps[tempUnits])
 }
 
+export type ChildrenProviderProps = {
+    children: React.ReactNode;
+}
+

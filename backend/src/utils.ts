@@ -8,3 +8,7 @@ export enum TempCommands {
 }
 
 export const deviceTypeThermostat = "sdm.devices.types.THERMOSTAT"
+
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
