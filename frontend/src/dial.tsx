@@ -60,10 +60,6 @@ function Dial() {
         setDispHeatPoint(roundedTemp(unitTemp, tempData.tempUnits));
     }, [tempData.heatCelsius, tempData.tempUnits, tempData.tempMode, tempData.ecoMode]);
 
-    useEffect(() => {
-        fetchTempData();
-    }, []);
-
     function changeSingleTemp(newTemp: number, setPointType: SetPointType) {
         let fixedTemp = makeTempInRange(newTemp, tempData.tempUnits);
         if (setPointType === SetPointType.heat && tempData.tempMode === TempMode.heat) {

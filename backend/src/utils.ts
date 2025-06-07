@@ -4,7 +4,7 @@ export enum TempCommands {
     setRange = "sdm.devices.commands.ThermostatTemperatureSetpoint.SetRange",
     setMode = "sdm.devices.commands.ThermostatMode.SetMode",
     setEcoMode = "sdm.devices.commands.ThermostatEco.SetMode",
-    setFan = "sdm.devices.commands.ThermostatFanMode.SetMode"
+    setFan = "sdm.devices.commands.Fan.SetTimer"
 }
 
 export const deviceTypeThermostat = "sdm.devices.types.THERMOSTAT"

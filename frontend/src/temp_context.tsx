@@ -1,11 +1,12 @@
-import { createContext, useState, useRef } from "react";
-import { type TempData, type TempDataArray, initTempData, demoTempDataArray, HvacStatus, TempMode, EcoMode, demoSetPointDefaults } from "./types";
+import { createContext, useState, useRef, useEffect } from "react";
+import { type TempData, type TempDataArray, type FetchReturn, initTempData, demoTempDataArray, HvacStatus, TempMode, EcoMode, demoSetPointDefaults } from "./types";
 import { type SetHeatBody, type SetCoolBody, type SetRangeBody, type SetTempModeBody, type SetEcoModeBody } from "./schemas";
-import { demoMode, debounceTime } from "./utils";
+import { demoMode, debounceTime, defaultAPIURL } from "./utils";
 
 export interface TempContextType {
     tempDataArray: TempData[];
-    fetchTempData: () => Promise<void>,
+    fetchTempData: () => Promise<FetchReturn>,
+    initialLoadComplete: boolean,
     getSelectedTempData: () => TempData,
     debounceTempData: (calledFunction: Function) => void,
     // debounceTimer: RefObject<number | null>,
@@ -19,7 +20,8 @@ export interface TempContextType {
 }
 export const initTempContext: TempContextType = {
     tempDataArray: [],
-    fetchTempData: async () => {},
+    fetchTempData: async () => {return {success: false}},
+    initialLoadComplete: false,
     getSelectedTempData: () => {return structuredClone(initTempData)},
     debounceTempData: () => {},
     // debounceTimer: createRef(),
@@ -41,11 +43,28 @@ type TempDataProviderProps = {
 export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDataProviderProps) => {
     const [tempDataArray, setTempDataArray] = useState<TempDataArray>([structuredClone(initTempData)]);
     const [selectedDeviceID, setSelectedDeviceID] = useState<string | null>(null);
+    const [initialLoadComplete, setInitialLoadComplete] = useState<boolean>(false);
+    const hasFetchedInitial = useRef<boolean>(false);
     const debounceTimer = useRef<number | null>(null);
     // one shared timer for getting data after setting it
     // const getDataTimeoutRef = useRef<number | null>(null);
 
-    async function fetchTempData() {
+    useEffect( () => {
+        if (hasFetchedInitial.current) {
+            return;
+        }
+        const fetchData = async () => {
+            hasFetchedInitial.current = true;
+            let fetchReturn = await fetchTempData();
+            if (fetchReturn.success) {
+                setInitialLoadComplete(true);
+            }
+        }
+        fetchData();
+    }, []);
+
+    async function fetchTempData(): Promise<FetchReturn> {
+        let fetchReturn: FetchReturn = {success: false}
         // DEMO DATA
         if (demoMode) {
             setTempDataArray(structuredClone(demoTempDataArray));
@@ -53,10 +72,11 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
                 setSelectedDeviceID(demoTempDataArray[0].deviceID);
             }
             console.log("got demo data");
-            return;
+            fetchReturn.success = true;
+            return fetchReturn;
         }
         // REAL DATA
-        const url = "/api/info";
+        const url = defaultAPIURL + "/info";
         try {
             const response = await fetch(url, {
                 method: "GET",
@@ -65,7 +85,7 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
                 }
             });
             if (!response.ok) {
-                return;
+                return fetchReturn;
             }
             const data = await response.json();
             console.log("Got temp data successfully:", data);
@@ -74,12 +94,14 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
                 if (selectedDeviceID === null) {
                     setSelectedDeviceID(data[0].deviceID);
                 }
+                fetchReturn.success = true;
             } else {
                 console.error("Invalid temp data format:", data);
             }
         } catch (error) {
             console.error("Error fetching temp data info:", error);
         }
+        return fetchReturn;
     }
 
     async function refreshTempData () {
@@ -148,7 +170,7 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
             return;
         }
         
-        const url = "/api/set_heat";
+        const url = defaultAPIURL + "/set_heat";
         try {
             const reqBody: SetHeatBody = {
                 deviceID: selectedDeviceID,
@@ -201,7 +223,7 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
             return;
         }
         
-        const url = "/api/set_cool";
+        const url = defaultAPIURL + "/set_cool";
         try {
             const reqBody: SetCoolBody = {
                 deviceID: selectedDeviceID,
@@ -260,7 +282,7 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
             return;
         }
         
-        const url = "/api/set_range";
+        const url = defaultAPIURL + "/set_range";
         try {
             const reqBody: SetRangeBody = {
                 deviceID: selectedDeviceID,
@@ -322,7 +344,7 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
             return;
         }
         
-        const url = "/api/set_temp_mode";
+        const url = defaultAPIURL + "/set_temp_mode";
         try {
             const reqBody: SetTempModeBody = {
                 deviceID: selectedDeviceID,
@@ -384,7 +406,7 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
             return;
         }
         
-        const url = "/api/set_eco_mode";
+        const url = defaultAPIURL + "/set_eco_mode";
         try {
             const reqBody: SetEcoModeBody = {
                 deviceID: selectedDeviceID,
@@ -408,7 +430,7 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         }
     }
 
-    const value: TempContextType = {tempDataArray, fetchTempData, getSelectedTempData, debounceTempData, selectedDeviceID, changeDeviceID, setHeatCelsius, setCoolCelsius, setRangeCelsius, setTempMode, setEcoMode};
+    const value: TempContextType = {tempDataArray, fetchTempData, initialLoadComplete, getSelectedTempData, debounceTempData, selectedDeviceID, changeDeviceID, setHeatCelsius, setCoolCelsius, setRangeCelsius, setTempMode, setEcoMode};
 
     return (
         <TempDataContext.Provider value={value}>{props.children}</TempDataContext.Provider>

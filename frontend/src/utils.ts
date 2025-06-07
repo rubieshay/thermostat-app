@@ -5,6 +5,7 @@ console.log("setting...");
 export const demoMode = ((window as any)._env_.DEMO_MODE === "TRUE" ||
                          (window as any)._env_.DEMO_MODE === "1" ||
                          (window as any)._env_.DEMO_MODE === "YES") ? true : false;
+export const defaultAPIURL = (window as any)._env_.DEFAULT_API_URL ? (window as any)._env_.DEFAULT_API_URL : "https://thermostat.shaytech.net/api";
 
 export const debounceTime: number = 3000;
 // export const responseWaitTime: number = 5000;
@@ -46,4 +47,3 @@ export function makeTempInRange(tempVal: number | null, tempUnits: TempUnits): n
     return Math.min(Math.max(minDialTemps[tempUnits], tempVal), maxDialTemps[tempUnits])
 }
 
-export const DEFAULT_API_URL = import.meta.env.VITE_DEFAULT_API_URL === undefined ? "https://thermostat.shaytech.net/api" : import.meta.env.VITE_DEFAULT_API_URL;

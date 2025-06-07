@@ -9,10 +9,6 @@ function Tiles() {
 
     const tempData = getSelectedTempData();
 
-    useEffect(() => {
-        fetchTempData();
-    }, []);
-
     useEffect (() => {
         setDispTempMode(tempData.tempMode);
     }, [tempData.tempMode]);

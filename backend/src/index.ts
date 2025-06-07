@@ -1,9 +1,11 @@
 import Fastify from "fastify";
 import fastifyWebSockets from "@fastify/websocket";
 import { FetchReturn, WeatherData, initWeatherData } from "./types";
-import { latLongQuerySchema, latLongQueryString, setHeatSchema, SetHeatBody, setCoolSchema, SetCoolBody, setRangeSchema, SetRangeBody, setTempModeSchema, SetTempModeBody, setEcoModeSchema, SetEcoModeBody } from "./schemas";
+import { latLongQuerySchema, latLongQueryString, setHeatSchema, SetHeatBody, 
+        setCoolSchema, SetCoolBody, setRangeSchema, SetRangeBody, setTempModeSchema,
+        SetTempModeBody, setEcoModeSchema, SetEcoModeBody, setFanTimerSchema, SetFanTimerBody} from "./schemas";
 import "dotenv/config";
-import { getDeviceInfo, setHeat, setCool, setRange, setMode, setEcoMode} from "./googlesdm";
+import { getDeviceInfo, setHeat, setCool, setRange, setTempMode, setEcoMode, setFanTimer} from "./googlesdm";
 import { getCurrentObservation } from "./weather";
 
 export const googleClientId  = process.env.CLIENT_ID || "";
@@ -109,7 +111,7 @@ fastify.post<{Body: SetRangeBody;}>("/set_range", {schema: { body: setRangeSchem
 
 fastify.post<{Body: SetTempModeBody;}>("/set_temp_mode", {schema: { body: setTempModeSchema } }, async (request, reply) => {
     const { deviceID, tempMode } = request.body;
-    let fetchReturn = await setMode(deviceID,tempMode);
+    let fetchReturn = await setTempMode(deviceID,tempMode);
     if (!fetchReturn.success) {
         reply.status(500).send({ error: fetchReturn.error || "Failed to set temp mode" });
     } else {
@@ -118,12 +120,23 @@ fastify.post<{Body: SetTempModeBody;}>("/set_temp_mode", {schema: { body: setTem
 });
 
 fastify.post<{Body: SetEcoModeBody;}>("/set_eco_mode", {schema: { body: setEcoModeSchema } }, async (request, reply) => {
+    console.log("Got a setEcoMode request");
     const { deviceID, ecoMode } = request.body;
     let fetchReturn = await setEcoMode(deviceID,ecoMode);
     if (!fetchReturn.success) {
         reply.status(500).send({ error: fetchReturn.error || "Failed to set eco mode" });
     } else {
         reply.send({ success: true, message: "EcoMode set successfully", data: fetchReturn.data });
+    }
+});
+
+fastify.post<{Body: SetFanTimerBody;}>("/set_fan_timer", {schema: { body: setFanTimerSchema } }, async (request, reply) => {
+    const { deviceID, timerMode, durationSeconds } = request.body;
+    let fetchReturn = await setFanTimer(deviceID,timerMode, durationSeconds);
+    if (!fetchReturn.success) {
+        reply.status(500).send({ error: fetchReturn.error || "Failed to set fan timer" });
+    } else {
+        reply.send({ success: true, message: "Fan Timer set successfully", data: fetchReturn.data });
     }
 });
 

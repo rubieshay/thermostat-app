@@ -3,11 +3,7 @@ import { Connectivity } from "./types";
 import { TempDataContext } from "./temp_context";
 
 function Title() {
-    const {getSelectedTempData, fetchTempData} = useContext(TempDataContext);
-
-    useEffect(() => {
-        fetchTempData();
-    }, []);
+    const {getSelectedTempData} = useContext(TempDataContext);
 
     const tempData = getSelectedTempData();
     

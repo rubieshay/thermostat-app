@@ -1,5 +1,5 @@
 import { type FromSchema } from "json-schema-to-ts";
-import { EcoMode, TempMode } from "./types";
+import { EcoMode, FanTimerMode, TempMode } from "./types";
 
 export const setHeatSchema = {
     type: "object",
@@ -86,6 +86,28 @@ export const setEcoModeSchema = {
 
 export type SetEcoModeBody = FromSchema<typeof setEcoModeSchema>;
 
+export const setFanTimerSchema = {
+    type: "object",
+    properties: {
+        deviceID: {
+            type: "string"
+        },
+        timerMode: {
+            type: "string",
+            enum: [FanTimerMode.off, FanTimerMode.on]
+        },
+        durationSeconds: {
+            type: "number",
+            minimum: 1,
+            maximum: 43200
+        }
+    },
+    required: ["deviceID","timerMode"],
+    additionalProperties: false
+} as const;
+
+export type SetFanTimerBody = FromSchema<typeof setFanTimerSchema>;
+
 export const latLongQuerySchema = {
     type: "object",
     properties: {
@@ -110,7 +132,7 @@ export type RangeParams = {
     coolCelsius: number
 }
 
-export type HvacModeParams = {
+export type TempModeParams = {
     mode: TempMode
 }
 
@@ -118,4 +140,9 @@ export type EcoModeParams = {
     mode: EcoMode
 }
 
-export type APIParams = HeatParams | CoolParams | RangeParams | HvacModeParams | EcoModeParams;
+export type FanTimerParams = {
+    timerMode: FanTimerMode,
+    duration?: string
+}
+
+export type APIParams = HeatParams | CoolParams | RangeParams | TempModeParams | EcoModeParams | FanTimerParams; 

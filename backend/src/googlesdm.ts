@@ -1,6 +1,7 @@
 import { googleClientSecret, googleRefreshToken, googleClientId, googleProjectId} from "./index";
-import { APIParams, CoolParams, EcoModeParams, HeatParams, HvacModeParams, RangeParams } from "./schemas";
-import { Connectivity, FetchReturn, FanMode, TempMode, HvacStatus, EcoMode, TempUnitsName, TempUnits, TempData, initTempData } from "./types"; 
+import { APIParams, CoolParams, EcoModeParams, HeatParams, TempModeParams, RangeParams, FanTimerParams } from "./schemas";
+import { Connectivity, FetchReturn, FanMode, TempMode, HvacStatus, EcoMode,
+        TempUnitsName, TempUnits, TempData, initTempData, FanTimerMode } from "./types"; 
 import { TempCommands, deviceTypeThermostat } from "./utils"
 
 export let tempDataInfo: TempData[] = [];
@@ -235,12 +236,12 @@ export async function setRange(deviceID: string, heatCelsius: number, coolCelsiu
     return await (makeGoogleAPICall(urlString,TempCommands.setRange, params, "Setting Range"));
 }
 
-export async function setMode(deviceID: string, mode: TempMode): Promise<FetchReturn> {
+export async function setTempMode(deviceID: string, mode: TempMode): Promise<FetchReturn> {
     const urlString = encodeURI("https://smartdevicemanagement.googleapis.com/v1/enterprises/"+encodeURIComponent(googleProjectId)+"/devices/"+encodeURIComponent(deviceID)+":executeCommand");
-    let params: HvacModeParams = {
+    let params: TempModeParams = {
         mode: mode
     }
-    return await (makeGoogleAPICall(urlString,TempCommands.setMode, params, "Setting Mode"));
+    return await (makeGoogleAPICall(urlString,TempCommands.setMode, params, "Setting Temp Mode"));
 }
 
 export async function setEcoMode(deviceID: string, mode: EcoMode): Promise<FetchReturn> {
@@ -248,5 +249,16 @@ export async function setEcoMode(deviceID: string, mode: EcoMode): Promise<Fetch
     let params: EcoModeParams = {
         mode: mode
     }
-    return await (makeGoogleAPICall(urlString,TempCommands.setMode, params, "Setting Eco Mode"));
+    return await (makeGoogleAPICall(urlString,TempCommands.setEcoMode, params, "Setting Eco Mode"));
+}
+
+export async function setFanTimer(deviceID: string, timerMode: FanTimerMode, durationSeconds?: number): Promise<FetchReturn> {
+    const urlString = encodeURI("https://smartdevicemanagement.googleapis.com/v1/enterprises/"+encodeURIComponent(googleProjectId)+"/devices/"+encodeURIComponent(deviceID)+":executeCommand");
+    let params: FanTimerParams = {
+        timerMode: timerMode
+    }
+    if (durationSeconds) {
+        params.duration = durationSeconds.toString();
+    }
+    return await (makeGoogleAPICall(urlString,TempCommands.setFan, params, "Setting Fan Timer"));
 }
