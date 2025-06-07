@@ -84,11 +84,6 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         fetchData();
     }, []);
 
-    useEffect( () => {
-        console.log("lastAPIError changed:", structuredClone(lastAPIError));
-
-    },[lastAPIError.fetchReturn.success])
-
     async function fetchTempData(): Promise<FetchReturn> {
         let fetchError: LastAPIError = structuredClone(initLastAPIError);
         fetchError.errorSeq = lastAPIError.errorSeq + 1;
