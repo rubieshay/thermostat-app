@@ -83,13 +83,6 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
     }
 
     async function refreshTempData () {
-        // if (getDataTimeoutRef.current) {
-        //     clearTimeout(getDataTimeoutRef.current);
-        // }
-        // getDataTimeoutRef.current = setTimeout(() => {
-        //     fetchTempData();
-        //     console.log("refreshed tempData");
-        // }, responseWaitTime);
         if (demoMode) {
             return;
         }
@@ -117,7 +110,7 @@ export const TempDataProvider: React.FC<TempDataProviderProps> = (props: TempDat
         if (debounceTimer.current) {
             clearTimeout(debounceTimer.current);
         }
-        debounceTimer.current = setTimeout(() => {
+        debounceTimer.current = window.setTimeout(() => {
             calledFunction();
         }, debounceTime);
     }
