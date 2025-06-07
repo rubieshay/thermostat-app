@@ -110,3 +110,21 @@ export type FetchReturn = {
     error?: string,
     data?: any
 }
+
+export type LastAPIError  = {
+    fetchReturn: FetchReturn,
+    lastErrorWasFetch: boolean;
+    errorSeq: number;
+}
+
+export const initLastAPIError: LastAPIError = {
+    fetchReturn : {success: false},
+    lastErrorWasFetch: false,
+    errorSeq: 0,
+}
+
+export const noLastAPIError: LastAPIError = {
+    fetchReturn: {success: true},
+    lastErrorWasFetch: false,
+    errorSeq: 0
+}

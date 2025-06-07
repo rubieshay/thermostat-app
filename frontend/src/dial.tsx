@@ -25,6 +25,8 @@ function Dial() {
     let heatPointThumbAngle: number | null = getThumbAngle(dispHeatPoint);
     let activeTrackRange: number[] = getTrackRange();
 
+
+
     useEffect (() => {
         setActiveSetPoint(null);
         if (tempData.tempMode === TempMode.cool) {
@@ -70,6 +72,7 @@ function Dial() {
         // fix then round then convert
         let celsiusFixedTemp: number | null = convertTemp(roundedTemp(fixedTemp, tempData.tempUnits), tempData.tempUnits, TempUnits.celsius);
 
+        if (celsiusFixedTemp === null) {console.log("invalid temp change"); return};
         if (tempData.tempMode === TempMode.heat) {
             debounceTempData(() => setHeatCelsius(celsiusFixedTemp));
         } else if (tempData.tempMode === TempMode.cool) {
@@ -117,6 +120,9 @@ function Dial() {
         // convert to C and send calls
         let heatCelsiusFixedTemp = convertTemp(newHeatPoint, tempData.tempUnits, TempUnits.celsius);
         let coolCelsiusFixedTemp = convertTemp(newCoolPoint, tempData.tempUnits, TempUnits.celsius);
+        if (heatCelsiusFixedTemp === null || coolCelsiusFixedTemp === null) {
+            console.log("invalid temp in range"); return;
+        }
         debounceTempData(() => setRangeCelsius(heatCelsiusFixedTemp, coolCelsiusFixedTemp));
     }
 
