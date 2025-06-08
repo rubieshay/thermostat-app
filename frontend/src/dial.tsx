@@ -32,7 +32,7 @@ function Dial() {
         } else if (tempData.tempMode === TempMode.heat) {
             setLastSetPoint(SetPointType.heat);
         }
-    }, [tempData.tempMode,SetPointType.cool,SetPointType.heat]);
+    }, [tempData.tempMode, SetPointType]);
 
     useEffect (() => {
         let baseTemp = null;
@@ -334,10 +334,14 @@ function Dial() {
                         "--end-thumb": "0turn"} as React.CSSProperties}>
                     </div>
                     <div className="track-cover" aria-hidden="true"></div>
-                    <div className="track-cap" aria-hidden="true" style={{"--cap-angle": -usedDialRatio/2 + "turn", "--cap-bg": (tempData.tempMode === TempMode.cool ? "var(--cap-bg-in-range)" : "var(--cap-bg-out-range)")} as React.CSSProperties}></div>
-                    <div className="track-cap" aria-hidden="true" style={{"--cap-angle": usedDialRatio/2 + "turn", "--cap-bg": (tempData.tempMode === TempMode.heat ? "var(--cap-bg-in-range)" : "var(--cap-bg-out-range)")} as React.CSSProperties}></div>
+                    <div className="track-cap track-cap-outer" aria-hidden="true"
+                        style={{"--cap-angle": -usedDialRatio/2 + "turn"} as React.CSSProperties}>
+                    </div>
+                    <div className="track-cap track-cap-outer" aria-hidden="true"
+                        style={{"--cap-angle": usedDialRatio/2 + "turn"} as React.CSSProperties}>
+                    </div>
                     <h2 id="offline-message">OFFLINE</h2>
-                    <div className="material-symbols material-symbols-rounded bottom-icon">offline_bolt</div>
+                    <div className="material-symbols material-symbols-rounded bottom-icon">sync_problem</div>
                 </>
             }
         </section>

@@ -53,94 +53,105 @@ export function makeTempInRange(tempVal: number | null, tempUnits: TempUnits): n
     return Math.min(Math.max(minDialTemps[tempUnits], tempVal), maxDialTemps[tempUnits])
 }
 
+export function getUTCDatePlusSeconds(addSeconds: number) : Date {
+    return new Date(Date.now() + (addSeconds * 1000));
+}
+
+export function getTimeAfterISODate(isoDateTime: string) : number {
+    const endDateTime = Date.parse(isoDateTime);
+    return endDateTime - Date.now();
+}
+
+export function getHoursAndMinutes(duration: number) : string {
+    if (duration < 0) {
+        return "";
+    }
+    const hoursInt = Math.floor(duration / (1000*60*60));
+    const minutesInt = Math.round((duration - (hoursInt * (1000*60*60))) / (1000*60));
+    let minutesString = "";
+    if ((minutesInt > 0 || hoursInt > 0) && !(hoursInt > 0 && minutesInt == 60)) {
+        minutesString += String(minutesInt) + " min";
+    }
+    if (hoursInt > 0) {
+        if (minutesInt === 60) {
+            return String(hoursInt + 1) + " hr " + minutesString;
+        } else {
+            return String(hoursInt) + " hr " + minutesString;
+        }
+    } else if (minutesInt > 0) {
+        return minutesString;
+    } else {
+        return "";
+    }
+}
+
 export type ChildrenProviderProps = {
     children: React.ReactNode;
 }
 
 interface UsePageVisibilityRefreshOptions {
-  refreshData: () => void | Promise<FetchReturn>;
-  onStart?: () => void;
-  onStop?: () => void;
-  refreshInterval: number; // in milliseconds, defaults to 5000
-  initialLoadComplete: boolean
+    refreshData: () => void | Promise<FetchReturn>;
+    onStart?: () => void;
+    onStop?: () => void;
+    refreshInterval: number; // in milliseconds, defaults to 5000
+    initialLoadComplete: boolean
 }
 
-export const usePageVisibilityRefresh = ({
-  refreshData,
-  onStart,
-  onStop,
-  refreshInterval = dataRefreshTime,
-  initialLoadComplete
-}: UsePageVisibilityRefreshOptions) => {
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const isRefreshingRef = useRef(false);
+export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshInterval = dataRefreshTime, initialLoadComplete}: UsePageVisibilityRefreshOptions) => {
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const isRefreshingRef = useRef(false);
 
-  const startIntervalRefresh = useCallback( () => {
-    if (isRefreshingRef.current || !dataRefreshEnabled || !initialLoadComplete) return;
-    
-    isRefreshingRef.current = true;
-    onStart?.(); // Optional callback when starting
-    refreshData(); // Initial call to fetch data
-    
-    intervalRef.current = setInterval(() => {
-      refreshData(); // Call refreshData every interval
-    }, refreshInterval);
-  },[initialLoadComplete, refreshData, onStart, refreshInterval]);
+    const startIntervalRefresh = useCallback(() => {
+        if (isRefreshingRef.current || !dataRefreshEnabled || !initialLoadComplete) return;
+        
+        isRefreshingRef.current = true;
+        onStart?.(); // Optional callback when starting
+        refreshData(); // Initial call to fetch data
+        
+        intervalRef.current = setInterval(() => {
+        refreshData(); // Call refreshData every interval
+        }, refreshInterval);
+    }, [initialLoadComplete, refreshData, onStart, refreshInterval]);
 
-  const stopIntervalRefresh = useCallback( () => {
-    if (!isRefreshingRef.current || !dataRefreshEnabled) return;
-    
-    isRefreshingRef.current = false;
-    onStop?.(); // Optional callback when stopping
-    
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  },[onStop])
+    const stopIntervalRefresh = useCallback( () => {
+        if (!isRefreshingRef.current || !dataRefreshEnabled) return;
+        
+        isRefreshingRef.current = false;
+        onStop?.(); // Optional callback when stopping
+        
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        }
+    }, [onStop])
 
-  useEffect(() => {
-    const handleVisibilityChange = (evt: Event) => {
-      if (document.visibilityState === "hidden" || evt.type === "pagehide") {
-        console.log("Page hidden, stopping interval timer");
-        stopIntervalRefresh();
-      } else {
-        console.log("Page back, starting refresh cycles");
-        startIntervalRefresh();
-      }
-    };
+    useEffect(() => {
+        const handleVisibilityChange = (evt: Event) => {
+            if (document.visibilityState === "hidden" || evt.type === "pagehide") {
+                console.log("Page hidden, stopping interval timer");
+                stopIntervalRefresh();
+            } else {
+                console.log("Page back, starting refresh cycles");
+                startIntervalRefresh();
+            }
+        };
 
-    // Add event listener
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    document.addEventListener('pagehide', handleVisibilityChange)
+        // Add event listener
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+        document.addEventListener("pagehide", handleVisibilityChange)
 
-    // Start refresh if page is initially visible
-    if (document.visibilityState !== "hidden") {
-      console.log("Page visible at startup, starting interval refresh...");
-      startIntervalRefresh();
-    }
+        // Start refresh if page is initially visible
+        if (document.visibilityState !== "hidden") {
+            console.log("Page visible at startup, starting interval refresh...");
+            startIntervalRefresh();
+        }
 
-    // Cleanup function
-    return () => {
-      console.log("Cleaning up interval timers and visibility listeners");
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      document.removeEventListener("pagehide", handleVisibilityChange);
-      stopIntervalRefresh();
-    };
-  }, [startIntervalRefresh, stopIntervalRefresh,refreshData, onStart, onStop, refreshInterval,initialLoadComplete]);
+        // Cleanup function
+        return () => {
+            console.log("Cleaning up interval timers and visibility listeners");
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+            document.removeEventListener("pagehide", handleVisibilityChange);
+            stopIntervalRefresh();
+        };
+    }, [startIntervalRefresh, stopIntervalRefresh,refreshData, onStart, onStop, refreshInterval,initialLoadComplete]);
 };
-
-export function getUTCDatePlusSeconds(addSeconds: number) : Date {
-    const now = new Date();
-    const utcTime = Date.UTC(
-        now.getUTCFullYear(),
-        now.getUTCMonth(),
-        now.getUTCDate(),
-        now.getUTCHours(),
-        now.getUTCMinutes(),
-        now.getUTCSeconds(),
-        now.getUTCMilliseconds()
-  );
-  
-  return new Date(utcTime + (addSeconds * 1000));
-}

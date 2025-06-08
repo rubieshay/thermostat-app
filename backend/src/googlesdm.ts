@@ -1,6 +1,6 @@
 import { googleClientSecret, googleRefreshToken, googleClientId, googleProjectId, demoMode } from "./index";
 import { APIParams, CoolParams, EcoModeParams, HeatParams, TempModeParams, RangeParams, FanTimerParams } from "./schemas";
-import { Connectivity, FetchReturn, FanMode, TempMode, HvacStatus, EcoMode,
+import { Connectivity, FetchReturn, TempMode, HvacStatus, EcoMode,
         TempUnitsName, TempUnits, TempData, initTempData, FanTimerMode, 
         demoTempDataArray} from "./types"; 
 import { TempCommands, deviceTypeThermostat, sleep } from "./utils"
@@ -133,7 +133,7 @@ export async function getDeviceInfo() : Promise<FetchReturn> {
             if (!device.traits["sdm.devices.traits.Fan"]) {
                 fetchReturn.error = "Fan trait not found";
             } else {
-                if (device.traits["sdm.devices.traits.Fan"].timerMode === FanMode.off) {
+                if (device.traits["sdm.devices.traits.Fan"].timerMode === FanTimerMode.off) {
                     currTempData.fanTimer = null;
                 } else {
                     currTempData.fanTimer = device.traits["sdm.devices.traits.Fan"].timerTimeout;

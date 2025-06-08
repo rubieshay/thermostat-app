@@ -4,7 +4,6 @@ export enum TempMode {heat="HEAT", cool="COOL", heatcool="HEATCOOL", off="OFF"};
 export enum HvacStatus {heating="HEATING", cooling="COOLING", off="OFF"};
 export enum EcoMode {on="MANUAL_ECO", off="OFF"};
 export enum Connectivity {online="ONLINE", offline="OFFLINE"};
-export enum FanMode {on="ON", off="OFF"};
 export enum FanTimerMode {on="ON", off="OFF"};
 
 export type TempData = {
@@ -55,8 +54,8 @@ export const demoTempDataArray: TempData[] = [
         tempMode: TempMode.heatcool,
         hvacStatus: HvacStatus.off,
         ecoMode: EcoMode.off,
-        ecoHeatCelsius: 27.777778,
-        ecoCoolCelsius: 12.777778,
+        ecoHeatCelsius: 12.777778,
+        ecoCoolCelsius: 27.777778,
         fanTimer: null,
         connectivity: Connectivity.online,
         deviceName: "My Demo Thermostat",
