@@ -94,38 +94,47 @@ interface UsePageVisibilityRefreshOptions {
     onStart?: () => void;
     onStop?: () => void;
     refreshInterval: number; // in milliseconds, defaults to 5000
-    initialLoadComplete: boolean
+    okToStartRefresh: boolean
 }
 
-export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshInterval = dataRefreshTime, initialLoadComplete}: UsePageVisibilityRefreshOptions) => {
+export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshInterval = dataRefreshTime, okToStartRefresh = false}: UsePageVisibilityRefreshOptions) => {
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const isRefreshingRef = useRef(false);
 
     const startIntervalRefresh = useCallback(() => {
-        if (isRefreshingRef.current || !dataRefreshEnabled || !initialLoadComplete) return;
-        
+        if (isRefreshingRef.current || !dataRefreshEnabled || !okToStartRefresh) {
+            console.log("NOT starting timer because:", {isRefreshingRef: isRefreshingRef.current, dataRefreshEnabled, okToStartRefresh});
+            return;
+        }        
         isRefreshingRef.current = true;
         onStart?.(); // Optional callback when starting
-        refreshData(); // Initial call to fetch data
         
         intervalRef.current = setInterval(() => {
-        refreshData(); // Call refreshData every interval
+            console.log("Triggering refreshData from page vis timer");
+            refreshData(); // Call refreshData every interval
         }, refreshInterval);
-    }, [initialLoadComplete, refreshData, onStart, refreshInterval]);
+    }, [okToStartRefresh, refreshData, onStart, refreshInterval]);
 
     const stopIntervalRefresh = useCallback( () => {
-        if (!isRefreshingRef.current || !dataRefreshEnabled) return;
+        if (!isRefreshingRef.current || !dataRefreshEnabled) {
+            console.log("Stop Interval Refresh cancelled - not currently refreshing or refresh not enabled");
+            return;
+        }
         
         isRefreshingRef.current = false;
         onStop?.(); // Optional callback when stopping
         
         if (intervalRef.current) {
+            console.log("Actually clearing interval in stopIntervalRefresh");
             clearInterval(intervalRef.current);
             intervalRef.current = null;
+        } else {
+            console.log("No interval to clear in stop Interval Refresh");
         }
     }, [onStop])
 
     useEffect(() => {
+
         const handleVisibilityChange = (evt: Event) => {
             if (document.visibilityState === "hidden" || evt.type === "pagehide") {
                 console.log("Page hidden, stopping interval timer");
@@ -141,9 +150,10 @@ export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshI
         document.addEventListener("pagehide", handleVisibilityChange)
 
         // Start refresh if page is initially visible
-        if (document.visibilityState !== "hidden") {
-            console.log("Page visible at startup, starting interval refresh...");
+        if (document.visibilityState !== "hidden" && okToStartRefresh) {
+            console.log("Page visible at startup, NOT YET... starting first load and timer...");
             startIntervalRefresh();
+//            doInitialAndStart();
         }
 
         // Cleanup function
@@ -153,5 +163,99 @@ export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshI
             document.removeEventListener("pagehide", handleVisibilityChange);
             stopIntervalRefresh();
         };
-    }, [startIntervalRefresh, stopIntervalRefresh,refreshData, onStart, onStop, refreshInterval,initialLoadComplete]);
+    }, [startIntervalRefresh, stopIntervalRefresh,refreshData, onStart, onStop, refreshInterval,okToStartRefresh]);
+
+// DEBUG USE EFFECT TRIGGERS
+
+    // useEffect( () => {
+    //     console.log("Start interval refresh changed")
+    // },[startIntervalRefresh])
+    // useEffect( () => {
+    //     console.log("Stop interval refresh changed")
+    // },[stopIntervalRefresh])
+    // useEffect( () => {
+    //     console.log("refreshData changed")
+    // },[refreshData])
+    // useEffect( () => {
+    //     console.log("onStart changed")
+    // },[onStart])
+    // useEffect( () => {
+    //     console.log("onStop changed")
+    // },[onStop])
+    // useEffect( () => {
+    //     console.log("refresh Interval changed")
+    // },[refreshInterval])
+    // useEffect( () => {
+    //     console.log("okToStart changed")
+    // },[okToStartRefresh])
 };
+
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function arraysEqualIgnoreOrder<T extends Record<string, any>>(arr1: T[], arr2: T[]): boolean {
+  // Check if arrays have the same length
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+
+  // Helper function to deeply compare two objects
+  function objectsEqual(obj1: T, obj2: T): boolean {
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+
+    // Check if objects have the same number of keys
+    if (keys1.length !== keys2.length) {
+      return false;
+    }
+
+    // Check if all keys and values match
+    for (const key of keys1) {
+      if (!(key in obj2)) {
+        return false;
+      }
+
+      const val1 = obj1[key];
+      const val2 = obj2[key];
+
+      // Handle nested objects recursively
+      if (typeof val1 === 'object' && val1 !== null && typeof val2 === 'object' && val2 !== null) {
+        if (Array.isArray(val1) && Array.isArray(val2)) {
+          // For arrays, do a simple comparison (you might want to make this recursive too)
+          if (JSON.stringify(val1) !== JSON.stringify(val2)) {
+            return false;
+          }
+        } else if (!Array.isArray(val1) && !Array.isArray(val2)) {
+          if (!objectsEqual(val1 as T, val2 as T)) {
+            return false;
+          }
+        } else {
+          return false; // One is array, one is not
+        }
+      } else if (val1 !== val2) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  // For each object in arr1, find a matching object in arr2
+  for (const obj1 of arr1) {
+    let found = false;
+    for (const obj2 of arr2) {
+      if (objectsEqual(obj1, obj2)) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}

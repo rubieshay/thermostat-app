@@ -57,7 +57,8 @@ fastify.get("/info", async (request, reply) => {
     fetchReturn = await getDeviceInfo();
     if (!fetchReturn.success) {
         console.log("Got an error in getDeviceInfo:", fetchReturn.error);
-        return reply.status(500).send({ error: fetchReturn.error || "Failed to get device info" });
+        if (!fetchReturn.httpCode) {fetchReturn.httpCode = 500;}
+        return reply.status(fetchReturn.httpCode).send({ error: fetchReturn.error || "Failed to get device info" });
     }
     reply.send(tempDataInfo);
 })
