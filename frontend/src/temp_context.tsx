@@ -468,7 +468,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
 
             setTempDataArray((prevState: TempDataArray) =>
                 prevState.map(item => item.deviceID === selectedDeviceID ?
-                { ...item, hvacStatus: newHvacStatus, ecoMode: newEcoMode } :
+                { ...item, ecoMode: newEcoMode, hvacStatus: newHvacStatus, coolCelsius: null, heatCelsius: null } :
                 item)
             );
             console.log("set demo ecoMode");

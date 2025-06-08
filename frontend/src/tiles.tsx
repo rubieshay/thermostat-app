@@ -24,8 +24,6 @@ function Tiles() {
         console.log("tempData.fanTimer changed");
     }, [tempData.fanTimer]);
 
-    console.log("Generally rendering tiles");
-
     function changeTempMode(event: React.ChangeEvent<HTMLInputElement>) {
         // const newTempMode: TempMode = TempMode[event.target.value as keyof typeof TempMode];
         const newTempMode = event.target.value as TempMode;
