@@ -1,15 +1,20 @@
 import { TempUnits, type FetchReturn } from "./types";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 console.log( "ENV IS: "+JSON.stringify((window as any)._env_))
-console.log("setting...");
 export const demoMode = ((window as any)._env_.DEMO_MODE === "TRUE" ||
                          (window as any)._env_.DEMO_MODE === "1" ||
                          (window as any)._env_.DEMO_MODE === "YES") ? true : false;
 export const defaultAPIURL = (window as any)._env_.DEFAULT_API_URL ? (window as any)._env_.DEFAULT_API_URL : "https://thermostat.shaytech.net/api";
+export const dataRefreshEnabled =((window as any)._env_.DATA_REFRESH_ENABLED === "TRUE" || 
+                                  (window as any)._env_.DATA_REFRESH_ENABLED === "1" ||
+                                  (window as any)._env_.DATA_REFRESH_ENABLED === "YES") ? true : false;
+/* eslint-enable @typescript-eslint/no-explicit-any */                                  
+console.log("Environment driven settings:", {demoMode,defaultAPIURL,dataRefreshEnabled});
 
 export const debounceTime: number = 3000;
-export const dataRefreshTime: number = 5000;
+export const dataRefreshTime: number = 7000;
 export const setPointFadeDelay: number = 3000;
 export const setPointFadeDuration: number = 1000;
  
@@ -56,20 +61,22 @@ interface UsePageVisibilityRefreshOptions {
   refreshData: () => void | Promise<FetchReturn>;
   onStart?: () => void;
   onStop?: () => void;
-  refreshInterval?: number; // in milliseconds, defaults to 5000
+  refreshInterval: number; // in milliseconds, defaults to 5000
+  initialLoadComplete: boolean
 }
 
 export const usePageVisibilityRefresh = ({
   refreshData,
   onStart,
   onStop,
-  refreshInterval = dataRefreshTime
+  refreshInterval = dataRefreshTime,
+  initialLoadComplete
 }: UsePageVisibilityRefreshOptions) => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const isRefreshingRef = useRef(false);
 
-  const startIntervalRefresh = () => {
-    if (isRefreshingRef.current) return;
+  const startIntervalRefresh = useCallback( () => {
+    if (isRefreshingRef.current || !dataRefreshEnabled || !initialLoadComplete) return;
     
     isRefreshingRef.current = true;
     onStart?.(); // Optional callback when starting
@@ -78,10 +85,10 @@ export const usePageVisibilityRefresh = ({
     intervalRef.current = setInterval(() => {
       refreshData(); // Call refreshData every interval
     }, refreshInterval);
-  };
+  },[initialLoadComplete, refreshData, onStart, refreshInterval]);
 
-  const stopIntervalRefresh = () => {
-    if (!isRefreshingRef.current) return;
+  const stopIntervalRefresh = useCallback( () => {
+    if (!isRefreshingRef.current || !dataRefreshEnabled) return;
     
     isRefreshingRef.current = false;
     onStop?.(); // Optional callback when stopping
@@ -90,7 +97,7 @@ export const usePageVisibilityRefresh = ({
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-  };
+  },[onStop])
 
   useEffect(() => {
     const handleVisibilityChange = (evt: Event) => {
@@ -120,12 +127,8 @@ export const usePageVisibilityRefresh = ({
       document.removeEventListener("pagehide", handleVisibilityChange);
       stopIntervalRefresh();
     };
-  }, [refreshData, onStart, onStop, refreshInterval]);
+  }, [startIntervalRefresh, stopIntervalRefresh,refreshData, onStart, onStop, refreshInterval,initialLoadComplete]);
 
   // Return current refresh state for debugging/UI purposes
-  return {
-    isRefreshing: isRefreshingRef.current,
-    startRefresh: startIntervalRefresh,
-    stopRefresh: stopIntervalRefresh
-  };
+
 };

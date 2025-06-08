@@ -4,7 +4,6 @@ import { TempDataContext } from "./temp_context";
 function Error() {
     const {fetchTempData, selectedTempData: tempData,lastAPIError,clearAPIError} = useContext(TempDataContext);
     const [errorText, setErrorText] = useState<string>("");
-    const serialError = JSON.stringify(lastAPIError);
 
     useEffect( () => {
         if (lastAPIError.errorSeq === 0) {return;};
@@ -14,7 +13,7 @@ function Error() {
             clearAPIError();
             fetchTempData();
         }
-    },[serialError]);
+    },[lastAPIError.errorSeq,clearAPIError,fetchTempData,lastAPIError]);
     
     useEffect( () => {
         console.log("Current temp data is: ",structuredClone(tempData))

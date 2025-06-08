@@ -50,33 +50,22 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
     const [initialLoadComplete, setInitialLoadComplete] = useState<boolean>(false);
     const [lastAPIError, setLastAPIError] = useState<LastAPIError>(noLastAPIError);
     const hasFetchedInitial = useRef<boolean>(false);
+    const isFetching = useRef<boolean>(false);
     const debounceTimer = useRef<number | null>(null);
 
-    useEffect( () => {
-        if (hasFetchedInitial.current) {
-            return;
-        }
-        const fetchData = async () => {
-            hasFetchedInitial.current = true;
-            let fetchReturn = await fetchTempData();
-            if (fetchReturn.success) {
-                setInitialLoadComplete(true);
-            }
-        }
-        fetchData();
-    }, []);
-
-    useEffect ( () => {
-        console.log("TempDataArray changed: ",structuredClone(tempDataArray));
-    },[tempDataArray[0].deviceID])
 
     useEffect( () => {
         console.log("Initial Load Complete changed to:", initialLoadComplete);
     },[initialLoadComplete])
 
-    async function fetchTempData(): Promise<FetchReturn> {
+    const fetchTempData = useCallback ( async () => {
         console.log("in FetchTempData...");
-        let fetchError: LastAPIError = structuredClone(initLastAPIError);
+        const fetchError: LastAPIError = structuredClone(initLastAPIError);
+        if (isFetching.current) {
+            console.log("Fetch already in progress. Ignoring");
+            return fetchError.fetchReturn;
+        }
+        isFetching.current = true;
         fetchError.errorSeq = lastAPIError.errorSeq + 1;
         // DEMO DATA
         if (demoMode) {
@@ -86,6 +75,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             }
             console.log("got demo data");
             fetchError.fetchReturn.success = true;
+            isFetching.current = false;
             return(fetchError.fetchReturn);
         }
         // REAL DATA
@@ -102,6 +92,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                 fetchError.fetchReturn.httpCode = response.status;
                 fetchError.lastErrorWasFetch = true;
                 setLastAPIError(fetchError)
+                isFetching.current = false;
                 return fetchError.fetchReturn;
             }
             const data = await response.json();
@@ -124,32 +115,48 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             fetchError.fetchReturn.error = "Other error fetiching temp data info";
             setLastAPIError(fetchError);
         }
+        isFetching.current = false;
         return fetchError.fetchReturn;
-    }
+    },[lastAPIError.errorSeq,selectedDeviceID])
 
-    async function refreshTempData () {
+    useEffect( () => {
+        if (hasFetchedInitial.current) {
+            return;
+        }
+        const fetchData = async () => {
+            hasFetchedInitial.current = true;
+            const fetchReturn = await fetchTempData();
+            if (fetchReturn.success) {
+                setInitialLoadComplete(true);
+            }
+        }
+        fetchData();
+    }, [fetchTempData]);
+
+
+    const refreshTempData = useCallback(() => {
         if (demoMode) {
             return;
         }
         fetchTempData();
         console.log("refreshed tempData");
-    }
+    },[fetchTempData])
 
     async function changeDeviceID(selectedDeviceID: string) {
         setSelectedDeviceID(selectedDeviceID);
     }
 
-    function getSelectedTempData(): TempData {
+    const getSelectedTempData = useCallback( () => {
         if (selectedDeviceID === null) {
             return structuredClone(initTempData);
         }
-        let selectedTempData = tempDataArray.find((item) => (item.deviceID === selectedDeviceID));
+        const selectedTempData = tempDataArray.find((item) => (item.deviceID === selectedDeviceID));
         if (selectedTempData) {
             return selectedTempData;
         } else {
             return structuredClone(initTempData);
         }
-    }
+    },[selectedDeviceID, tempDataArray])
 
     function debounceTempData(cbFunction: Function) {
         if (debounceTimer.current) {
@@ -170,7 +177,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
 
     // SETTING DATA FUNCTIONS
 
-    async function setHeatCelsius(newHeatCelsius: number) {
+    const setHeatCelsius = useCallback( async (newHeatCelsius: number) => {
         if (newHeatCelsius === null || selectedDeviceID === null) {
             return;
         };
@@ -202,7 +209,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         }
         
         const url = defaultAPIURL + "/set_heat";
-        let fetchError: LastAPIError = structuredClone(initLastAPIError);
+        const fetchError: LastAPIError = structuredClone(initLastAPIError);
         fetchError.errorSeq = lastAPIError.errorSeq + 1;
         try {
             const reqBody: SetHeatBody = {
@@ -229,10 +236,10 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             setLastAPIError(fetchError)
             console.error("Error setting heatpoint:", error);
         }
-    }
+    },[getSelectedTempData,lastAPIError.errorSeq,refreshTempData,selectedDeviceID])
 
-    async function setCoolCelsius(newCoolCelsius: number) {
-        if (newCoolCelsius === null || selectedDeviceID === null) {
+    const setCoolCelsius = useCallback( async(newCoolCelsius: number) => {
+        if (selectedDeviceID === null) {
             return;
         };
         if (demoMode) {
@@ -261,7 +268,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         }
         
         const url = defaultAPIURL + "/set_cool";
-        let fetchError: LastAPIError = structuredClone(initLastAPIError);
+        const fetchError: LastAPIError = structuredClone(initLastAPIError);
         fetchError.errorSeq = lastAPIError.errorSeq + 1;
         try {
             const reqBody: SetCoolBody = {
@@ -289,9 +296,9 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             setLastAPIError(fetchError);
             console.error("Error setting coolpoint:", error);
         }
-    }
+    },[getSelectedTempData,selectedDeviceID,lastAPIError.errorSeq,refreshTempData])
 
-    async function setRangeCelsius(newHeatCelsius: number | null, newCoolCelsius: number | null) {
+    const setRangeCelsius = useCallback( async (newHeatCelsius: number, newCoolCelsius: number) => {
         if (newHeatCelsius === null || newCoolCelsius === null || selectedDeviceID === null) {
             return;
         };
@@ -327,7 +334,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         }
         
         const url = defaultAPIURL + "/set_range";
-        let fetchError: LastAPIError = structuredClone(initLastAPIError);
+        const fetchError: LastAPIError = structuredClone(initLastAPIError);
         fetchError.errorSeq = lastAPIError.errorSeq + 1;
         try {
             const reqBody: SetRangeBody = {
@@ -356,9 +363,9 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             setLastAPIError(fetchError);
             console.error("Error setting range:", error);
         }
-    }
+    },[getSelectedTempData,selectedDeviceID,refreshTempData,lastAPIError.errorSeq])
 
-    async function setTempMode(newTempMode: TempMode) {
+    const  setTempMode = useCallback( async (newTempMode: TempMode) => {
         if (selectedDeviceID === null) {
             return;
         }
@@ -396,7 +403,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         }
         
         const url = defaultAPIURL + "/set_temp_mode";
-        let fetchError: LastAPIError = structuredClone(initLastAPIError);
+        const fetchError: LastAPIError = structuredClone(initLastAPIError);
         fetchError.errorSeq = lastAPIError.errorSeq + 1;
         try {
             const reqBody: SetTempModeBody = {
@@ -424,9 +431,9 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             setLastAPIError(fetchError);
             console.error("Error setting tempMode:", error);
         }
-    }
+    },[getSelectedTempData,selectedDeviceID,refreshTempData,lastAPIError.errorSeq])
 
-    async function setEcoMode(newEcoMode: EcoMode) {
+    const setEcoMode = useCallback( async (newEcoMode: EcoMode) => {
         if (selectedDeviceID === null) {
             return;
         }
@@ -465,7 +472,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         }
         
         const url = defaultAPIURL + "/set_eco_mode";
-        let fetchError: LastAPIError = structuredClone(initLastAPIError);
+        const fetchError: LastAPIError = structuredClone(initLastAPIError);
         fetchError.errorSeq = lastAPIError.errorSeq + 1;
         try {
             const reqBody: SetEcoModeBody = {
@@ -494,40 +501,35 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             setLastAPIError(fetchError);
             console.error("Error setting ecoMode:", error);
         }
-    }
+    },[selectedDeviceID,lastAPIError.errorSeq,refreshTempData])
 
-    function clearAPIError() {
+    const clearAPIError  = useCallback( () => {
         setLastAPIError(structuredClone(noLastAPIError));
-    }
+    },[])
 
-    const cbFetchTempData = useCallback(() => fetchTempData(),[]);
-    const cbClearAPIError = useCallback(() => clearAPIError(),[]);
-    const cbGetSelectedTempData = useCallback(() => getSelectedTempData(),[selectedDeviceID]);
-    const cbDebounceTempData = useCallback((cbFunction: Function) => debounceTempData(cbFunction),[debounceTimer]);
+    const cbDebounceTempData = useCallback((cbFunction: Function) => debounceTempData(cbFunction),[]);
     const cbChangeDeviceID = useCallback((selectedDeviceID: string) => changeDeviceID(selectedDeviceID),[]);
-    const cbSetHeatCelsius = useCallback((newHeatCelsius: number) => setHeatCelsius(newHeatCelsius),[selectedDeviceID]);
-    const cbSetCoolCelsius = useCallback((newCoolCelsius: number) => setCoolCelsius(newCoolCelsius),[selectedDeviceID]);
-    const cbSetRangeCelsius = useCallback((newHeatCelsius: number, newCoolCelsius: number) => setRangeCelsius(newHeatCelsius, newCoolCelsius),[selectedDeviceID]);
-    const cbSetTempMode = useCallback((tempMode: TempMode) => setTempMode(tempMode),[selectedDeviceID]);
-    const cbSetEcoMode = useCallback((ecoMode: EcoMode) => setEcoMode(ecoMode),[selectedDeviceID]);
     
     const selectedTempData = getSelectedTempData();
 
     const memoedValue: TempContextType = useMemo(() => ({
         tempDataArray, initialLoadComplete, lastAPIError, selectedDeviceID, selectedTempData,
-        fetchTempData: cbFetchTempData, 
-        clearAPIError : cbClearAPIError,
-        getSelectedTempData : cbGetSelectedTempData,
+        fetchTempData, 
+        clearAPIError, 
+        getSelectedTempData, 
         debounceTempData : cbDebounceTempData, 
         changeDeviceID : cbChangeDeviceID,
-        setHeatCelsius : cbSetHeatCelsius,
-        setCoolCelsius : cbSetCoolCelsius,
-        setRangeCelsius : cbSetRangeCelsius,
-        setTempMode : cbSetTempMode,
-        setEcoMode: cbSetEcoMode,
-        startRefreshTimer: startRefreshTimer,
-        stopRefreshTimer: stopRefreshTimer
-    }),[tempDataArray,initialLoadComplete,lastAPIError,selectedDeviceID])
+        setHeatCelsius,
+        setCoolCelsius,
+        setRangeCelsius,
+        setTempMode,
+        setEcoMode,
+        startRefreshTimer,
+        stopRefreshTimer
+    }),[tempDataArray,initialLoadComplete,lastAPIError,selectedDeviceID,selectedTempData,fetchTempData,clearAPIError,
+        getSelectedTempData, cbDebounceTempData, cbChangeDeviceID, setHeatCelsius, setCoolCelsius,
+        setRangeCelsius, setTempMode, setEcoMode, startRefreshTimer, stopRefreshTimer
+    ])
 
     return (
         <TempDataContext.Provider value={memoedValue}>{props.children}</TempDataContext.Provider>

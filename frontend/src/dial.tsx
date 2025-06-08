@@ -18,10 +18,10 @@ function Dial() {
     const midDialTemp: number = (maxDialTemp + minDialTemp) / 2;
     const dialRange: number = maxDialTemp - minDialTemp;
 
-    let ambientThumbAngle: number | null = getThumbAngle(dispAmbientTemp);
-    let coolPointThumbAngle: number | null = getThumbAngle(dispCoolPoint);
-    let heatPointThumbAngle: number | null = getThumbAngle(dispHeatPoint);
-    let activeTrackRange: number[] = getTrackRange();
+    const ambientThumbAngle: number | null = getThumbAngle(dispAmbientTemp);
+    const coolPointThumbAngle: number | null = getThumbAngle(dispCoolPoint);
+    const heatPointThumbAngle: number | null = getThumbAngle(dispHeatPoint);
+    const activeTrackRange: number[] = getTrackRange();
 
 
 
@@ -32,7 +32,7 @@ function Dial() {
         } else if (tempData.tempMode === TempMode.heat) {
             setLastSetPoint(SetPointType.heat);
         }
-    }, [tempData.tempMode]);
+    }, [tempData.tempMode,SetPointType.cool,SetPointType.heat]);
 
     useEffect (() => {
         let baseTemp = null;
@@ -45,7 +45,7 @@ function Dial() {
         }
         const unitTemp = convertTemp(baseTemp, TempUnits.celsius, tempData.tempUnits);
         setDispCoolPoint(roundedTemp(unitTemp, tempData.tempUnits));
-    }, [tempData.coolCelsius, tempData.tempUnits, tempData.tempMode, tempData.ecoMode]);
+    }, [tempData.ecoCoolCelsius, tempData.coolCelsius, tempData.tempUnits, tempData.tempMode, tempData.ecoMode]);
 
     useEffect (() => {
         let baseTemp = null;
@@ -58,17 +58,17 @@ function Dial() {
         }
         const unitTemp = convertTemp(baseTemp, TempUnits.celsius, tempData.tempUnits);
         setDispHeatPoint(roundedTemp(unitTemp, tempData.tempUnits));
-    }, [tempData.heatCelsius, tempData.tempUnits, tempData.tempMode, tempData.ecoMode]);
+    }, [tempData.ecoHeatCelsius, tempData.heatCelsius, tempData.tempUnits, tempData.tempMode, tempData.ecoMode]);
 
     function changeSingleTemp(newTemp: number, setPointType: SetPointType) {
-        let fixedTemp = makeTempInRange(newTemp, tempData.tempUnits);
+        const fixedTemp = makeTempInRange(newTemp, tempData.tempUnits);
         if (setPointType === SetPointType.heat && tempData.tempMode === TempMode.heat) {
             setDispHeatPoint(fixedTemp);
         } else if (setPointType === SetPointType.cool && tempData.tempMode === TempMode.cool) {
             setDispCoolPoint(fixedTemp);
         }
         // fix then round then convert
-        let celsiusFixedTemp: number | null = convertTemp(roundedTemp(fixedTemp, tempData.tempUnits), tempData.tempUnits, TempUnits.celsius);
+        const celsiusFixedTemp: number | null = convertTemp(roundedTemp(fixedTemp, tempData.tempUnits), tempData.tempUnits, TempUnits.celsius);
 
         if (celsiusFixedTemp === null) {console.log("invalid temp change"); return};
         if (tempData.tempMode === TempMode.heat) {
@@ -116,8 +116,8 @@ function Dial() {
         setDispHeatPoint(newHeatPoint);
         setDispCoolPoint(newCoolPoint);
         // convert to C and send calls
-        let heatCelsiusFixedTemp = convertTemp(newHeatPoint, tempData.tempUnits, TempUnits.celsius);
-        let coolCelsiusFixedTemp = convertTemp(newCoolPoint, tempData.tempUnits, TempUnits.celsius);
+        const heatCelsiusFixedTemp = convertTemp(newHeatPoint, tempData.tempUnits, TempUnits.celsius);
+        const coolCelsiusFixedTemp = convertTemp(newCoolPoint, tempData.tempUnits, TempUnits.celsius);
         if (heatCelsiusFixedTemp === null || coolCelsiusFixedTemp === null) {
             console.log("invalid temp in range"); return;
         }

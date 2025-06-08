@@ -18,11 +18,12 @@ export default tseslint.config(
       'react-refresh': reactRefresh,
     },
     rules: {
+      '@typescript-eslint/no-unsafe-function-type': 'off',
       ...reactHooks.configs.recommended.rules,
       'react-hooks/rules-of-hooks': 'error', // Checks rules of Hooks
-      'react-hooks/exhaustive-deps': 'warn', // Checks effect dependencies
+      'react-hooks/exhaustive-deps': 'error', // Checks effect dependencies
       'react-refresh/only-export-components': [
-        'warn',
+        'off',
         { allowConstantExport: true },
       ],
     },
