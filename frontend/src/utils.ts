@@ -94,38 +94,47 @@ interface UsePageVisibilityRefreshOptions {
     onStart?: () => void;
     onStop?: () => void;
     refreshInterval: number; // in milliseconds, defaults to 5000
-    initialLoadComplete: boolean
+    okToStartRefresh: boolean
 }
 
-export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshInterval = dataRefreshTime, initialLoadComplete}: UsePageVisibilityRefreshOptions) => {
+export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshInterval = dataRefreshTime, okToStartRefresh = false}: UsePageVisibilityRefreshOptions) => {
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const isRefreshingRef = useRef(false);
 
     const startIntervalRefresh = useCallback(() => {
-        if (isRefreshingRef.current || !dataRefreshEnabled || !initialLoadComplete) return;
-        
+        if (isRefreshingRef.current || !dataRefreshEnabled || !okToStartRefresh) {
+            console.log("NOT starting timer because:", {isRefreshingRef: isRefreshingRef.current, dataRefreshEnabled, okToStartRefresh});
+            return;
+        }        
         isRefreshingRef.current = true;
         onStart?.(); // Optional callback when starting
-        refreshData(); // Initial call to fetch data
         
         intervalRef.current = setInterval(() => {
-        refreshData(); // Call refreshData every interval
+            console.log("Triggering refreshData from page vis timer");
+            refreshData(); // Call refreshData every interval
         }, refreshInterval);
-    }, [initialLoadComplete, refreshData, onStart, refreshInterval]);
+    }, [okToStartRefresh, refreshData, onStart, refreshInterval]);
 
     const stopIntervalRefresh = useCallback( () => {
-        if (!isRefreshingRef.current || !dataRefreshEnabled) return;
+        if (!isRefreshingRef.current || !dataRefreshEnabled) {
+            console.log("Stop Interval Refresh cancelled - not currently refreshing or refresh not enabled");
+            return;
+        }
         
         isRefreshingRef.current = false;
         onStop?.(); // Optional callback when stopping
         
         if (intervalRef.current) {
+            console.log("Actually clearing interval in stopIntervalRefresh");
             clearInterval(intervalRef.current);
             intervalRef.current = null;
+        } else {
+            console.log("No interval to clear in stop Interval Refresh");
         }
     }, [onStop])
 
     useEffect(() => {
+
         const handleVisibilityChange = (evt: Event) => {
             if (document.visibilityState === "hidden" || evt.type === "pagehide") {
                 console.log("Page hidden, stopping interval timer");
@@ -141,9 +150,10 @@ export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshI
         document.addEventListener("pagehide", handleVisibilityChange)
 
         // Start refresh if page is initially visible
-        if (document.visibilityState !== "hidden") {
-            console.log("Page visible at startup, starting interval refresh...");
+        if (document.visibilityState !== "hidden" && okToStartRefresh) {
+            console.log("Page visible at startup, NOT YET... starting first load and timer...");
             startIntervalRefresh();
+//            doInitialAndStart();
         }
 
         // Cleanup function
@@ -153,8 +163,33 @@ export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshI
             document.removeEventListener("pagehide", handleVisibilityChange);
             stopIntervalRefresh();
         };
-    }, [startIntervalRefresh, stopIntervalRefresh,refreshData, onStart, onStop, refreshInterval,initialLoadComplete]);
+    }, [startIntervalRefresh, stopIntervalRefresh,refreshData, onStart, onStop, refreshInterval,okToStartRefresh]);
+
+// DEBUG USE EFFECT TRIGGERS
+
+    // useEffect( () => {
+    //     console.log("Start interval refresh changed")
+    // },[startIntervalRefresh])
+    // useEffect( () => {
+    //     console.log("Stop interval refresh changed")
+    // },[stopIntervalRefresh])
+    // useEffect( () => {
+    //     console.log("refreshData changed")
+    // },[refreshData])
+    // useEffect( () => {
+    //     console.log("onStart changed")
+    // },[onStart])
+    // useEffect( () => {
+    //     console.log("onStop changed")
+    // },[onStop])
+    // useEffect( () => {
+    //     console.log("refresh Interval changed")
+    // },[refreshInterval])
+    // useEffect( () => {
+    //     console.log("okToStart changed")
+    // },[okToStartRefresh])
 };
+
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function arraysEqualIgnoreOrder<T extends Record<string, any>>(arr1: T[], arr2: T[]): boolean {
@@ -219,4 +254,8 @@ export function arraysEqualIgnoreOrder<T extends Record<string, any>>(arr1: T[],
   }
 
   return true;
+}
+
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }

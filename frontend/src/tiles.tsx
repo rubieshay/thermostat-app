@@ -8,6 +8,7 @@ function Tiles() {
     const [dispTempMode, setDispTempMode] = useState<TempMode>(TempMode.off);
     const [dispEcoMode, setDispEcoMode] = useState<EcoMode>(EcoMode.off);
     const [dispFanTimer, setDispFanTimer] = useState<string | null>(null);
+    const [fanOnUntil, setFanOnUntil] = useState<string>("");
 
     useEffect (() => {
         setDispTempMode(tempData.tempMode);
@@ -22,7 +23,23 @@ function Tiles() {
     useEffect (() => {
         setDispFanTimer(tempData.fanTimer);
         console.log("tempData.fanTimer changed");
-    }, [tempData.fanTimer]);
+        const calculateMinutes = () => {
+            if (dispFanTimer === null) {
+                return "Off"
+            } else {
+                return getHoursAndMinutes(getTimeAfterISODate(dispFanTimer))            }
+        };
+        // Calculate immediately
+        setFanOnUntil(calculateMinutes());
+
+        // Update every minute
+        const interval = setInterval(() => {
+            setFanOnUntil(calculateMinutes());
+        }, 60000); // 60000ms = 1 minute
+
+        return () => clearInterval(interval);
+
+    }, [tempData.fanTimer,dispFanTimer]);
 
     console.log("Generally rendering tiles");
 
@@ -122,7 +139,7 @@ function Tiles() {
                     </div>
                     <div className="tile">
                         <h2>Current Fan Timer:</h2>
-                        <div>{dispFanTimer === null ? "Off" : getHoursAndMinutes(getTimeAfterISODate(dispFanTimer))}</div>
+                        <div>{fanOnUntil}</div>
                         <hr></hr>
                         <ul className="button-select">
                             <li className={dispFanTimer === null ? "button-option-disabled" : ""}>
