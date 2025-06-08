@@ -33,4 +33,6 @@ echo "}" >> ./env-config.js
 echo "New Environment file created:"
 cat ./env-config.js
 echo "Copying file to ./public"
-cp ./env-config.js ./public/env-config.js
+if [ -d "./public" ]; then
+  cp ./env-config.js ./public/env-config.js
+fi

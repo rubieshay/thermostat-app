@@ -1,7 +1,7 @@
 import { createContext, useState, useRef, useEffect, useCallback, useMemo} from "react";
 import { type TempData, type TempDataArray, type FetchReturn, type LastAPIError, initLastAPIError, noLastAPIError, initTempData, demoTempDataArray, HvacStatus, TempMode, EcoMode, demoSetPointDefaults, FanTimerMode} from "./types";
 import { type SetHeatBody, type SetCoolBody, type SetRangeBody, type SetTempModeBody, type SetEcoModeBody, type SetFanTimerBody } from "./schemas";
-import { demoMode, debounceTime, defaultAPIURL, type ChildrenProviderProps, getUTCDatePlusSeconds } from "./utils";
+import { demoMode, debounceTime, defaultAPIURL, type ChildrenProviderProps, getUTCDatePlusSeconds, arraysEqualIgnoreOrder } from "./utils";
 
 export interface TempContextType {
     tempDataArray: TempData[];
@@ -100,9 +100,11 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             const data = await response.json();
             console.log("Got temp data successfully:", data);
             if (data) {
-                setTempDataArray(data);
-                if (selectedDeviceID === null) {
-                    setSelectedDeviceID(data[0].deviceID);
+                if (!arraysEqualIgnoreOrder(tempDataArray,data)) {
+                    setTempDataArray(data);
+                    if (selectedDeviceID === null) {
+                        setSelectedDeviceID(data[0].deviceID);
+                    }
                 }
                 fetchError.fetchReturn.success = true;
             } else {
@@ -119,7 +121,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         }
         isFetching.current = false;
         return fetchError.fetchReturn;
-    }, [lastAPIError.errorSeq, selectedDeviceID])
+    }, [lastAPIError.errorSeq, selectedDeviceID,tempDataArray])
 
     useEffect(() => {
         if (hasFetchedInitial.current) {
