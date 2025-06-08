@@ -1,8 +1,9 @@
 import { createContext, useState, useRef, useEffect, useCallback, useMemo} from "react";
 import { type TempData, type TempDataArray, type FetchReturn, 
-    type LastAPIError, initLastAPIError, noLastAPIError, initTempData, demoTempDataArray, HvacStatus, TempMode, EcoMode, demoSetPointDefaults } from "./types";
-import { type SetHeatBody, type SetCoolBody, type SetRangeBody, type SetTempModeBody, type SetEcoModeBody } from "./schemas";
-import { demoMode, debounceTime, defaultAPIURL, type ChildrenProviderProps } from "./utils";
+    type LastAPIError, initLastAPIError, noLastAPIError, initTempData, demoTempDataArray, HvacStatus, TempMode, EcoMode, demoSetPointDefaults, 
+    FanTimerMode} from "./types";
+import { type SetHeatBody, type SetCoolBody, type SetRangeBody, type SetTempModeBody, type SetEcoModeBody, type SetFanTimerBody } from "./schemas";
+import { demoMode, debounceTime, defaultAPIURL, type ChildrenProviderProps, getUTCDatePlusSeconds } from "./utils";
 
 
 export interface TempContextType {
@@ -20,6 +21,7 @@ export interface TempContextType {
     setRangeCelsius: (newHeatCelsius: number, newCoolCelsius: number) => void,
     setTempMode: (newTempMode: TempMode) => void,
     setEcoMode: (newEcoMode: EcoMode) => void,
+    setFanTimer: (newFanTimerMode: FanTimerMode, durationSeconds: number) => void,
     startRefreshTimer: () => void,
     stopRefreshTimer: () => void
 }
@@ -38,6 +40,7 @@ export const initTempContext: TempContextType = {
     setRangeCelsius: async () => {},
     setTempMode: async () => {},
     setEcoMode: async () => {},
+    setFanTimer: async () => {},
     startRefreshTimer: () => {},
     stopRefreshTimer: () => {}
 }
@@ -365,6 +368,70 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         }
     },[getSelectedTempData,selectedDeviceID,refreshTempData,lastAPIError.errorSeq])
 
+    const setFanTimer = useCallback( async (newFanTimerMode: FanTimerMode, durationSeconds?: number) => {
+        if (selectedDeviceID === null) {
+            return;
+        };
+        if (newFanTimerMode === FanTimerMode.on && ( !durationSeconds || durationSeconds < 0)) {
+            return;
+        }
+        if (demoMode) {
+            if (newFanTimerMode === FanTimerMode.off) {
+                setTempDataArray((prevState: TempDataArray) => 
+                    prevState.map(item => item.deviceID === selectedDeviceID ?
+                    { ...item, fanTimer: null } :
+                    item)
+                    )
+            } else {
+                const newDate = getUTCDatePlusSeconds(durationSeconds!)
+                setTempDataArray((prevState: TempDataArray) => 
+                    prevState.map(item => item.deviceID === selectedDeviceID ?
+                    { ...item, fanTimer: newDate.toISOString() } :
+                    item)
+                );
+            }
+            // const selectedTempData = getSelectedTempData();
+            console.log("set demo fan");
+            return;
+        }
+        
+        const url = defaultAPIURL + "/set_fan_timer";
+        const fetchError: LastAPIError = structuredClone(initLastAPIError);
+        fetchError.errorSeq = lastAPIError.errorSeq + 1;
+        try {
+
+            const reqBody: SetFanTimerBody = {
+                deviceID: selectedDeviceID,
+                timerMode: newFanTimerMode
+            };
+            if (newFanTimerMode === FanTimerMode.on) {
+                reqBody.durationSeconds = durationSeconds;
+            }
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(reqBody)
+            });
+            if (!response.ok) {
+                fetchError.fetchReturn.error = "Failed to set fan timer: " + response.statusText;
+                fetchError.fetchReturn.httpCode = response.status;
+                setLastAPIError(fetchError);
+                return;
+            }
+            const data = await response.json();
+            console.log("Set fan timer successfully:", data);
+            refreshTempData();
+        } catch (error) {
+            fetchError.fetchReturn.error = "Error setting fan timer: " + error;
+            setLastAPIError(fetchError);
+            console.error("Error setting fan timer:", error);
+        }
+    },[selectedDeviceID,refreshTempData,lastAPIError.errorSeq])
+
+
+
     const  setTempMode = useCallback( async (newTempMode: TempMode) => {
         if (selectedDeviceID === null) {
             return;
@@ -524,11 +591,12 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         setRangeCelsius,
         setTempMode,
         setEcoMode,
+        setFanTimer,
         startRefreshTimer,
         stopRefreshTimer
     }),[tempDataArray,initialLoadComplete,lastAPIError,selectedDeviceID,selectedTempData,fetchTempData,clearAPIError,
         getSelectedTempData, cbDebounceTempData, cbChangeDeviceID, setHeatCelsius, setCoolCelsius,
-        setRangeCelsius, setTempMode, setEcoMode, startRefreshTimer, stopRefreshTimer
+        setRangeCelsius, setTempMode, setEcoMode, setFanTimer, startRefreshTimer, stopRefreshTimer
     ])
 
     return (

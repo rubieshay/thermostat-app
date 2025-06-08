@@ -128,7 +128,19 @@ export const usePageVisibilityRefresh = ({
       stopIntervalRefresh();
     };
   }, [startIntervalRefresh, stopIntervalRefresh,refreshData, onStart, onStop, refreshInterval,initialLoadComplete]);
-
-  // Return current refresh state for debugging/UI purposes
-
 };
+
+export function getUTCDatePlusSeconds(addSeconds: number) : Date {
+    const now = new Date();
+    const utcTime = Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate(),
+        now.getUTCHours(),
+        now.getUTCMinutes(),
+        now.getUTCSeconds(),
+        now.getUTCMilliseconds()
+  );
+  
+  return new Date(utcTime + (addSeconds * 1000));
+}

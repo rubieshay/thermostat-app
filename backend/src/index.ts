@@ -133,6 +133,7 @@ fastify.post<{Body: SetEcoModeBody;}>("/set_eco_mode", {schema: { body: setEcoMo
 });
 
 fastify.post<{Body: SetFanTimerBody;}>("/set_fan_timer", {schema: { body: setFanTimerSchema } }, async (request, reply) => {
+    console.log("Got set fan timer request: ",request.body);
     const { deviceID, timerMode, durationSeconds } = request.body;
     let fetchReturn = await setFanTimer(deviceID,timerMode, durationSeconds);
     if (!fetchReturn.success) {

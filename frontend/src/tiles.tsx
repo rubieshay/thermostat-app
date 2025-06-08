@@ -1,9 +1,9 @@
 import { useContext, useState, useEffect } from "react";
-import { Connectivity, TempMode, EcoMode } from "./types";
+import { Connectivity, TempMode, EcoMode, FanTimerMode } from "./types";
 import { TempDataContext } from "./temp_context";
 
 function Tiles() {
-    const {selectedTempData: tempData, debounceTempData, setTempMode, setEcoMode} = useContext(TempDataContext);
+    const {selectedTempData: tempData, debounceTempData, setTempMode, setEcoMode, setFanTimer} = useContext(TempDataContext);
     const [dispTempMode, setDispTempMode] = useState<TempMode>(TempMode.off);
     const [dispEcoMode, setDispEcoMode] = useState<EcoMode>(EcoMode.off);
 
@@ -28,6 +28,8 @@ function Tiles() {
         setDispEcoMode(newEcoMode);
         debounceTempData(() => setEcoMode(newEcoMode));
     }
+
+    console.log("DATE IS: ",tempData.fanTimer);
 
     return (
         <section id="info">
@@ -103,6 +105,7 @@ function Tiles() {
                     </div>
                     <div className="tile">HVAC Status: {tempData.hvacStatus}</div>
                     <div className="tile">Fan Timer: {String(tempData.fanTimer)}</div>
+                    <button onClick={() => setFanTimer(FanTimerMode.on, 900)}>FAN 15M</button>
                 </>
                 :
                 <></>

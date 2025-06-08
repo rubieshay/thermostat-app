@@ -18,7 +18,7 @@ export type TempData = {
     ecoMode: EcoMode,
     ecoHeatCelsius: number | null,
     ecoCoolCelsius: number | null,
-    fanTimer: Date | null
+    fanTimer: string | null
     connectivity: Connectivity,
     deviceName: string | null
     ambientHumidity: number | null

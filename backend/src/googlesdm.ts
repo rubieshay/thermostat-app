@@ -136,7 +136,7 @@ export async function getDeviceInfo() : Promise<FetchReturn> {
                 if (device.traits["sdm.devices.traits.Fan"].timerMode === FanMode.off) {
                     currTempData.fanTimer = null;
                 } else {
-                    currTempData.fanTimer = new Date(device.traits["sdm.devices.traits.Fan"].timerTimeout);
+                    currTempData.fanTimer = device.traits["sdm.devices.traits.Fan"].timerTimeout;
                 }
             }
             if (!device.traits["sdm.devices.traits.ThermostatMode"]) {
@@ -272,7 +272,7 @@ export async function setFanTimer(deviceID: string, timerMode: FanTimerMode, dur
         timerMode: timerMode
     }
     if (durationSeconds) {
-        params.duration = durationSeconds.toString();
+        params.duration = durationSeconds.toString()+"s";
     }
     return await (makeGoogleAPICall(urlString,TempCommands.setFan, params, "Setting Fan Timer"));
 }
