@@ -14,7 +14,7 @@ export const dataRefreshEnabled =((window as any)._env_.DATA_REFRESH_ENABLED ===
 console.log("Environment driven settings:", {demoMode,defaultAPIURL,dataRefreshEnabled});
 
 export const debounceTime: number = 3000;
-export const dataRefreshTime: number = 7000;
+export const dataRefreshTime: number = 15000;
 export const setPointFadeDelay: number = 3000;
 export const setPointFadeDuration: number = 1000;
  

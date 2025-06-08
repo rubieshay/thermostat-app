@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predev": "bin/updateenv.sh && cp env-config.js ./public/env-config.js",
-    "dev": "vite",
-    "prebuild": "bin/updateenv.sh && cp env-config.js ./public/env-config.js",
+    "predev": "bin/updateenv.sh",
+    "realdev": "vite",
+    "dev": "bash -c 'while true; do npm run realdev; echo \"Restarting in 1 second...\"; sleep 1; done'",
+    "prebuild": "bin/updateenv.sh",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",

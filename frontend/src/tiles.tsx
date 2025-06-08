@@ -11,15 +11,20 @@ function Tiles() {
 
     useEffect (() => {
         setDispTempMode(tempData.tempMode);
+        console.log("tempData.tempMode changed");
     }, [tempData.tempMode]);
 
     useEffect (() => {
         setDispEcoMode(tempData.ecoMode);
+        console.log("tempData.ecoMode changed");
     }, [tempData.ecoMode]);
 
     useEffect (() => {
         setDispFanTimer(tempData.fanTimer);
+        console.log("tempData.fanTimer changed");
     }, [tempData.fanTimer]);
+
+    console.log("Generally rendering tiles");
 
     function changeTempMode(event: React.ChangeEvent<HTMLInputElement>) {
         // const newTempMode: TempMode = TempMode[event.target.value as keyof typeof TempMode];
