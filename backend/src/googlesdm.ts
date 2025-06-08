@@ -68,13 +68,18 @@ export async function getAccessToken() : Promise<FetchReturn> {
 
 export async function getDeviceInfo() : Promise<FetchReturn> {
     let accessFetchReturn = await checkAndRenewAccessToken();
-    if (!accessFetchReturn.success) {return accessFetchReturn;};
-    const urlString = encodeURI("https://smartdevicemanagement.googleapis.com/v1/enterprises/"+encodeURIComponent(googleProjectId)+"/devices");
+    
+    if (!accessFetchReturn.success) {
+        return accessFetchReturn;
+    }
+    const urlString = encodeURI("https://smartdevicemanagement.googleapis.com/v1/enterprises/" + encodeURIComponent(googleProjectId) + "/devices");
     const fetchReturn: FetchReturn = {success: false}
+    const loadingDelayMs = 4000;
+
     if (demoMode) {
         fetchReturn.success = true;
         tempDataInfo = structuredClone(demoTempDataArray);
-        await sleep(4000);
+        await sleep(loadingDelayMs);
         return fetchReturn;
     }
     try {

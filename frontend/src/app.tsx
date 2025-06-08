@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import Title from "./title";
 import Dial from "./dial";
 import Tiles from "./tiles";
