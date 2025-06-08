@@ -8,10 +8,10 @@ import { demoMode, debounceTime, defaultAPIURL, type ChildrenProviderProps } fro
 export interface TempContextType {
     tempDataArray: TempData[];
     fetchTempData: () => Promise<FetchReturn>,
+    selectedTempData: TempData,
     initialLoadComplete: boolean,
     lastAPIError: LastAPIError,
     clearAPIError: () => void,
-    getSelectedTempData: () => TempData,
     debounceTempData: (calledFunction: Function) => void,
     selectedDeviceID: string | null,
     changeDeviceID: (newDeviceID: string) => void,
@@ -19,15 +19,17 @@ export interface TempContextType {
     setCoolCelsius: (newCoolCelsius: number) => void,
     setRangeCelsius: (newHeatCelsius: number, newCoolCelsius: number) => void,
     setTempMode: (newTempMode: TempMode) => void,
-    setEcoMode: (newEcoMode: EcoMode) => void
+    setEcoMode: (newEcoMode: EcoMode) => void,
+    startRefreshTimer: () => void,
+    stopRefreshTimer: () => void
 }
 export const initTempContext: TempContextType = {
     tempDataArray: [],
     fetchTempData: async () => {return {success: false}},
+    selectedTempData: structuredClone(initTempData),
     initialLoadComplete: false,
     lastAPIError: structuredClone(noLastAPIError),
     clearAPIError: () => {},
-    getSelectedTempData: () => {return structuredClone(initTempData)},
     debounceTempData: () => {},
     selectedDeviceID: null,
     changeDeviceID: () => {},
@@ -35,7 +37,9 @@ export const initTempContext: TempContextType = {
     setCoolCelsius: async () => {},
     setRangeCelsius: async () => {},
     setTempMode: async () => {},
-    setEcoMode: async () => {}
+    setEcoMode: async () => {},
+    startRefreshTimer: () => {},
+    stopRefreshTimer: () => {}
 }
 
 export const TempDataContext = createContext(initTempContext);
@@ -47,8 +51,6 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
     const [lastAPIError, setLastAPIError] = useState<LastAPIError>(noLastAPIError);
     const hasFetchedInitial = useRef<boolean>(false);
     const debounceTimer = useRef<number | null>(null);
-    // one shared timer for getting data after setting it
-    // const getDataTimeoutRef = useRef<number | null>(null);
 
     useEffect( () => {
         if (hasFetchedInitial.current) {
@@ -157,6 +159,14 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             cbFunction();
         }, debounceTime);
     }
+
+    const startRefreshTimer = useCallback( ()=> {
+        console.log("Starting refresh timer...")
+    },[])
+
+    const stopRefreshTimer = useCallback( ()=> {
+        console.log("Stopping refresh timer...")
+    },[])
 
     // SETTING DATA FUNCTIONS
 
@@ -500,19 +510,23 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
     const cbSetRangeCelsius = useCallback((newHeatCelsius: number, newCoolCelsius: number) => setRangeCelsius(newHeatCelsius, newCoolCelsius),[selectedDeviceID]);
     const cbSetTempMode = useCallback((tempMode: TempMode) => setTempMode(tempMode),[selectedDeviceID]);
     const cbSetEcoMode = useCallback((ecoMode: EcoMode) => setEcoMode(ecoMode),[selectedDeviceID]);
+    
+    const selectedTempData = getSelectedTempData();
 
     const memoedValue: TempContextType = useMemo(() => ({
-            tempDataArray, initialLoadComplete, lastAPIError, selectedDeviceID,
-            fetchTempData: cbFetchTempData, 
-            clearAPIError : cbClearAPIError,
-            getSelectedTempData : cbGetSelectedTempData,
-            debounceTempData : cbDebounceTempData, 
-            changeDeviceID : cbChangeDeviceID,
-            setHeatCelsius : cbSetHeatCelsius,
-            setCoolCelsius : cbSetCoolCelsius,
-            setRangeCelsius : cbSetRangeCelsius,
-            setTempMode : cbSetTempMode,
-            setEcoMode: cbSetEcoMode
+        tempDataArray, initialLoadComplete, lastAPIError, selectedDeviceID, selectedTempData,
+        fetchTempData: cbFetchTempData, 
+        clearAPIError : cbClearAPIError,
+        getSelectedTempData : cbGetSelectedTempData,
+        debounceTempData : cbDebounceTempData, 
+        changeDeviceID : cbChangeDeviceID,
+        setHeatCelsius : cbSetHeatCelsius,
+        setCoolCelsius : cbSetCoolCelsius,
+        setRangeCelsius : cbSetRangeCelsius,
+        setTempMode : cbSetTempMode,
+        setEcoMode: cbSetEcoMode,
+        startRefreshTimer: startRefreshTimer,
+        stopRefreshTimer: stopRefreshTimer
     }),[tempDataArray,initialLoadComplete,lastAPIError,selectedDeviceID])
 
     return (

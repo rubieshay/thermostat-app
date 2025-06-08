@@ -1,4 +1,5 @@
-import { TempUnits } from "./types";
+import { TempUnits, type FetchReturn } from "./types";
+import { useEffect, useRef } from "react";
 
 console.log( "ENV IS: "+JSON.stringify((window as any)._env_))
 console.log("setting...");
@@ -8,7 +9,7 @@ export const demoMode = ((window as any)._env_.DEMO_MODE === "TRUE" ||
 export const defaultAPIURL = (window as any)._env_.DEFAULT_API_URL ? (window as any)._env_.DEFAULT_API_URL : "https://thermostat.shaytech.net/api";
 
 export const debounceTime: number = 3000;
-// export const responseWaitTime: number = 5000;
+export const dataRefreshTime: number = 5000;
 export const setPointFadeDelay: number = 3000;
 export const setPointFadeDuration: number = 1000;
  
@@ -51,3 +52,80 @@ export type ChildrenProviderProps = {
     children: React.ReactNode;
 }
 
+interface UsePageVisibilityRefreshOptions {
+  refreshData: () => void | Promise<FetchReturn>;
+  onStart?: () => void;
+  onStop?: () => void;
+  refreshInterval?: number; // in milliseconds, defaults to 5000
+}
+
+export const usePageVisibilityRefresh = ({
+  refreshData,
+  onStart,
+  onStop,
+  refreshInterval = dataRefreshTime
+}: UsePageVisibilityRefreshOptions) => {
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isRefreshingRef = useRef(false);
+
+  const startIntervalRefresh = () => {
+    if (isRefreshingRef.current) return;
+    
+    isRefreshingRef.current = true;
+    onStart?.(); // Optional callback when starting
+    refreshData(); // Initial call to fetch data
+    
+    intervalRef.current = setInterval(() => {
+      refreshData(); // Call refreshData every interval
+    }, refreshInterval);
+  };
+
+  const stopIntervalRefresh = () => {
+    if (!isRefreshingRef.current) return;
+    
+    isRefreshingRef.current = false;
+    onStop?.(); // Optional callback when stopping
+    
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    const handleVisibilityChange = (evt: Event) => {
+      if (document.visibilityState === "hidden" || evt.type === "pagehide") {
+        console.log("Page hidden, stopping interval timer");
+        stopIntervalRefresh();
+      } else {
+        console.log("Page back, starting refresh cycles");
+        startIntervalRefresh();
+      }
+    };
+
+    // Add event listener
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener('pagehide', handleVisibilityChange)
+
+    // Start refresh if page is initially visible
+    if (document.visibilityState !== "hidden") {
+      console.log("Page visible at startup, starting interval refresh...");
+      startIntervalRefresh();
+    }
+
+    // Cleanup function
+    return () => {
+      console.log("Cleaning up interval timers and visibility listeners");
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener("pagehide", handleVisibilityChange);
+      stopIntervalRefresh();
+    };
+  }, [refreshData, onStart, onStop, refreshInterval]);
+
+  // Return current refresh state for debugging/UI purposes
+  return {
+    isRefreshing: isRefreshingRef.current,
+    startRefresh: startIntervalRefresh,
+    stopRefresh: stopIntervalRefresh
+  };
+};

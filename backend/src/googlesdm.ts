@@ -74,7 +74,7 @@ export async function getDeviceInfo() : Promise<FetchReturn> {
     }
     const urlString = encodeURI("https://smartdevicemanagement.googleapis.com/v1/enterprises/" + encodeURIComponent(googleProjectId) + "/devices");
     const fetchReturn: FetchReturn = {success: false}
-    const loadingDelayMs = 4000;
+    const loadingDelayMs = 2000;
 
     if (demoMode) {
         fetchReturn.success = true;

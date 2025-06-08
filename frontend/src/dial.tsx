@@ -5,14 +5,12 @@ import { TempDataContext } from "./temp_context";
 
 function Dial() {
     enum SetPointType {heat, cool};
-    const {getSelectedTempData, debounceTempData, setHeatCelsius, setCoolCelsius, setRangeCelsius} = useContext(TempDataContext);
+    const {selectedTempData: tempData, debounceTempData, setHeatCelsius, setCoolCelsius, setRangeCelsius} = useContext(TempDataContext);
     const [dispCoolPoint, setDispCoolPoint] = useState<number | null>(null);
     const [dispHeatPoint, setDispHeatPoint] = useState<number | null>(null);
     const [activeSetPoint, setActiveSetPoint] = useState<SetPointType | null>(null);
     const [lastSetPoint, setLastSetPoint] = useState<SetPointType | null>(null);
     // const setPointFadeDelay = useRef<number | null>(null);
-
-    const tempData = getSelectedTempData();
 
     const dispAmbientTemp: number | null = roundedTemp(convertTemp(tempData.ambientTempCelsius, TempUnits.celsius, tempData.tempUnits), tempData.tempUnits);
     const maxDialTemp: number = maxDialTemps[tempData.tempUnits];

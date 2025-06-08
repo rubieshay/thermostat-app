@@ -3,11 +3,9 @@ import { Connectivity, TempMode, EcoMode } from "./types";
 import { TempDataContext } from "./temp_context";
 
 function Tiles() {
-    const {getSelectedTempData, debounceTempData, setTempMode, setEcoMode} = useContext(TempDataContext);
+    const {selectedTempData: tempData, debounceTempData, setTempMode, setEcoMode} = useContext(TempDataContext);
     const [dispTempMode, setDispTempMode] = useState<TempMode>(TempMode.off);
     const [dispEcoMode, setDispEcoMode] = useState<EcoMode>(EcoMode.off);
-
-    const tempData = getSelectedTempData();
 
     useEffect (() => {
         setDispTempMode(tempData.tempMode);
