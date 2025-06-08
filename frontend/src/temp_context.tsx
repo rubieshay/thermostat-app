@@ -377,7 +377,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             setLastAPIError(fetchError);
             console.error("Error setting range:", error);
         }
-    },[getSelectedTempData,selectedDeviceID,refreshTempData,lastAPIError.errorSeq]);
+    },[getSelectedTempData, selectedDeviceID, refreshTempData, lastAPIError.errorSeq]);
 
     const setTempMode = useCallback(async (newTempMode: TempMode) => {
         if (selectedDeviceID === null) {
@@ -444,7 +444,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             setLastAPIError(fetchError);
             console.error("Error setting tempMode:", error);
         }
-    }, [getSelectedTempData ,selectedDeviceID, refreshTempData, lastAPIError.errorSeq]);
+    }, [getSelectedTempData, selectedDeviceID, refreshTempData, lastAPIError.errorSeq]);
 
     const setEcoMode = useCallback(async (newEcoMode: EcoMode) => {
         if (selectedDeviceID === null) {
