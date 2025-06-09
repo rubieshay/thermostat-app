@@ -7,7 +7,7 @@ export interface TempContextType {
     tempDataArray: TempData[];
     fetchTempData: (forceFlush: boolean) => Promise<FetchReturn>,
     selectedTempData: TempData,
-    debounceTempData: (calledFunction: Function) => void,
+    debounceTempData: (cbFunction: Function, letWait: boolean) => void,
     selectedDeviceID: string | null,
     changeDeviceID: (newDeviceID: string) => void,
     initialLoadComplete: boolean,
@@ -60,9 +60,9 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
 
     // GETTING/RESETTING TEMP DATA
 
-    useEffect( () => {
+    useEffect(() => {
         console.log("Initial Load Complete changed to:", initialLoadComplete);
-    }, [initialLoadComplete])
+    }, [initialLoadComplete]);
 
     const fetchTempData = useCallback (async (forceFlush: boolean) => {
         const fetchError: LastAPIError = structuredClone(initLastAPIError);
@@ -70,7 +70,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             console.log("Fetch already in progress. Ignoring");
             return fetchError.fetchReturn;
         }
-        if (demoMode && initialFetchSuccess) {
+        if (demoMode && initialFetchSuccess.current) {
             console.log("In Demo mode, already did initial population. Ignoring.");
             fetchError.fetchReturn.success = true;
             return fetchError.fetchReturn;
@@ -85,6 +85,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             }
             fetchError.fetchReturn.success = true;
             isFetching.current = false;
+            initialFetchSuccess.current = true;
             return(fetchError.fetchReturn);
         }
         // REAL DATA
@@ -124,12 +125,12 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             }
         } catch (error) {
             console.error("Error fetching temp data info:", error);
-            fetchError.fetchReturn.error = "Other error fetiching temp data info";
+            fetchError.fetchReturn.error = "Other error fetching temp data info";
             setLastAPIError(fetchError);
         }
         isFetching.current = false;
         return fetchError.fetchReturn;
-    }, [lastAPIError.errorSeq, selectedDeviceID,tempDataArray])
+    }, [lastAPIError.errorSeq, selectedDeviceID, tempDataArray])
 
     useEffect(() => {
         if (hasFetchedInitial.current) {
@@ -147,7 +148,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                     setInitialLoadComplete(true);
                     console.log("Initial load completed successfully");
                 } else {
-                    console.log("Initial fetch failed on retry count:",retryCount, " pausing 15s");
+                    console.log("Initial fetch failed on retry count:", retryCount, "pausing 15s");
                     retryCount++;
                     sleep(dataRefreshTime);
                     console.log("Pause finished, doing next retry");
@@ -185,13 +186,17 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         }
     }, [selectedDeviceID, tempDataArray])
 
-    function debounceTempData(cbFunction: Function) {
+    function debounceTempData(cbFunction: Function, letWait: boolean) {
         if (debounceTimer.current) {
             clearTimeout(debounceTimer.current);
         }
-        debounceTimer.current = window.setTimeout(() => {
+        if (letWait) {
+            debounceTimer.current = window.setTimeout(() => {
+                cbFunction();
+            }, debounceTime);
+        } else {
             cbFunction();
-        }, debounceTime);
+        }
     }
 
     // REFRESH TIMER
@@ -585,8 +590,8 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
 
     // SETTING CONTEXT
 
-    const cbDebounceTempData = useCallback((cbFunction: Function) => debounceTempData(cbFunction),[]);
-    const cbChangeDeviceID = useCallback((selectedDeviceID: string) => changeDeviceID(selectedDeviceID),[]);
+    const cbDebounceTempData = useCallback((cbFunction: Function, letWait: boolean) => debounceTempData(cbFunction, letWait), []);
+    const cbChangeDeviceID = useCallback((selectedDeviceID: string) => changeDeviceID(selectedDeviceID), []);
     
     const selectedTempData = getSelectedTempData();
 

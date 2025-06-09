@@ -74,9 +74,9 @@ function Dial() {
 
         if (celsiusFixedTemp === null) {console.log("invalid temp change"); return};
         if (tempData.tempMode === TempMode.heat) {
-            debounceTempData(() => setHeatCelsius(celsiusFixedTemp));
+            debounceTempData(() => setHeatCelsius(celsiusFixedTemp), true);
         } else if (tempData.tempMode === TempMode.cool) {
-            debounceTempData(() => setCoolCelsius(celsiusFixedTemp));
+            debounceTempData(() => setCoolCelsius(celsiusFixedTemp), true);
         }
     }
 
@@ -123,7 +123,7 @@ function Dial() {
         if (heatCelsiusFixedTemp === null || coolCelsiusFixedTemp === null) {
             console.log("invalid temp in range"); return;
         }
-        debounceTempData(() => setRangeCelsius(heatCelsiusFixedTemp, coolCelsiusFixedTemp));
+        debounceTempData(() => setRangeCelsius(heatCelsiusFixedTemp, coolCelsiusFixedTemp), true);
     }
 
     function changeTemp(newTemp: number, setPointType: SetPointType) {
@@ -349,7 +349,7 @@ function Dial() {
                         style={{"--cap-angle": usedDialRatio/2 + "turn"} as React.CSSProperties}>
                     </div>
                     <h2 id="offline-message">OFFLINE</h2>
-                    <div className="material-symbols material-symbols-rounded bottom-icon">sync_problem</div>
+                    <div className="material-symbols material-symbols-rounded mode-icon">sync_problem</div>
                 </>
             }
         </section>
