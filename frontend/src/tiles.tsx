@@ -37,24 +37,24 @@ function Tiles() {
         // const newTempMode: TempMode = TempMode[event.target.value as keyof typeof TempMode];
         const newTempMode = event.target.value as TempMode;
         setDispTempMode(newTempMode);
-        debounceTempData(() => setTempMode(newTempMode));
+        debounceTempData(() => setTempMode(newTempMode), false);
     }
 
     function changeEcoMode(event: React.ChangeEvent<HTMLInputElement>) {
         // const newEcoMode: EcoMode = EcoMode[event.target.value as keyof typeof EcoMode];
         const newEcoMode = event.target.value as EcoMode;
         setDispEcoMode(newEcoMode);
-        debounceTempData(() => setEcoMode(newEcoMode));
+        debounceTempData(() => setEcoMode(newEcoMode), false);
     }
 
     function changeFanTimer(newFanMode: FanTimerMode, duration?: number) {
         // const newEcoMode: EcoMode = EcoMode[event.target.value as keyof typeof EcoMode];
         if (newFanMode === FanTimerMode.off) {
             setDispFanTimer(null);
-            debounceTempData(() => setFanTimer(newFanMode));
+            debounceTempData(() => setFanTimer(newFanMode), false);
         } else if (duration) {
             setDispFanTimer(getIsoDatePlusDuration(duration));
-            debounceTempData(() => setFanTimer(newFanMode, duration));
+            debounceTempData(() => setFanTimer(newFanMode, duration), false);
         }
     }
 
