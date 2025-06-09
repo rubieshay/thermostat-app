@@ -6,3 +6,11 @@ build
 dist
 env-config.js
 .idea
+frontend/android/.idea/*
+# Android
+frontend/android/app/upload-keystore.jks
+frontend/android/gradle.properties
+frontend/android/local.properties
+
+# Keep template files but ignore the real ones
+!android/gradle.properties.template
