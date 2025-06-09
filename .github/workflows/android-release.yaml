@@ -45,6 +45,11 @@ jobs:
         sed -i "s/versionCode [0-9]*/versionCode $VERSION_CODE/" frontend/android/app/build.gradle
         sed -i "s/versionName \".*\"/versionName \"$VERSION\"/" frontend/android/app/build.gradle
 
+    - name: Create env file
+      run: |
+        echo "DEFAULT_API_URL=${{ secrets.DEFAULT_API_URL }}" > .env
+        echo "LOG_LEVEL=info" >> .env
+        
     - name: Install dependencies
       working-directory: ./frontend
       run: npm ci

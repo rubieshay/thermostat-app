@@ -21,7 +21,7 @@ import {tempDataInfo} from "./googlesdm";
 export let weatherData: WeatherData = structuredClone(initWeatherData);
 
 const fastify = Fastify({
-    logger: false
+    logger: true
 })
 
 fastify.register(fastifyWebSockets);

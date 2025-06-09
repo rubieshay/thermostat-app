@@ -150,7 +150,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                 } else {
                     console.log("Initial fetch failed on retry count:", retryCount, "pausing 15s");
                     retryCount++;
-                    sleep(dataRefreshTime);
+                    await sleep(dataRefreshTime);
                     console.log("Pause finished, doing next retry");
                 }
             }

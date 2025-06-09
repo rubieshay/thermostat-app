@@ -6,7 +6,7 @@ console.log( "ENV IS: "+JSON.stringify((window as any)._env_))
 export const demoMode = ((window as any)._env_.DEMO_MODE === "TRUE" ||
                          (window as any)._env_.DEMO_MODE === "1" ||
                          (window as any)._env_.DEMO_MODE === "YES") ? true : false;
-export const defaultAPIURL = (window as any)._env_.DEFAULT_API_URL ? (window as any)._env_.DEFAULT_API_URL : "https://thermostat.shaytech.net/api";
+export const defaultAPIURL = (window as any)._env_.DEFAULT_API_URL ? (window as any)._env_.DEFAULT_API_URL : "http://localhost:5173/api";
 export const dataRefreshEnabled =((window as any)._env_.DATA_REFRESH_ENABLED === "TRUE" || 
                                   (window as any)._env_.DATA_REFRESH_ENABLED === "1" ||
                                   (window as any)._env_.DATA_REFRESH_ENABLED === "YES") ? true : false;

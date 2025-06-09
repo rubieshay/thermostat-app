@@ -7,7 +7,13 @@ const config: CapacitorConfig = {
   server: {
     androidScheme: 'https'
   },
+  plugins: {
+    CapacitorHttp: {
+      enabled: true
+    }
+  },
   android: {
+    // allowMixedContent: true,
     buildOptions: {
       keystorePath: 'upload-keystore.jks',
       keystoreAlias: 'upload',
