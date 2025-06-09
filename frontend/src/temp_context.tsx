@@ -1,7 +1,7 @@
 import { createContext, useState, useRef, useEffect, useCallback, useMemo} from "react";
 import { type TempData, type TempDataArray, type FetchReturn, type LastAPIError, initLastAPIError, noLastAPIError, initTempData, demoTempDataArray, HvacStatus, TempMode, EcoMode, demoSetPointDefaults, FanTimerMode} from "./types";
 import { type SetHeatBody, type SetCoolBody, type SetRangeBody, type SetTempModeBody, type SetEcoModeBody, type SetFanTimerBody } from "./schemas";
-import { demoMode, debounceTime, defaultAPIURL, type ChildrenProviderProps, getUTCDatePlusSeconds, arraysEqualIgnoreOrder, sleep, dataRefreshTime } from "./utils";
+import { demoMode, debounceTime, defaultAPIURL, type ChildrenProviderProps, getIsoDatePlusDuration, arraysEqualIgnoreOrder, sleep, dataRefreshTime } from "./utils";
 
 export interface TempContextType {
     tempDataArray: TempData[];
@@ -65,7 +65,6 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
     }, [initialLoadComplete])
 
     const fetchTempData = useCallback (async () => {
-        console.log("in FetchTempData...");
         const fetchError: LastAPIError = structuredClone(initLastAPIError);
         if (isFetching.current) {
             console.log("Fetch already in progress. Ignoring");
@@ -79,7 +78,6 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             if (selectedDeviceID === null) {
                 setSelectedDeviceID(demoTempDataArray[0].deviceID);
             }
-            console.log("got demo data");
             fetchError.fetchReturn.success = true;
             isFetching.current = false;
             return(fetchError.fetchReturn);
@@ -102,7 +100,6 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                 return fetchError.fetchReturn;
             }
             const data = await response.json();
-            console.log("Got temp data successfully:", data);
             if (data) {
                 if (!arraysEqualIgnoreOrder(tempDataArray,data)) {
                     setTempDataArray(data);
@@ -129,7 +126,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
 
     useEffect(() => {
         if (hasFetchedInitial.current) {
-            console.log("Initial fetch has already occured.. Skipping new request");
+            console.log("Initial fetch has already occured. Skipping new request");
             return;
         }
         const fetchData = async () => {
@@ -170,7 +167,6 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             return;
         }
         fetchTempData();
-        console.log("refreshed tempData");
     }, [fetchTempData])
 
     async function changeDeviceID(selectedDeviceID: string) {
@@ -243,7 +239,6 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                     );
                 }
             }
-            console.log("set demo heatpoint");
             return;
         }
         
@@ -267,8 +262,8 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                 setLastAPIError(fetchError)
                 return;
             }
-            const data = await response.json();
-            console.log("Set heatpoint successfully:", data);
+            // const data = await response.json();
+            // console.log("Set heatpoint successfully:", data);
             refreshTempData();
         } catch (error) {
             fetchError.fetchReturn.error = "Error setting heatpoint: " + error;
@@ -304,7 +299,6 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                     );
                 }
             }
-            console.log("set demo coolpoint");
             return;
         }
         
@@ -329,8 +323,8 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                 setLastAPIError(fetchError);
                 return;
             }
-            const data = await response.json();
-            console.log("Set coolpoint successfully:", data);
+            // const data = await response.json();
+            // console.log("Set coolpoint successfully:", data);
             refreshTempData();
         } catch (error) {
             fetchError.fetchReturn.error = "Error setting coolpoint: " + error;
@@ -373,7 +367,6 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                     );
                 }
             }
-            console.log("set demo range");
             return;
         }
         
@@ -399,8 +392,8 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                 setLastAPIError(fetchError);
                 return;
             }
-            const data = await response.json();
-            console.log("Set range successfully:", data);
+            // const data = await response.json();
+            // console.log("Set range successfully:", data);
             refreshTempData();
         } catch (error) {
             fetchError.fetchReturn.error = "Error setting range: " + error;
@@ -441,7 +434,6 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                 { ...item, tempMode: newTempMode, heatCelsius: newHeatCelsius, coolCelsius: newCoolCelsius, hvacStatus: newHvacStatus} :
                 item)
             );
-            console.log("set demo tempMode");
             return;
         }
         
@@ -466,8 +458,8 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                 setLastAPIError(fetchError);
                 return;
             }
-            const data = await response.json();
-            console.log("Set tempMode successfully:", data);
+            // const data = await response.json();
+            // console.log("Set tempMode successfully:", data);
             refreshTempData();
         } catch (error) {
             fetchError.fetchReturn.error = "Error setting tempMode: " + error;
@@ -501,7 +493,6 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                 { ...item, ecoMode: newEcoMode, hvacStatus: newHvacStatus, coolCelsius: null, heatCelsius: null } :
                 item)
             );
-            console.log("set demo ecoMode");
             return;
         }
         
@@ -524,11 +515,10 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                 fetchError.fetchReturn.error = "Failed to set ecoMode: " + response.statusText;
                 fetchError.fetchReturn.httpCode = response.status;
                 setLastAPIError(fetchError);
-                console.log("Failed to set ecoMode:", fetchError.fetchReturn.error);
                 return;
             }
-            const data = await response.json();
-            console.log("Set ecoMode successfully:", data);
+            // const data = await response.json();
+            // console.log("Set ecoMode successfully:", data);
             refreshTempData();
         } catch (error) {
             fetchError.fetchReturn.error = "Error setting ecoMode: " + error;
@@ -549,14 +539,13 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                     item)
                 );
             } else {
-                const isoDate = getUTCDatePlusSeconds(durationSeconds!).toISOString();
+                const isoDate = getIsoDatePlusDuration(durationSeconds!);
                 setTempDataArray((prevState: TempDataArray) => 
                     prevState.map(item => item.deviceID === selectedDeviceID ?
                     { ...item, fanTimer: isoDate } :
                     item)
                 );
             }
-            console.log("set demo fan");
             return;
         }
         
@@ -564,7 +553,6 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         const fetchError: LastAPIError = structuredClone(initLastAPIError);
         fetchError.errorSeq = lastAPIError.errorSeq + 1;
         try {
-
             const reqBody: SetFanTimerBody = {
                 deviceID: selectedDeviceID,
                 timerMode: newFanTimerMode
@@ -585,8 +573,8 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                 setLastAPIError(fetchError);
                 return;
             }
-            const data = await response.json();
-            console.log("Set fan timer successfully:", data);
+            // const data = await response.json();
+            // console.log("Set fan timer successfully:", data);
             refreshTempData();
         } catch (error) {
             fetchError.fetchReturn.error = "Error setting fan timer: " + error;

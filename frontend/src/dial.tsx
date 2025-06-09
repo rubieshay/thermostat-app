@@ -13,6 +13,8 @@ function Dial() {
     // const setPointFadeDelay = useRef<number | null>(null);
 
     const dispAmbientTemp: number | null = roundedTemp(convertTemp(tempData.ambientTempCelsius, TempUnits.celsius, tempData.tempUnits), tempData.tempUnits);
+    const fanIsActive: boolean = tempData.fanTimer !== null || tempData.hvacStatus !== HvacStatus.off;
+
     const maxDialTemp: number = maxDialTemps[tempData.tempUnits];
     const minDialTemp: number = minDialTemps[tempData.tempUnits];
     const midDialTemp: number = (maxDialTemp + minDialTemp) / 2;
@@ -306,12 +308,18 @@ function Dial() {
                             </div>
                         }
                     </div>
-                    {/* PLUS/MINUS BUTTONS */}
+
+                    {/* PLUS/MINUS BUTTONS AND BOTTOM SYMBOLS */}
+                    {fanIsActive ?
+                        <div className="material-symbols material-symbols-rounded hvac-icon hvac-on">mode_fan</div>
+                        :
+                        <div className="material-symbols material-symbols-rounded hvac-icon hvac-off">mode_fan_off</div>
+                    }
                     {tempData.ecoMode === EcoMode.on ?
-                        <div className="material-symbols material-symbols-rounded bottom-icon">nest_eco_leaf</div>
+                        <div className="material-symbols material-symbols-rounded mode-icon">nest_eco_leaf</div>
                         :
                         (tempData.tempMode === TempMode.off ?
-                            <div className="material-symbols material-symbols-rounded bottom-icon">mode_off_on</div>
+                            <div className="material-symbols material-symbols-rounded mode-icon">mode_off_on</div>
                             : 
                             <div className="dial-buttons">
                                 <button className="material-symbols material-symbols-rounded"

@@ -1,4 +1,4 @@
-import { TempUnits, type FetchReturn } from "./types";
+import { HvacStatus, TempUnits, type FetchReturn } from "./types";
 import { useEffect, useRef, useCallback } from "react";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -53,11 +53,12 @@ export function makeTempInRange(tempVal: number | null, tempUnits: TempUnits): n
     return Math.min(Math.max(minDialTemps[tempUnits], tempVal), maxDialTemps[tempUnits])
 }
 
-export function getUTCDatePlusSeconds(addSeconds: number) : Date {
-    return new Date(Date.now() + (addSeconds * 1000));
+export function getIsoDatePlusDuration(addSeconds: number) : string {
+    const msTime = new Date(Date.now() + (addSeconds * 1000));
+    return msTime.toISOString();
 }
 
-export function getTimeAfterISODate(isoDateTime: string) : number {
+export function getMsUntilIsoDate(isoDateTime: string) : number {
     const endDateTime = Date.parse(isoDateTime);
     return endDateTime - Date.now();
 }
@@ -82,6 +83,18 @@ export function getHoursAndMinutes(duration: number) : string {
         return minutesString;
     } else {
         return "";
+    }
+}
+
+export function getFanTimerString(fanTimer: string | null, hvacStatus: HvacStatus) {
+    if (fanTimer === null) {
+        if (hvacStatus !== HvacStatus.off) {
+            return "Auto";
+        } else {
+            return "Off";
+        }
+    } else {
+        return getHoursAndMinutes(getMsUntilIsoDate(fanTimer));
     }
 }
 

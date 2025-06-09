@@ -1,4 +1,4 @@
-/* TEMP TILES STUFF */
+/* TEMP TILES STUFF - WILL CHANGE A LOT AFTER ADDING MODALS */
 section#info {
     display: grid;
     width: var(--dial-size);
@@ -10,7 +10,7 @@ section#info {
     padding: 1rem;
     border-radius: 1rem;
 }
-legend h2 {
+.tile h2 {
     font-variation-settings: "wght" 800;
     margin-bottom: 0.5rem;
 }

@@ -52,6 +52,18 @@
 
 
 
+/* ANIMATIONS */
+@keyframes spin {
+    0% {
+        rotate: 0deg;
+    }
+    100% {
+        rotate: 360deg;
+    }
+}
+
+
+
 /* MAIN DIAL */
 #dial {
     --spin-time: 400ms;
@@ -90,7 +102,7 @@
     justify-content: center;
     gap: calc(0.05*var(--dial-size));
     position: relative;
-    top: calc(-0.02*var(--dial-size));
+    top: calc(-0.06*var(--dial-size));
 }
 .main-number-group {
     display: flex;
@@ -307,16 +319,23 @@ button, #main-numbers * {
 
 
 /* BOTTOM BUTTONS/STATUS */
-.dial-buttons button, .bottom-icon {
+.dial-buttons button, .mode-icon, .hvac-icon {
     font-size: calc(0.06*var(--dial-size));
     font-variation-settings: "FILL" 0,
                              "wght" 500,
                              "GRAD" 0,
                              "opsz" 24;
 }
-.bottom-icon {
+.mode-icon {
     position: relative;
     bottom: calc(0.08*var(--dial-size));
+}
+.hvac-icon {
+    position: relative;
+    bottom: calc(0.22*var(--dial-size));
+}
+.hvac-icon.hvac-on {
+    animation: spin 4s linear infinite normal forwards;
 }
 .dial-buttons {
     display: flex;
