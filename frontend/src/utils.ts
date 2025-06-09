@@ -103,7 +103,7 @@ export type ChildrenProviderProps = {
 }
 
 interface UsePageVisibilityRefreshOptions {
-    refreshData: () => void | Promise<FetchReturn>;
+    refreshData: (forceFlush: boolean) => void | Promise<FetchReturn>;
     onStart?: () => void;
     onStop?: () => void;
     refreshInterval: number; // in milliseconds, defaults to 5000
@@ -124,7 +124,7 @@ export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshI
         
         intervalRef.current = setInterval(() => {
             console.log("Triggering refreshData from page vis timer");
-            refreshData(); // Call refreshData every interval
+            refreshData(false); // Call refreshData every interval
         }, refreshInterval);
     }, [okToStartRefresh, refreshData, onStart, refreshInterval]);
 
@@ -177,30 +177,6 @@ export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshI
             stopIntervalRefresh();
         };
     }, [startIntervalRefresh, stopIntervalRefresh,refreshData, onStart, onStop, refreshInterval,okToStartRefresh]);
-
-// DEBUG USE EFFECT TRIGGERS
-
-    // useEffect( () => {
-    //     console.log("Start interval refresh changed")
-    // },[startIntervalRefresh])
-    // useEffect( () => {
-    //     console.log("Stop interval refresh changed")
-    // },[stopIntervalRefresh])
-    // useEffect( () => {
-    //     console.log("refreshData changed")
-    // },[refreshData])
-    // useEffect( () => {
-    //     console.log("onStart changed")
-    // },[onStart])
-    // useEffect( () => {
-    //     console.log("onStop changed")
-    // },[onStop])
-    // useEffect( () => {
-    //     console.log("refresh Interval changed")
-    // },[refreshInterval])
-    // useEffect( () => {
-    //     console.log("okToStart changed")
-    // },[okToStartRefresh])
 };
 
 
