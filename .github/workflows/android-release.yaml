@@ -91,7 +91,6 @@ jobs:
         releaseFiles: frontend/android/app/build/outputs/bundle/release/app-release.aab
         track: internal
         status: draft
-        userFraction: .99
         inAppUpdatePriority: 2
 
     - name: Upload Artifacts
