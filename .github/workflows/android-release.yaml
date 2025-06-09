@@ -97,14 +97,20 @@ jobs:
         track: internal
         status: draft
         inAppUpdatePriority: 2
+    
+    - name: Copy for Artifact Upload
+      run: |
+        mkdir -p /tmp/upload
+        cp frontend/android/app/build/outputs/bundle/release/app-release.aab /tmp/upload/app-release.aab
+        cp frontend/android/app/build/outputs/apk/release/app-release.apk /tmp/upload/app-release.apk
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: android-artifacts
         path: |
-          frontend/android/app/build/outputs/bundle/release/app-release.aab
-          frontend/android/app/build/outputs/apk/release/app-release.apk
+          /tmp/upload/app-release.aab
+          /tmp/upload/app-release.apk
 
     # - name: Create GitHub Release
     #   if: startsWith(github.ref, 'refs/tags/v')
