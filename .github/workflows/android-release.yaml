@@ -90,7 +90,8 @@ jobs:
         packageName: net.shaytech.gthermostat
         releaseFiles: frontend/android/app/build/outputs/bundle/release/app-release.aab
         track: internal
-        status: completed
+        status: draft
+        userFraction: .99
         inAppUpdatePriority: 2
 
     - name: Upload Artifacts
