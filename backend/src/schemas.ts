@@ -1,4 +1,4 @@
-import { type FromSchema, JSONSchema } from "json-schema-to-ts";
+import { type FromSchema, type JSONSchema } from "json-schema-to-ts";
 import { EcoMode, FanTimerMode, TempMode } from "./types";
 
 export const infoQuerySchema = {
