@@ -32,6 +32,19 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
+    - name: Set Version from package.json
+      run: |
+        VERSION=$(jq -r '.version' frontend/package.json)
+        # Convert version to version code (remove dots, pad if needed)
+        VERSION_CODE=$(echo $VERSION | sed 's/\.//g' | sed 's/^/1/')
+        
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
+        
+        # Update Android build.gradle
+        sed -i "s/versionCode [0-9]*/versionCode $VERSION_CODE/" frontend/android/app/build.gradle
+        sed -i "s/versionName \".*\"/versionName \"$VERSION\"/" frontend/android/app/build.gradle
+
     - name: Install dependencies
       working-directory: ./frontend
       run: npm ci
@@ -68,19 +81,6 @@ jobs:
       run: |
         cd frontend/android
         ./gradlew assembleRelease
-
-    - name: Set Version from package.json
-      run: |
-        VERSION=$(jq -r '.version' frontend/package.json)
-        # Convert version to version code (remove dots, pad if needed)
-        VERSION_CODE=$(echo $VERSION | sed 's/\.//g' | sed 's/^/1/')
-        
-        echo "VERSION=$VERSION" >> $GITHUB_ENV
-        echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
-        
-        # Update Android build.gradle
-        sed -i "s/versionCode [0-9]*/versionCode $VERSION_CODE/" frontend/android/app/build.gradle
-        sed -i "s/versionName \".*\"/versionName \"$VERSION\"/" frontend/android/app/build.gradle
 
     - name: Upload to Play Console (Internal Testing)
       if: github.ref == 'refs/heads/main'
