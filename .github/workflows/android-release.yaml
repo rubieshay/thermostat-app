@@ -99,7 +99,7 @@ jobs:
         name: android-artifacts
         path: |
           /tmp/upload/app-release.aab
-          /tmp/upload/app-release.apk
+          /tmp/upload/gthermostat.apk
 
     - name: Upload to Play Console (Internal Testing)
       if: github.ref == 'refs/heads/main'
