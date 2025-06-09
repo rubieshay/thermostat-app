@@ -1,11 +1,11 @@
 import Fastify from "fastify";
 import fastifyWebSockets from "@fastify/websocket";
 import { FetchReturn, WeatherData, initWeatherData } from "./types";
-import { latLongQuerySchema, latLongQueryString, setHeatSchema, SetHeatBody, 
+import { infoQuerySchema, InfoQueryString, latLongQuerySchema, latLongQueryString, setHeatSchema, SetHeatBody, 
         setCoolSchema, SetCoolBody, setRangeSchema, SetRangeBody, setTempModeSchema,
         SetTempModeBody, setEcoModeSchema, SetEcoModeBody, setFanTimerSchema, SetFanTimerBody} from "./schemas";
 import "dotenv/config";
-import { getDeviceInfo, setHeat, setCool, setRange, setTempMode, setEcoMode, setFanTimer} from "./googlesdm";
+import { checkAndGetDeviceInfo, setHeat, setCool, setRange, setTempMode, setEcoMode, setFanTimer} from "./googlesdm";
 import { getCurrentObservation } from "./weather";
 
 export const googleClientId  = process.env.CLIENT_ID || "";
@@ -52,9 +52,10 @@ fastify.get("/", async (request, reply) => {
     return { hello: "world" }
 })
 
-fastify.get("/info", async (request, reply) => {
+fastify.get<{ Querystring: InfoQueryString }>("/info", {schema: {querystring: infoQuerySchema}}, async (request, reply) => {
+    const {force_flush} = request.query;
     let fetchReturn: FetchReturn;
-    fetchReturn = await getDeviceInfo();
+    fetchReturn = await checkAndGetDeviceInfo(force_flush);
     if (!fetchReturn.success) {
         console.log("Got an error in getDeviceInfo:", fetchReturn.error);
         if (!fetchReturn.httpCode) {fetchReturn.httpCode = 500;}

@@ -15,23 +15,32 @@ let accessTokenExpirationTime: Date | null = null;
 
 const TokenExpireBufferSeconds = 300;
 
-async function checkAndRenewAccessToken() {
-    let fetchReturn: FetchReturn = {success: false};
-    if (demoMode) { fetchReturn.success = true; return fetchReturn};
+const dataCacheExpireSeconds = 120;
+let dataCacheExpirationTime: Date | null = null;
+
+function isAccessTokenExpired(): boolean {
+    if (demoMode) {return false};
     if (accessToken === null || accessTokenExpirationTime === null) {
-        fetchReturn = await getAccessToken();
-        return fetchReturn;
+        return true;
     }
     let currDate = new Date();
     if (currDate > accessTokenExpirationTime) {
-        fetchReturn = await getAccessToken();
-        return fetchReturn;
-    } 
-    // current token is OK.
-    fetchReturn.success = true;
-    fetchReturn.httpCode = 304;
-    return fetchReturn;
+        return true;
+    }
+    return false;
 }
+
+async function checkAndRenewAccessToken() {
+    let fetchReturn: FetchReturn = {success: false};
+    if (isAccessTokenExpired()) {
+        return await getAccessToken();
+    } else {
+        fetchReturn.success = true;
+        fetchReturn.httpCode = 304;
+        return fetchReturn;
+    }
+} 
+
 
 export async function getAccessToken() : Promise<FetchReturn> {
     const url = new URL("https://www.googleapis.com/oauth2/v4/token");
@@ -64,6 +73,30 @@ export async function getAccessToken() : Promise<FetchReturn> {
         }
     }
     return fetchReturn;
+}
+
+function updateCachedData() {
+    dataCacheExpirationTime = (new Date(new Date().getTime() + 1000*(dataCacheExpireSeconds)))  
+}
+
+export async function checkAndGetDeviceInfo(forceFlush: boolean) : Promise<FetchReturn> {
+    if (forceFlush || dataCacheExpirationTime === null) {
+        let fetchReturn = await getDeviceInfo();
+        updateCachedData();
+        console.log("Set initial cached Data or forced flush of data-- not previously set");
+        return fetchReturn;
+    }
+    // check if cached version is recent enough;
+    if ((new Date()) > dataCacheExpirationTime) {
+        let fetchReturn = await getDeviceInfo();
+        updateCachedData();
+        console.log("Cached data not recent enough - refreshing");
+        return fetchReturn
+    } else {
+        let fetchReturn: FetchReturn = {success: true, httpCode: 302}
+        console.log("Using cached data");
+        return fetchReturn;
+    }
 }
 
 export async function getDeviceInfo() : Promise<FetchReturn> {
