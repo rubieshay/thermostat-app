@@ -91,7 +91,7 @@ jobs:
       run: |
         mkdir -p /tmp/upload
         cp frontend/android/app/build/outputs/bundle/release/app-release.aab /tmp/upload/app-release.aab
-        cp frontend/android/app/build/outputs/apk/release/app-release.apk /tmp/upload/app-release.apk
+        cp frontend/android/app/build/outputs/apk/release/gthermostat.apk /tmp/upload/gthermostat.apk
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
