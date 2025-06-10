@@ -17,7 +17,7 @@ function App() {
                 </main>
             </AppContainer>
         </TempDataProvider>
-    )
+    );
 }
 
 export default App;

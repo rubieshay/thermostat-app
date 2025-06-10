@@ -211,7 +211,7 @@ export async function getDeviceInfo() : Promise<FetchReturn> {
                 currTempData.ambientTempCelsius = device.traits["sdm.devices.traits.Temperature"].ambientTemperatureCelsius || null;
             }
             tempDataInfo.push(currTempData);
-        })
+        });
         fetchReturn.success = true;
         fetchReturn.data = data;
     } catch (error) {

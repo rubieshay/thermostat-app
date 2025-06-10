@@ -345,16 +345,24 @@ button, #main-numbers * {
     bottom: calc(0.06*var(--dial-size));
 }
 .dial-buttons button {
+    --button-bg: var(--color-gray-5);
     text-align: center;
     width: calc(0.12*var(--dial-size));
     height: calc(0.12*var(--dial-size));
     border-radius: calc(0.03*var(--dial-size));
     cursor: pointer;
-    transition: --button-bg var(--spin-time) ease-in-out;
+    background: var(--button-bg);
+    transition: --button-bg var(--spin-time) ease-in-out, color var(--spin-time) ease-in-out;
+}
+#dial.hvac-status-cooling .dial-buttons button {
+    --button-bg: var(--color-cool-5);
+}
+#dial.hvac-status-heating .dial-buttons button {
+    --button-bg: var(--color-heat-5);
 }
 .dial-buttons button:focus-visible, .dial-buttons button:hover {
     --button-bg: var(--color-gray-3);
-    background: var(--button-bg);
+    color: var(--color-gray-0);
 }
 #dial.hvac-status-cooling .dial-buttons button:focus-visible, #dial.hvac-status-cooling .dial-buttons button:hover {
     --button-bg: var(--color-cool-3);

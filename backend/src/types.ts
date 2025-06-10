@@ -5,6 +5,7 @@ export enum HvacStatus {heating="HEATING", cooling="COOLING", off="OFF"};
 export enum EcoMode {on="MANUAL_ECO", off="OFF"};
 export enum Connectivity {online="ONLINE", offline="OFFLINE"};
 export enum FanTimerMode {on="ON", off="OFF"};
+export enum SetPointType {heat, cool};
 
 export type TempData = {
     deviceID: string | null,

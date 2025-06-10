@@ -1,16 +1,15 @@
-import { useEffect, useState, useContext } from "react";
-import { TempUnits, TempMode, EcoMode, HvacStatus, Connectivity } from "./types";
-import { roundedTemp, convertTemp, maxDialTemps, minDialTemps, usedDialRatio, decimalPrecision, minRangeGap, makeTempInRange } from "./utils";
+import { useEffect, useState, useContext, useRef } from "react";
+import { TempUnits, TempMode, EcoMode, HvacStatus, Connectivity, SetPointType } from "./types";
+import { roundedTemp, convertTemp, maxDialTemps, minDialTemps, usedDialRatio, decimalPrecision, minRangeGap, makeTempInRange, setPointFadeDuration } from "./utils";
 import { TempDataContext } from "./temp_context";
 
 function Dial() {
-    enum SetPointType {heat, cool};
     const {selectedTempData: tempData, debounceTempData, setHeatCelsius, setCoolCelsius, setRangeCelsius} = useContext(TempDataContext);
     const [dispCoolPoint, setDispCoolPoint] = useState<number | null>(null);
     const [dispHeatPoint, setDispHeatPoint] = useState<number | null>(null);
     const [activeSetPoint, setActiveSetPoint] = useState<SetPointType | null>(null);
     const [lastSetPoint, setLastSetPoint] = useState<SetPointType | null>(null);
-    // const setPointFadeDelay = useRef<number | null>(null);
+    const setPointFadeTimer = useRef<number | null>(null);
 
     const dispAmbientTemp: number | null = roundedTemp(convertTemp(tempData.ambientTempCelsius, TempUnits.celsius, tempData.tempUnits), tempData.tempUnits);
     const fanIsActive: boolean = tempData.fanTimer !== null || tempData.hvacStatus !== HvacStatus.off;
@@ -25,8 +24,6 @@ function Dial() {
     const heatPointThumbAngle: number | null = getThumbAngle(dispHeatPoint);
     const activeTrackRange: number[] = getTrackRange();
 
-
-
     useEffect (() => {
         setActiveSetPoint(null);
         if (tempData.tempMode === TempMode.cool) {
@@ -34,7 +31,7 @@ function Dial() {
         } else if (tempData.tempMode === TempMode.heat) {
             setLastSetPoint(SetPointType.heat);
         }
-    }, [tempData.tempMode, SetPointType]);
+    }, [tempData.tempMode]);
 
     useEffect (() => {
         let baseTemp = null;
@@ -61,6 +58,17 @@ function Dial() {
         const unitTemp = convertTemp(baseTemp, TempUnits.celsius, tempData.tempUnits);
         setDispHeatPoint(roundedTemp(unitTemp, tempData.tempUnits));
     }, [tempData.ecoHeatCelsius, tempData.heatCelsius, tempData.tempUnits, tempData.tempMode, tempData.ecoMode]);
+
+    function fadeSetPoint() {
+        if (setPointFadeTimer.current) {
+            clearTimeout(setPointFadeTimer.current);
+        }
+        setPointFadeTimer.current = window.setTimeout(() => {
+            setActiveSetPoint(null);
+        }, setPointFadeDuration);
+    }
+
+    // SETTING/CHANGING TEMP SETPOINTS
 
     function changeSingleTemp(newTemp: number, setPointType: SetPointType) {
         const fixedTemp = makeTempInRange(newTemp, tempData.tempUnits);
@@ -134,6 +142,7 @@ function Dial() {
         } else {
             changeSingleTemp(newTemp, setPointType);
         }
+        fadeSetPoint();
     }
 
     function bumpTemp(diff: number) {
@@ -179,7 +188,10 @@ function Dial() {
             setLastSetPoint(setPointType);
         }
         setActiveSetPoint(setPointType);
+        fadeSetPoint();
     }
+
+    // DIALS AND THUMBS
 
     function getThumbAngle(thumbTemp: number | null): number | null {
         if (thumbTemp === null) {
@@ -223,13 +235,11 @@ function Dial() {
     //     setDialThumbY(edgeY);
     // }
 
-
     // on mouse click near thumb (give thumb padding and make button)
         // move dial according to angle from center
     // on mouse release anywhere
         // snap to nearest int
     
-
     // we need to change dispTemps to not be rounded, but only display numbers as rounded or create roundedDispTemps (also could split into decimal component for superscript-like decimals)
 
     return (
@@ -353,7 +363,7 @@ function Dial() {
                 </>
             }
         </section>
-    )
+    );
 }
 
 export default Dial;

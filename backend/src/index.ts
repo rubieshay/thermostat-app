@@ -54,6 +54,7 @@ fastify.get("/", async (request, reply) => {
 
 fastify.get<{ Querystring: InfoQueryString }>("/info", {schema: {querystring: infoQuerySchema}}, async (request, reply) => {
     const {force_flush} = request.query;
+    console.log("INFO BODY:", JSON.stringify(request.query));
     let fetchReturn: FetchReturn;
     fetchReturn = await checkAndGetDeviceInfo(force_flush);
     if (!fetchReturn.success) {
@@ -62,7 +63,7 @@ fastify.get<{ Querystring: InfoQueryString }>("/info", {schema: {querystring: in
         return reply.status(fetchReturn.httpCode).send({ error: fetchReturn.error || "Failed to get device info" });
     }
     reply.send(tempDataInfo);
-})
+});
 
 fastify.get("/weather", async (request, reply) => {
     let fetchReturn: FetchReturn;
@@ -72,7 +73,7 @@ fastify.get("/weather", async (request, reply) => {
         return reply.status(500).send({ error: fetchReturn.error || "Failed to get weather" });
     }
     reply.send(weatherData);
-})
+});
 
 fastify.get<{ Querystring: latLongQueryString }> ("/set_lat_long", { schema: { querystring: latLongQuerySchema } }, async (request, reply) => {
     const {lat, long} = request.query;
@@ -93,7 +94,7 @@ fastify.post<{ Body: SetHeatBody }>("/set_heat", {schema: { body: setHeatSchema 
     }
 });
 
-fastify.post<{Body: SetCoolBody;}>("/set_cool", {schema: { body: setCoolSchema } }, async (request, reply) => {
+fastify.post<{ Body: SetCoolBody }>("/set_cool", {schema: { body: setCoolSchema } }, async (request, reply) => {
     const { deviceID, coolCelsius } = request.body;
     let fetchReturn = await setCool(deviceID,coolCelsius);
     if (!fetchReturn.success) {
@@ -103,7 +104,7 @@ fastify.post<{Body: SetCoolBody;}>("/set_cool", {schema: { body: setCoolSchema }
     }
 });
 
-fastify.post<{Body: SetRangeBody;}>("/set_range", {schema: { body: setRangeSchema } }, async (request, reply) => {
+fastify.post<{ Body: SetRangeBody }>("/set_range", {schema: { body: setRangeSchema } }, async (request, reply) => {
     const { deviceID, heatCelsius, coolCelsius } = request.body;
     let fetchReturn = await setRange(deviceID,heatCelsius, coolCelsius);
     if (!fetchReturn.success) {
@@ -113,7 +114,7 @@ fastify.post<{Body: SetRangeBody;}>("/set_range", {schema: { body: setRangeSchem
     }
 });
 
-fastify.post<{Body: SetTempModeBody;}>("/set_temp_mode", {schema: { body: setTempModeSchema } }, async (request, reply) => {
+fastify.post<{ Body: SetTempModeBody }>("/set_temp_mode", {schema: { body: setTempModeSchema } }, async (request, reply) => {
     const { deviceID, tempMode } = request.body;
     let fetchReturn = await setTempMode(deviceID,tempMode);
     if (!fetchReturn.success) {
@@ -123,7 +124,7 @@ fastify.post<{Body: SetTempModeBody;}>("/set_temp_mode", {schema: { body: setTem
     }
 });
 
-fastify.post<{Body: SetEcoModeBody;}>("/set_eco_mode", {schema: { body: setEcoModeSchema } }, async (request, reply) => {
+fastify.post<{ Body: SetEcoModeBody }>("/set_eco_mode", {schema: { body: setEcoModeSchema } }, async (request, reply) => {
     console.log("Got a setEcoMode request");
     const { deviceID, ecoMode } = request.body;
     let fetchReturn = await setEcoMode(deviceID,ecoMode);
@@ -134,7 +135,7 @@ fastify.post<{Body: SetEcoModeBody;}>("/set_eco_mode", {schema: { body: setEcoMo
     }
 });
 
-fastify.post<{Body: SetFanTimerBody;}>("/set_fan_timer", {schema: { body: setFanTimerSchema } }, async (request, reply) => {
+fastify.post<{ Body: SetFanTimerBody }>("/set_fan_timer", {schema: { body: setFanTimerSchema } }, async (request, reply) => {
     console.log("Got set fan timer request: ",request.body);
     const { deviceID, timerMode, durationSeconds } = request.body;
     let fetchReturn = await setFanTimer(deviceID,timerMode, durationSeconds);

@@ -57,6 +57,9 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
     const initialFetchSuccess = useRef<boolean>(false);
     const isFetching = useRef<boolean>(false);
     const debounceTimer = useRef<number | null>(null);
+    
+    // time to wait before getting data after setting for tempMode and ecoMode
+    const setGetDelay = 3000;
 
     // GETTING/RESETTING TEMP DATA
 
@@ -65,6 +68,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
     }, [initialLoadComplete]);
 
     const fetchTempData = useCallback (async (forceFlush: boolean) => {
+        console.log("IN FETCHING");
         const fetchError: LastAPIError = structuredClone(initLastAPIError);
         if (isFetching.current) {
             console.log("Fetch already in progress. Ignoring");
@@ -92,8 +96,8 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         const url = defaultAPIURL + "/info";
         try {
             const fetchParams = new URL(url);
-            fetchParams.searchParams.append("force_flush",forceFlush.toString());
-            const response = await fetch(url, {
+            fetchParams.searchParams.append("force_flush", forceFlush.toString());
+            const response = await fetch(fetchParams, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"
@@ -103,7 +107,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                 fetchError.fetchReturn.error = "Failed to fetch temp data: " + response.statusText;
                 fetchError.fetchReturn.httpCode = response.status;
                 fetchError.lastErrorWasFetch = true;
-                setLastAPIError(fetchError)
+                setLastAPIError(fetchError);
                 isFetching.current = false;
                 return fetchError.fetchReturn;
             }
@@ -123,6 +127,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                 setLastAPIError(fetchError)
                 console.error("Invalid temp data format:", data);
             }
+            console.log("DATA:", data);
         } catch (error) {
             console.error("Error fetching temp data info:", error);
             fetchError.fetchReturn.error = "Other error fetching temp data info";
@@ -130,7 +135,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         }
         isFetching.current = false;
         return fetchError.fetchReturn;
-    }, [lastAPIError.errorSeq, selectedDeviceID, tempDataArray])
+    }, [lastAPIError.errorSeq, selectedDeviceID, tempDataArray]);
 
     useEffect(() => {
         if (hasFetchedInitial.current) {
@@ -172,6 +177,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
 
     async function changeDeviceID(selectedDeviceID: string) {
         setSelectedDeviceID(selectedDeviceID);
+        // shouldn't this also change selectedTempData?
     }
 
     const getSelectedTempData = useCallback(() => {
@@ -184,7 +190,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         } else {
             return structuredClone(initTempData);
         }
-    }, [selectedDeviceID, tempDataArray])
+    }, [selectedDeviceID, tempDataArray]);
 
     function debounceTempData(cbFunction: Function, letWait: boolean) {
         if (debounceTimer.current) {
@@ -203,17 +209,17 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
     
     const startRefreshTimer = useCallback(()=> {
         console.log("Starting refresh timer...")
-    }, [])
+    }, []);
 
     const stopRefreshTimer = useCallback(()=> {
         console.log("Stopping refresh timer...")
-    }, [])
+    }, []);
 
     // ERROR DISPLAY
 
     const clearAPIError = useCallback(() => {
         setLastAPIError(structuredClone(noLastAPIError));
-    }, [])
+    }, []);
 
     // SETTING DATA FUNCTIONS
 
@@ -465,6 +471,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             }
             // const data = await response.json();
             // console.log("Set tempMode successfully:", data);
+            await sleep(setGetDelay);
             fetchTempData(true);
         } catch (error) {
             fetchError.fetchReturn.error = "Error setting tempMode: " + error;
@@ -524,6 +531,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             }
             // const data = await response.json();
             // console.log("Set ecoMode successfully:", data);
+            await sleep(setGetDelay);
             fetchTempData(true);
         } catch (error) {
             fetchError.fetchReturn.error = "Error setting ecoMode: " + error;

@@ -2,7 +2,7 @@ import { HvacStatus, TempUnits, type FetchReturn } from "./types";
 import { useEffect, useRef, useCallback } from "react";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-console.log( "ENV IS: "+JSON.stringify((window as any)._env_))
+console.log("ENV IS: " +  JSON.stringify((window as any)._env_))
 export const demoMode = ((window as any)._env_.DEMO_MODE === "TRUE" ||
                          (window as any)._env_.DEMO_MODE === "1" ||
                          (window as any)._env_.DEMO_MODE === "YES") ? true : false;
@@ -11,12 +11,11 @@ export const dataRefreshEnabled =((window as any)._env_.DATA_REFRESH_ENABLED ===
                                   (window as any)._env_.DATA_REFRESH_ENABLED === "1" ||
                                   (window as any)._env_.DATA_REFRESH_ENABLED === "YES") ? true : false;
 /* eslint-enable @typescript-eslint/no-explicit-any */                                  
-console.log("Environment driven settings:", {demoMode,defaultAPIURL,dataRefreshEnabled});
+console.log("Environment driven settings:", {demoMode, defaultAPIURL, dataRefreshEnabled});
 
 export const debounceTime: number = 3000;
 export const dataRefreshTime: number = 15000;
-export const setPointFadeDelay: number = 3000;
-export const setPointFadeDuration: number = 1000;
+export const setPointFadeDuration: number = 3000;
  
 export const minDialTemps: number[] = [9, 50];
 export const maxDialTemps: number[] = [32, 90];
