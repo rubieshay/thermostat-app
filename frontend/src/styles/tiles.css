@@ -12,6 +12,8 @@ section#info {
 }
 .tile h2 {
     font-variation-settings: "wght" 800;
+}
+.tile legend, .tile > h2 {
     margin-bottom: 0.5rem;
 }
 .radio-select ul {
@@ -36,6 +38,9 @@ section#info {
     width: 1.5rem;
     line-height: 1;
 }
+.radio-select input {
+    height: 1.5rem;
+}
 
 hr {
     height: 1rem;
@@ -54,4 +59,6 @@ ul.button-select li button {
 ul.button-select li.button-option-disabled button {
     background: var(--color-gray-4);
     color: var(--color-gray-3);
+    cursor: default;
+    pointer-events: none;
 }

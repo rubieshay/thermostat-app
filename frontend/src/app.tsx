@@ -13,8 +13,8 @@ function App() {
                     <Title/>
                     <Dial/>
                     <Tiles/>
-                    <Error/>
                 </main>
+                <Error/>
             </AppContainer>
         </TempDataProvider>
     );

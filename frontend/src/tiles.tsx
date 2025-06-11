@@ -92,8 +92,7 @@ function Tiles() {
                                         <input id={"temp-mode-select-" + option.IdText}
                                                name="temp-mode-select" type="radio" value={option.value}
                                                checked={dispTempMode === option.value}
-                                               onChange={(event) => changeTempMode(event)}>
-                                        </input>
+                                               onChange={(event) => changeTempMode(event)}/>
                                         <label htmlFor={"temp-mode-select-" + option.IdText}>
                                             <span className="material-symbols material-symbols-rounded">
                                                 {option.symbolText}
@@ -114,8 +113,7 @@ function Tiles() {
                                         <input id={"eco-mode-select-" + option.IdText}
                                                name="eco-mode-select" type="radio" value={option.value}
                                                checked={dispEcoMode === option.value}
-                                               onChange={(event) => changeEcoMode(event)}>
-                                        </input>
+                                               onChange={(event) => changeEcoMode(event)}/>
                                         <label htmlFor={"eco-mode-select-" + option.IdText}>
                                             <span className="material-symbols material-symbols-rounded">
                                                 {option.symbolText}

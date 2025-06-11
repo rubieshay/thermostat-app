@@ -4,6 +4,7 @@ import "./styles/style.css";
 import "./styles/dial.css";
 import "./styles/tiles.css";
 import "./styles/loading.css";
+import "./styles/error.css";
 import App from "./app";
 
 createRoot(document.getElementById("root")!).render(

@@ -216,11 +216,9 @@ function Dial() {
         setIsDraggingTemp(true);
         window.addEventListener("pointermove", dragTemp);
         window.addEventListener("pointerup", finishDragTemp);
-        console.log("Start Drag");
     }
 
     function dragTemp(event: PointerEvent) {
-        console.log("dragging", lastSetPoint, activeSetPoint);
         if (activeSetPoint === null) {
             return;
         }
@@ -315,10 +313,10 @@ function Dial() {
                         <div className="dial-thumb"></div>
                     </div>
                     {tempData.tempMode === TempMode.heat || tempData.tempMode === TempMode.heatcool ?
-                        <div id="heatpoint-thumb-container" className={"dial-thumb-container" +
-                            (activeSetPoint === SetPointType.heat ? " setpoint-thumb-active": "")}
+                        <div id="heatpoint-thumb-container" className="dial-thumb-container"
                             style={{"--thumb-angle": heatPointThumbAngle + "turn"} as React.CSSProperties}>
-                            <div className="dial-thumb setpoint-thumb"
+                            <div className={"dial-thumb setpoint-thumb" +
+                                (activeSetPoint === SetPointType.heat && isDraggingTemp ? " setpoint-thumb-active": "")}
                                 onPointerDown={() => startDragTemp(SetPointType.heat)}>
                             </div>
                         </div>
@@ -326,10 +324,10 @@ function Dial() {
                         <></>
                     }
                     {tempData.tempMode === TempMode.cool || tempData.tempMode === TempMode.heatcool ?
-                        <div id="coolpoint-thumb-container" className={"dial-thumb-container" +
-                            (activeSetPoint === SetPointType.cool ? " setpoint-thumb-active": "")}
+                        <div id="coolpoint-thumb-container" className="dial-thumb-container"
                             style={{"--thumb-angle": coolPointThumbAngle + "turn"} as React.CSSProperties}>
-                            <div className="dial-thumb setpoint-thumb"
+                            <div className={"dial-thumb setpoint-thumb" +
+                                (activeSetPoint === SetPointType.cool && isDraggingTemp ? " setpoint-thumb-active": "")}
                                 onPointerDown={() => startDragTemp(SetPointType.cool)}>
                             </div>
                         </div>
@@ -347,7 +345,7 @@ function Dial() {
                             :
                             <div id="main-numbers-setpoints">
                                 {tempData.tempMode === TempMode.heat || tempData.tempMode === TempMode.heatcool ?
-                                    <button id="main-numbers-heatpoint" className={"main-number-group" + (activeSetPoint === SetPointType.heat ? " setpoint-active" : "")} onClick={() => changeActiveSetpoint(SetPointType.heat, true)}>
+                                    <button id="main-numbers-heatpoint" className={"main-number-group" + (activeSetPoint === SetPointType.heat ? " setpoint-number-active" : "")} onClick={() => changeActiveSetpoint(SetPointType.heat, true)}>
                                         <h2>Heat</h2>
                                         <h3>{(typeof dispHeatPoint === "number") && !isNaN(dispHeatPoint) ? dispHeatPoint : ""}</h3>
                                     </button>
@@ -355,7 +353,7 @@ function Dial() {
                                     <></>
                                 }
                                 {tempData.tempMode === TempMode.cool || tempData.tempMode === TempMode.heatcool ?
-                                    <button id="main-numbers-coolpoint" className={"main-number-group" + (activeSetPoint === SetPointType.cool ? " setpoint-active" : "")} onClick={() => changeActiveSetpoint(SetPointType.cool, true)}>
+                                    <button id="main-numbers-coolpoint" className={"main-number-group" + (activeSetPoint === SetPointType.cool ? " setpoint-number-active" : "")} onClick={() => changeActiveSetpoint(SetPointType.cool, true)}>
                                         <h2>Cool</h2>
                                         <h3>{(typeof dispCoolPoint === "number") && !isNaN(dispCoolPoint) ? dispCoolPoint : ""}</h3>
                                     </button>

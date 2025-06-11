@@ -2,23 +2,40 @@ import { useContext, useEffect, useState } from "react";
 import { TempDataContext } from "./temp_context";
 
 function Error() {
-    const {fetchTempData,lastAPIError,clearAPIError} = useContext(TempDataContext);
+    const { fetchTempData, lastAPIError, clearAPIError } = useContext(TempDataContext);
     const [errorText, setErrorText] = useState<string>("");
+    const [errorDialog, setErrorDialog] = useState<HTMLElement | null>(null);
 
-    useEffect( () => {
+    useEffect(() => {
         if (lastAPIError.errorSeq === 0) {
             return;
         }
         console.log("Error Sequence incremented... lastAPIError:", structuredClone(lastAPIError));
-        setErrorText(String(lastAPIError.fetchReturn.error));
+        const newErrorText = String(lastAPIError.fetchReturn.error);
+        setErrorText(newErrorText);
         if (!lastAPIError.lastErrorWasFetch) {
             clearAPIError();
             fetchTempData(true);
         }
-    }, [lastAPIError.errorSeq, clearAPIError, fetchTempData, lastAPIError]);
+        if (errorDialog) {
+            (errorDialog as HTMLDialogElement).showModal();
+        }
+    }, [lastAPIError.errorSeq, clearAPIError, fetchTempData, lastAPIError, errorDialog]);
+
+    useEffect(() => {
+        setErrorDialog(document.getElementById("error-dialog"));
+    }, [errorDialog]);
     
+    function handleCloseModal() {
+        (errorDialog as HTMLDialogElement).close();
+    }
+
     return (
-        <h1>{errorText}</h1>
+        <dialog id="error-dialog">
+            <h2>Error Occurred:</h2>
+            <p>{errorText}</p>
+            <button onClick={handleCloseModal}>Close</button>
+        </dialog>
     );
 }
 

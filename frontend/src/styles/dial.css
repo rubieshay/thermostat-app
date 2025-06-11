@@ -26,7 +26,7 @@
 }
 @property --dial-bg {
   syntax: "<color>";
-  inherits: false;
+  inherits: true;
   initial-value: #00000000;
 }
 @property --cap-bg {
@@ -64,7 +64,7 @@
 
 
 
-/* MAIN DIAL */
+/* MAIN DIAL AND COVER */
 #dial {
     --spin-time: 400ms;
     --dial-bg: var(--color-gray-5);
@@ -77,9 +77,9 @@
     border-radius: 50%;
     background: var(--dial-bg);
     position: relative;
-    transition: --dial-bg var(--spin-time) ease-in-out;
+    transition: background-color var(--spin-time) ease-in-out;
 }
-#dial.hvac-status-cooling  {
+#dial.hvac-status-cooling {
     --dial-bg: var(--color-cool-5);
 }
 #dial.hvac-status-heating  {
@@ -130,16 +130,16 @@
 #main-numbers #main-numbers-ambient h3 {
     font-size: calc(0.2*var(--dial-size));
 }
-#main-numbers-heatpoint.setpoint-active {
+#main-numbers-heatpoint.setpoint-number-active {
     color: var(--color-heat-1);
 }
-#main-numbers-coolpoint.setpoint-active {
+#main-numbers-coolpoint.setpoint-number-active {
     color: var(--color-cool-1);
 }
-#main-numbers .setpoint-active h2 {
+#main-numbers .setpoint-number-active h2 {
     font-variation-settings: "wght" 400;
 }
-#main-numbers .setpoint-active h3 {
+#main-numbers .setpoint-number-active h3 {
     font-variation-settings: "wght" 600;
 }
 
@@ -147,6 +147,7 @@ h2#offline-message {
     font-size: calc(0.1*var(--dial-size));
 }
 button, #main-numbers * {
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -183,13 +184,13 @@ button, #main-numbers * {
     --track-range-bg: var(--color-heat-3);
 }
 #dial .track-cover {
-    --dial-bg: inherit;
     display: block;
     background: var(--dial-bg);
     width: calc(0.78*var(--dial-size));
     height: calc(0.78*var(--dial-size));
     margin: calc(0.03*var(--dial-size));
     border-radius: 50%;
+    transition: background-color var(--spin-time) ease-in-out;
     z-index: 7;
 }
 #dial .track-cap {
@@ -223,7 +224,7 @@ button, #main-numbers * {
     position: absolute;
     top: 0;
     transform: translateY(-50%);
-    transition: --cap-bg var(--spin-time) ease-in-out;
+    transition: background-color var(--spin-time) ease-in-out;
 }
 #dial .track-cap-active::before {
     --cap-bg: var(--color-gray-3);
@@ -270,9 +271,6 @@ button, #main-numbers * {
 .setpoint-thumb {
     cursor: pointer;
 }
-.setpoint-thumb-active::after {
-    box-shadow: 0 0 5px 5px white;
-}
 .dial-thumb::after {
     /* displayed thumb */
     content: "";
@@ -285,6 +283,14 @@ button, #main-numbers * {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+
+}
+.setpoint-thumb::after {
+    transition: width 200ms ease-in-out, height 200ms ease-in-out;
+}
+.setpoint-thumb-active::after {
+    width: calc(0.045*var(--dial-size));
+    height: calc(0.045*var(--dial-size));
 }
 #ambient-thumb-container .dial-thumb::after {
     z-index: 6;
@@ -299,28 +305,11 @@ button, #main-numbers * {
 
 
 /* BOTTOM BUTTONS/STATUS */
-.dial-buttons button, .mode-icon, .hvac-icon {
-    font-size: calc(0.06*var(--dial-size));
-    font-variation-settings: "FILL" 0,
-                             "wght" 500,
-                             "GRAD" 0,
-                             "opsz" 24;
-}
-.mode-icon {
-    position: relative;
-    bottom: calc(0.08*var(--dial-size));
-}
-.hvac-icon {
-    position: relative;
-    bottom: calc(0.22*var(--dial-size));
-}
-.hvac-icon.hvac-on {
-    animation: spin 4s linear infinite normal forwards;
-}
 .dial-buttons {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
     gap: calc(0.02*var(--dial-size));
     margin-inline: auto;
     position: relative;
@@ -334,7 +323,14 @@ button, #main-numbers * {
     border-radius: calc(0.03*var(--dial-size));
     cursor: pointer;
     background: var(--button-bg);
-    transition: --button-bg var(--spin-time) ease-in-out, color var(--spin-time) ease-in-out;
+    transition: background-color var(--spin-time) ease-in-out, color var(--spin-time) ease-in-out;
+}
+.dial-buttons button, .mode-icon, .hvac-icon {
+    font-size: calc(0.06*var(--dial-size));
+    font-variation-settings: "FILL" 0,
+                             "wght" 500,
+                             "GRAD" 0,
+                             "opsz" 24;
 }
 #dial.hvac-status-cooling .dial-buttons button {
     --button-bg: var(--color-cool-5);
@@ -351,4 +347,15 @@ button, #main-numbers * {
 }
 #dial.hvac-status-heating .dial-buttons button:focus-visible, #dial.hvac-status-heating .dial-buttons button:hover {
     --button-bg: var(--color-heat-3);
+}
+.mode-icon {
+    position: relative;
+    bottom: calc(0.08*var(--dial-size));
+}
+.hvac-icon {
+    position: relative;
+    bottom: calc(0.22*var(--dial-size));
+}
+.hvac-icon.hvac-on {
+    animation: spin 4s linear infinite normal forwards;
 }
