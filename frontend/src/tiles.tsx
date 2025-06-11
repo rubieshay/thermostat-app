@@ -60,10 +60,10 @@ function Tiles() {
 
     const tempModeOptions = [{"value": TempMode.heat, "IdText": "heat",
                                 "dispText": "Heat", "symbolText": "heat"},
-                             {"value": TempMode.cool, "IdText": "cool",
-                                "dispText": "Cool", "symbolText": "mode_dual"},
                              {"value": TempMode.heatcool, "IdText": "heatcool",
-                                "dispText": "Heat • Cool", "symbolText": "mode_cool"},
+                                "dispText": "Heat • Cool", "symbolText": "mode_dual"},
+                             {"value": TempMode.cool, "IdText": "cool",
+                                "dispText": "Cool", "symbolText": "mode_cool"},
                              {"value": TempMode.off, "IdText": "off",
                                 "dispText": "Off", "symbolText": "mode_off_on"}]
     const ecoModeOptions = [{"value": EcoMode.on, "IdText": "on",

@@ -97,7 +97,7 @@ main {
     justify-content: center;
     flex-direction: column;
     gap: 2rem;
-    margin: 2rem 4vw;
+    padding: 2rem 4vw;
 }
 h1, h2, h3, h4, h5, h6 {
     display: block;
