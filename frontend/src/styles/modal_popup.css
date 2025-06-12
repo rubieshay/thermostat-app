@@ -1,4 +1,4 @@
-dialog#error-dialog[open] {
+dialog.modal-popup[open] {
     position: fixed;
     display: flex;
     flex-direction: column;
@@ -13,12 +13,12 @@ dialog#error-dialog[open] {
     left: 50%;
     transform: translate(-50%, -50%);
 }
-dialog::backdrop {
+dialog.modal-popup::backdrop {
     background: var(--color-heat-5);
     opacity: 0.5;
 }
-dialog button {
-    padding: 0.5rem;
+dialog.modal-popup button {
+    padding: 0.75rem 1rem;
     background: var(--color-gray-2);
     color: var(--color-gray-6);
     width: fit-content;

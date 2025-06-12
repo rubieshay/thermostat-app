@@ -31,7 +31,7 @@ function Error() {
     }
 
     return (
-        <dialog id="error-dialog">
+        <dialog id="error-dialog" className="modal-popup">
             <h2>Error Occurred:</h2>
             <p>{errorText}</p>
             <button onClick={handleCloseModal}>Close</button>

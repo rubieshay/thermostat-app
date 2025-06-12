@@ -1,5 +1,5 @@
-import { HvacStatus, TempUnits, type FetchReturn } from "./types";
 import { useEffect, useRef, useCallback } from "react";
+import { HvacStatus, TempUnits, TempMode, EcoMode, type FetchReturn } from "./types";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 console.log("ENV IS: " +  JSON.stringify((window as any)._env_))
@@ -22,6 +22,27 @@ export const maxDialTemps: number[] = [32, 90];
 export const minRangeGap: number[] = [1.5, 3]
 export const decimalPrecision: number[] = [0.5, 1.0];
 export const usedDialRatio: number = 5/6;
+
+export const tempModeOptions = [{"value": TempMode.heat, "IdText": "heat",
+                                 "dispText": "Heat", "symbolText": "heat"},
+                                {"value": TempMode.heatcool, "IdText": "heatcool",
+                                 "dispText": "Heat • Cool", "symbolText": "mode_dual"},
+                                {"value": TempMode.cool, "IdText": "cool",
+                                 "dispText": "Cool", "symbolText": "mode_cool"},
+                                {"value": TempMode.off, "IdText": "off",
+                                 "dispText": "Off", "symbolText": "mode_off_on"}]
+export const ecoModeOptions = [{"value": EcoMode.on, "IdText": "on",
+                                "dispText": "On", "symbolText": "nest_eco_leaf"},
+                               {"value": EcoMode.off, "IdText": "off",
+                                "dispText": "Off", "symbolText": "thermostat"}]
+export const fanTimerOptions = [{"duration": 900, "dispText": "15 min"},
+                                {"duration": 1800, "dispText": "30 min"},
+                                {"duration": 2700, "dispText": "45 min"},
+                                {"duration": 3600, "dispText": "1 hr"},
+                                {"duration": 7200, "dispText": "2 hr"},
+                                {"duration": 14400, "dispText": "4 hr"},
+                                {"duration": 28800, "dispText": "8 hr"},
+                                {"duration": 43200, "dispText": "12 hr"}]
 
 export function convertTemp(tempVal: number | null, inputUnits: TempUnits, outputUnits: TempUnits): number | null {
     if (tempVal === null){
@@ -62,9 +83,9 @@ export function getMsUntilIsoDate(isoDateTime: string) : number {
     return endDateTime - Date.now();
 }
 
-export function getHoursAndMinutes(duration: number) : string {
+export function getHoursAndMinutes(duration: number) : string | null {
     if (duration < 0) {
-        return "";
+        return null;
     }
     const hoursInt = Math.floor(duration / (1000*60*60));
     const minutesInt = Math.round((duration - (hoursInt * (1000*60*60))) / (1000*60));
@@ -93,7 +114,29 @@ export function getFanTimerString(fanTimer: string | null, hvacStatus: HvacStatu
             return "Off";
         }
     } else {
-        return getHoursAndMinutes(getMsUntilIsoDate(fanTimer));
+        const timerString = getHoursAndMinutes(getMsUntilIsoDate(fanTimer));
+        if (timerString === null) {
+            return "Off";
+        } else {
+            return timerString;
+        }
+    }
+}
+
+export function isFanOn(fanTimer: string | null, hvacStatus: HvacStatus) {
+    if (fanTimer === null) {
+        if (hvacStatus !== HvacStatus.off) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        const timerString = getHoursAndMinutes(getMsUntilIsoDate(fanTimer));
+        if (timerString === null) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }
 

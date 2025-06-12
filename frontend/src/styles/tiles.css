@@ -9,13 +9,32 @@ section#info {
     background: var(--color-gray-5);
     padding: 1rem;
     border-radius: 1rem;
+    transition: scale 200ms ease-in-out;
 }
-.tile h2 {
-    font-variation-settings: "wght" 800;
+.tile:hover, .tile:focus-visible {
+    scale: 1.05;
 }
-.tile legend, .tile > h2 {
+.tile h2, .drawer-content h2 {
+    font-variation-settings: "wght" 100;
+}
+.tile legend, .tile > h2, .drawer-content h2 {
     margin-bottom: 0.5rem;
 }
+.current-tile-selection {
+    display: flex;
+    gap: 0.5rem;
+    height: 1.5rem;
+}
+.current-tile-selection span {
+    display: block;
+    line-height: 1.5;
+}
+.current-tile-selection span.material-symbols {
+    font-size: 1.5rem;
+    width: 1.5rem;
+    line-height: 1;
+}
+
 .radio-select ul {
     display: grid;
     flex-direction: column;
@@ -51,14 +70,15 @@ ul.button-select {
     gap: 0.5rem;
 }
 ul.button-select li button {
-    background: var(--color-gray-3);
-    padding: 0.25rem 0.5rem;
+    background: var(--color-gray-2);
+    color: var(--color-gray-6);
+    padding: 0.75rem 1rem;
     border-radius: 0.5rem;
     flex: 0 0 min-content;
 }
 ul.button-select li.button-option-disabled button {
-    background: var(--color-gray-4);
-    color: var(--color-gray-3);
+    background: var(--color-gray-3);
+    color: var(--color-gray-5);
     cursor: default;
     pointer-events: none;
 }

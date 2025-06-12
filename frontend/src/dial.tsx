@@ -1,11 +1,11 @@
 import { useEffect, useState, useContext, useRef } from "react";
 import { TempUnits, TempMode, EcoMode, HvacStatus, Connectivity, SetPointType } from "./types";
-import { roundedTemp, convertTemp, maxDialTemps, minDialTemps, usedDialRatio, decimalPrecision, minRangeGap, makeTempInRange, setPointFadeDuration } from "./utils";
+import { roundedTemp, convertTemp, maxDialTemps, minDialTemps, usedDialRatio, decimalPrecision, minRangeGap, makeTempInRange, setPointFadeDuration, isFanOn } from "./utils";
 import { TempDataContext } from "./temp_context";
 
 function Dial() {
     const {selectedTempData: tempData, debounceTempData, setHeatCelsius, setCoolCelsius, setRangeCelsius} = useContext(TempDataContext);
-    // we need to change dispTemps to not be rounded for better dragging, but only display numbers as rounded at set numbers as rounded and maybe create roundedDispTemps (also could split into decimal component for superscript-like decimals)
+    // we need to possibly schange dispTemps to not be rounded for better dragging, but only display numbers as rounded at set numbers as rounded and maybe create roundedDispTemps (also could split into decimal component for superscript-like decimals)
     const [dispCoolPoint, setDispCoolPoint] = useState<number | null>(null);
     const [dispHeatPoint, setDispHeatPoint] = useState<number | null>(null);
     const [activeSetPoint, setActiveSetPoint] = useState<SetPointType | null>(null);
@@ -14,7 +14,7 @@ function Dial() {
     const setPointFadeTimer = useRef<number | null>(null);
 
     const dispAmbientTemp: number | null = roundedTemp(convertTemp(tempData.ambientTempCelsius, TempUnits.celsius, tempData.tempUnits), tempData.tempUnits);
-    const fanIsActive: boolean = tempData.fanTimer !== null || tempData.hvacStatus !== HvacStatus.off;
+    const fanIsActive: boolean = isFanOn(tempData.fanTimer, tempData.hvacStatus);
 
     const maxDialTemp: number = maxDialTemps[tempData.tempUnits];
     const minDialTemp: number = minDialTemps[tempData.tempUnits];
@@ -366,15 +366,15 @@ function Dial() {
 
                     {/* PLUS/MINUS BUTTONS AND BOTTOM SYMBOLS */}
                     {fanIsActive ?
-                        <div className="material-symbols material-symbols-rounded hvac-icon hvac-on">mode_fan</div>
+                        <span className="material-symbols material-symbols-rounded hvac-icon hvac-on">mode_fan</span>
                         :
-                        <div className="material-symbols material-symbols-rounded hvac-icon hvac-off">mode_fan_off</div>
+                        <span className="material-symbols material-symbols-rounded hvac-icon hvac-off">mode_fan_off</span>
                     }
                     {tempData.ecoMode === EcoMode.on ?
-                        <div className="material-symbols material-symbols-rounded mode-icon">nest_eco_leaf</div>
+                        <span className="material-symbols material-symbols-rounded mode-icon">nest_eco_leaf</span>
                         :
                         (tempData.tempMode === TempMode.off ?
-                            <div className="material-symbols material-symbols-rounded mode-icon">mode_off_on</div>
+                            <span className="material-symbols material-symbols-rounded mode-icon">mode_off_on</span>
                             : 
                             <div className="dial-buttons">
                                 <button className="material-symbols material-symbols-rounded"
@@ -404,7 +404,7 @@ function Dial() {
                         style={{"--cap-angle": usedDialRatio/2 + "turn"} as React.CSSProperties}>
                     </div>
                     <h2 id="offline-message">OFFLINE</h2>
-                    <div className="material-symbols material-symbols-rounded mode-icon">sync_problem</div>
+                    <span className="material-symbols material-symbols-rounded mode-icon">sync_problem</span>
                 </>
             }
         </section>

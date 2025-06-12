@@ -486,23 +486,34 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         }
         if (demoMode) {
             let newHvacStatus = HvacStatus.off;
+            let newCoolCelsius = null;
+            let newHeatCelsius = null;
             const selectedTempData = getSelectedTempData();
-            if (selectedTempData.ambientTempCelsius !== null) {
-                // give a 0.5C degree buffer for HVAC depending on mode
-                if ((selectedTempData.tempMode === TempMode.heat || selectedTempData.tempMode === TempMode.heatcool)
-                    && selectedTempData.ecoHeatCelsius !== null
-                    && selectedTempData.ambientTempCelsius - 0.5 < selectedTempData.ecoHeatCelsius) {
-                    newHvacStatus = HvacStatus.heating;
-                } else if ((selectedTempData.tempMode === TempMode.cool || selectedTempData.tempMode === TempMode.heatcool)
-                    && selectedTempData.ecoCoolCelsius !== null
-                    && selectedTempData.ambientTempCelsius - 0.5 > selectedTempData.ecoCoolCelsius) {
-                    newHvacStatus = HvacStatus.cooling;
+            if (newEcoMode === EcoMode.on && selectedTempData.tempMode !== TempMode.off) {
+                if (selectedTempData.ambientTempCelsius !== null) {
+                    // give a 0.5C degree buffer for HVAC depending on mode
+                    if ((selectedTempData.tempMode === TempMode.heat || selectedTempData.tempMode === TempMode.heatcool)
+                        && selectedTempData.ecoHeatCelsius !== null
+                        && selectedTempData.ambientTempCelsius - 0.5 < selectedTempData.ecoHeatCelsius) {
+                        newHvacStatus = HvacStatus.heating;
+                    } else if ((selectedTempData.tempMode === TempMode.cool || selectedTempData.tempMode === TempMode.heatcool)
+                        && selectedTempData.ecoCoolCelsius !== null
+                        && selectedTempData.ambientTempCelsius - 0.5 > selectedTempData.ecoCoolCelsius) {
+                        newHvacStatus = HvacStatus.cooling;
+                    }
+                }
+            } else if (newEcoMode === EcoMode.off && selectedTempData.tempMode !== TempMode.off) {
+                if (selectedTempData.tempMode === TempMode.heat || selectedTempData.tempMode === TempMode.heatcool) {
+                    newHeatCelsius = demoSetPointDefaults.heatCelsius;
+                }
+                if (selectedTempData.tempMode === TempMode.cool || selectedTempData.tempMode === TempMode.heatcool) {
+                    newCoolCelsius = demoSetPointDefaults.coolCelsius;
                 }
             }
 
             setTempDataArray((prevState: TempDataArray) =>
                 prevState.map(item => item.deviceID === selectedDeviceID ?
-                { ...item, ecoMode: newEcoMode, hvacStatus: newHvacStatus, coolCelsius: null, heatCelsius: null } :
+                { ...item, ecoMode: newEcoMode, hvacStatus: newHvacStatus, coolCelsius: newCoolCelsius, heatCelsius: newHeatCelsius } :
                 item)
             );
             return;

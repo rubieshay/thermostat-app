@@ -1,11 +1,18 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { TempDataContext } from "./temp_context";
-import type { ChildrenProviderProps } from "./utils";
 import AppLoading from "./app_loading";
+import Title from "./title";
+import Dial from "./dial";
+import Tiles from "./tiles";
+import Error from "./error";
+import ModalDrawer from "./modal_drawer";
+import { ModalDrawerType } from "./types";
 import { dataRefreshTime, usePageVisibilityRefresh } from "./utils";
 
-export const AppContainer: React.FC<ChildrenProviderProps> = (props: ChildrenProviderProps) => {
-    const {initialLoadComplete, okToStartRefreshTimer, stopRefreshTimer, startRefreshTimer, fetchTempData} = useContext(TempDataContext);
+export function AppContainer() {
+    const { initialLoadComplete, okToStartRefreshTimer, stopRefreshTimer, startRefreshTimer, fetchTempData } = useContext(TempDataContext);
+    const [modalDrawer, setModalDrawer] = useState<ModalDrawerType | null>(null);
+
     usePageVisibilityRefresh({
         refreshData: fetchTempData,
         onStart: startRefreshTimer,
@@ -14,11 +21,23 @@ export const AppContainer: React.FC<ChildrenProviderProps> = (props: ChildrenPro
         okToStartRefresh: okToStartRefreshTimer
     });
 
-    if (initialLoadComplete) {
-        return (props.children);
-    } else {
-        return (
-            <AppLoading></AppLoading>
-        );
-    }
+    return (
+        <>
+            {initialLoadComplete ?
+                <>
+                    <main>
+                        <Title/>
+                        <Dial/>
+                        <Tiles setModalDrawer={setModalDrawer}/>
+                    </main>
+                    <ModalDrawer modalDrawer={modalDrawer} setModalDrawer={setModalDrawer}/>
+                    <Error/>
+                </>
+                :
+                <AppLoading/>
+            }
+        </>
+    );
 }
+
+export default AppContainer;

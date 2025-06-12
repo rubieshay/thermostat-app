@@ -325,7 +325,7 @@ button, #main-numbers * {
     background: var(--button-bg);
     transition: background-color var(--spin-time) ease-in-out, color var(--spin-time) ease-in-out;
 }
-.dial-buttons button, .mode-icon, .hvac-icon {
+.dial-buttons button, #dial .mode-icon, #dial .hvac-icon {
     font-size: calc(0.06*var(--dial-size));
     font-variation-settings: "FILL" 0,
                              "wght" 500,
@@ -348,14 +348,13 @@ button, #main-numbers * {
 #dial.hvac-status-heating .dial-buttons button:focus-visible, #dial.hvac-status-heating .dial-buttons button:hover {
     --button-bg: var(--color-heat-3);
 }
-.mode-icon {
-    position: relative;
+#dial .mode-icon {
     bottom: calc(0.08*var(--dial-size));
 }
-.hvac-icon {
-    position: relative;
+#dial .hvac-icon {
     bottom: calc(0.22*var(--dial-size));
 }
+/* also used in tiles */
 .hvac-icon.hvac-on {
     animation: spin 4s linear infinite normal forwards;
 }
