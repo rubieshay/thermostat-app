@@ -26,6 +26,17 @@
     margin-top: 0;
     margin-bottom: 0;
 
+    inset: unset;
+    inset-inline: unset;
+    inset-block: unset;
+    inset-inline-start: unset;
+    inset-inline-end: unset;
+    inset-block-start: unset;
+    inset-block-end: unset;
+
+    max-width: none;
+    max-height: none;
+
     font-weight: normal;
     font-weight: 400;
     font-size: 1rem;
@@ -72,7 +83,7 @@
     background: var(--main-bg);
     color: var(--main-text);
 
-    --dial-size: max(min(100vh - 20.875rem, 92vw, 36rem), min(20rem, 92vw));
+    --dial-size: max(min(100vh - 20.875rem, 92vw, 32rem), min(20rem, 92vw));
 
     font-family: "Outfit", system-ui, sans-serif;
     font-variation-settings: "wght" 400;
@@ -82,16 +93,8 @@
 
 /* GENERAL  */
 
-.material-symbols {
-    font-variation-settings: "FILL" 0,
-                             "wght" 400,
-                             "GRAD" 0,
-                             "opsz" 24;
-    font-size: 1rem;
-    display: block;
-    aspect-ratio: 1;
-    -webkit-user-select: none;
-    user-select: none;
+body {
+    position: relative;
 }
 main {
     display: flex;
@@ -109,12 +112,23 @@ h1 {
     text-align: center;
     line-height: 1.25;
 }
+button {
+    cursor: pointer;
+}
+.material-symbols {
+    font-variation-settings: "FILL" 0,
+                             "wght" 400,
+                             "GRAD" 0,
+                             "opsz" 24;
+    font-size: 1rem;
+    display: block;
+    aspect-ratio: 1;
+    -webkit-user-select: none;
+    user-select: none;
+}
 ::selection {
     background: #f4f3f344;
     opacity: 0.5;
-}
-button {
-    cursor: pointer;
 }
 *:focus-visible {
     outline: 2px solid var(--color-gray-0);

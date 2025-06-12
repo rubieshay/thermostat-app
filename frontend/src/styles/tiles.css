@@ -1,4 +1,3 @@
-/* TEMP TILES STUFF - WILL CHANGE A LOT AFTER ADDING MODALS */
 section#info {
     display: grid;
     width: var(--dial-size);
@@ -35,49 +34,59 @@ section#info {
     line-height: 1;
 }
 
-.radio-select ul {
-    display: grid;
+/* OPTIONS IN MODALS WHEN YOU CLICK ON A TILE */
+ul.radio-select {
+    display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 1rem;
 }
 .radio-select li {
-    display: flex;
-    gap: 0.5rem;
+    display: block;
 }
-.radio-select label {
+.radio-select button {
+    width: 100%;
     display: flex;
+    padding: 1rem;
     gap: 0.5rem;
+    border-radius: 1rem;
+    background: var(--color-gray-4);
+    transition: scale 200ms ease-in-out;
 }
-.radio-select label span {
+.radio-select button:hover, .radio-select button:focus-visible {
+    scale: 1.025;
+}
+.radio-select button span {
     display: block;
     line-height: 1.5;
 }
-.radio-select label span.material-symbols {
+.radio-select button span.material-symbols {
     font-size: 1.5rem;
     width: 1.5rem;
     line-height: 1;
 }
-.radio-select input {
-    height: 1.5rem;
+.radio-select li.radio-selected button {
+    background: var(--color-gray-3);
+    color: var(--color-gray-0);
 }
-
-hr {
+.drawer-content hr {
     height: 1rem;
 }
 ul.button-select {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 1rem;
+}
+ul.button-select li {
+    display: block;
 }
 ul.button-select li button {
-    background: var(--color-gray-2);
-    color: var(--color-gray-6);
-    padding: 0.75rem 1rem;
+    background: var(--color-gray-3);
+    color: var(--color-gray-0);
+    padding: 1rem 1.25rem;
     border-radius: 0.5rem;
-    flex: 0 0 min-content;
 }
 ul.button-select li.button-option-disabled button {
-    background: var(--color-gray-3);
+    background: var(--color-gray-4);
     color: var(--color-gray-5);
     cursor: default;
     pointer-events: none;

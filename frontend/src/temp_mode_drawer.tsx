@@ -3,7 +3,11 @@ import { tempModeOptions } from "./utils";
 import { TempDataContext } from "./temp_context";
 import { TempMode } from "./types";
 
-function TempModeDrawer() {
+interface ModalDrawerProps {
+    handleCloseModal: () => void
+}
+
+const TempModeDrawer: React.FC<ModalDrawerProps> = ({ handleCloseModal }) => {
     const {selectedTempData: tempData, debounceTempData, setTempMode} = useContext(TempDataContext);
     const [dispTempMode, setDispTempMode] = useState<TempMode>(TempMode.off);
 
@@ -11,33 +15,28 @@ function TempModeDrawer() {
         setDispTempMode(tempData.tempMode);
     }, [tempData.tempMode]);
     
-    function changeTempMode(event: React.ChangeEvent<HTMLInputElement>) {
-        const newTempMode = event.target.value as TempMode;
+    function changeTempMode(newTempMode: TempMode) {
         setDispTempMode(newTempMode);
         debounceTempData(() => setTempMode(newTempMode), false);
+        handleCloseModal();
     }
 
     return (
         <div className="drawer-content">
-            <fieldset className="radio-select">
-                <legend><h2>Temperature Mode</h2></legend>
-                <ul>
-                    {tempModeOptions.map((option) => (
-                        <li key={option.value}>
-                            <input id={"temp-mode-select-" + option.IdText}
-                                    name="temp-mode-select" type="radio" value={option.value}
-                                    checked={dispTempMode === option.value}
-                                    onChange={(event) => changeTempMode(event)}/>
-                            <label htmlFor={"temp-mode-select-" + option.IdText}>
-                                <span className="material-symbols material-symbols-rounded">
-                                    {option.symbolText}
-                                </span>
-                                <span>{option.dispText}</span>
-                            </label>
-                        </li>
-                    ))}
-                </ul>
-            </fieldset>
+            <h2>Temperature Mode</h2>
+            <hr/>
+            <ul className="radio-select">
+                {tempModeOptions.map((option) => (
+                    <li key={option.tempMode} id={"temp-mode-select-" + option.IdText} className={dispTempMode === option.tempMode ? "radio-selected" : ""}>
+                        <button onClick={() => changeTempMode(option.tempMode)}>
+                            <span className="material-symbols material-symbols-rounded">
+                                {option.symbolText}
+                            </span>
+                            <span>{option.dispText}</span>
+                        </button>
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 }

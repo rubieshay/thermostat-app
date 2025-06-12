@@ -3,42 +3,45 @@ import { ModalDrawerType } from "./types";
 import TempModeDrawer from "./temp_mode_drawer";
 import EcoModeDrawer from "./eco_mode_drawer";
 import FanTimerDrawer from "./fan_timer_drawer";
+import { drawerTimeoutDuration } from "./utils";
 
 interface ModalDrawerProps {
-    modalDrawer: ModalDrawerType | null
-    setModalDrawer: React.Dispatch<SetStateAction<ModalDrawerType | null>>
+    modalDrawer: ModalDrawerType | null,
+    setModalDrawer: React.Dispatch<SetStateAction<ModalDrawerType | null>>,
+    handleResetModal: (startTimer: boolean) => void
 }
 
-const ModalDrawer: React.FC<ModalDrawerProps> = ({ modalDrawer, setModalDrawer }) => {
+const ModalDrawer: React.FC<ModalDrawerProps> = ({ modalDrawer, setModalDrawer, handleResetModal }) => {
     const [controlDrawer, setControlDrawer] = useState<HTMLElement | null>(null);
 
     useEffect(() => {
         setControlDrawer(document.getElementById("control-drawer"));
-        document.getElementById("control-drawer")?.addEventListener("close", () => setModalDrawer(null));
+        // document.getElementById("control-drawer")?.addEventListener("close", () => setModalDrawer(null));
     }, [setModalDrawer]);
 
     useEffect(() => {
         if (controlDrawer && modalDrawer) {
             (controlDrawer as HTMLDialogElement).showModal();
         }
-    }, [modalDrawer, controlDrawer]);
+        handleResetModal(false);
+    }, [modalDrawer, controlDrawer, handleResetModal]);
     
     function handleCloseModal() {
         (controlDrawer as HTMLDialogElement).close();
     }
 
     return (
-        <dialog id="control-drawer" className="modal-drawer" onClose={() => 
-        setModalDrawer(null)}>
-            <button className="drawer-handle" onClick={handleCloseModal}>Close</button>
+        // closedBy="any" not fully supported but does work in chrome if added
+        <dialog id="control-drawer" className="modal-drawer" style={{"--drawer-timeout-duration": drawerTimeoutDuration + "ms"} as React.CSSProperties} onClose={() => handleResetModal(true)}>
+            <button className="drawer-handle" onClick={handleCloseModal}></button>
             {modalDrawer === ModalDrawerType.tempModeModal ?
-                <TempModeDrawer/>
+                <TempModeDrawer handleCloseModal={handleCloseModal}/>
                 :
                 (modalDrawer === ModalDrawerType.ecoModeModal ?
-                    <EcoModeDrawer/>
+                    <EcoModeDrawer handleCloseModal={handleCloseModal}/>
                     :
                     (modalDrawer === ModalDrawerType.fanTimerModal ?
-                        <FanTimerDrawer/>
+                        <FanTimerDrawer handleCloseModal={handleCloseModal}/>
                         :
                         <></>
                     )

@@ -3,7 +3,11 @@ import { ecoModeOptions } from "./utils";
 import { TempDataContext } from "./temp_context";
 import { EcoMode } from "./types";
 
-function EcoModeDrawer() {
+interface ModalDrawerProps {
+    handleCloseModal: () => void
+}
+
+const EcoModeDrawer: React.FC<ModalDrawerProps> = ({ handleCloseModal }) => {
     const {selectedTempData: tempData, debounceTempData, setEcoMode} = useContext(TempDataContext);
     const [dispEcoMode, setDispEcoMode] = useState<EcoMode>(EcoMode.off);
 
@@ -11,33 +15,28 @@ function EcoModeDrawer() {
         setDispEcoMode(tempData.ecoMode);
     }, [tempData.ecoMode]);
     
-    function changeEcoMode(event: React.ChangeEvent<HTMLInputElement>) {
-        const newEcoMode = event.target.value as EcoMode;
+    function changeEcoMode(newEcoMode: EcoMode) {
         setDispEcoMode(newEcoMode);
         debounceTempData(() => setEcoMode(newEcoMode), false);
+        handleCloseModal();
     }
 
     return (
         <div className="drawer-content">
-            <fieldset className="radio-select">
-                <legend><h2>Eco Mode</h2></legend>
-                <ul>
-                    {ecoModeOptions.map((option) => (
-                        <li key={option.value}>
-                            <input id={"eco-mode-select-" + option.IdText}
-                                    name="eco-mode-select" type="radio" value={option.value}
-                                    checked={dispEcoMode === option.value}
-                                    onChange={(event) => changeEcoMode(event)}/>
-                            <label htmlFor={"eco-mode-select-" + option.IdText}>
-                                <span className="material-symbols material-symbols-rounded">
-                                    {option.symbolText}
-                                </span>
-                                <span>{option.dispText}</span>
-                            </label>
-                        </li>
-                    ))}
-                </ul>
-            </fieldset>
+            <h2>Eco Mode</h2>
+            <hr/>
+            <ul className="radio-select">
+                {ecoModeOptions.map((option) => (
+                    <li key={option.ecoMode} id={"eco-mode-select-" + option.IdText} className={dispEcoMode === option.ecoMode ? "radio-selected" : ""}>
+                        <button onClick={() => changeEcoMode(option.ecoMode)}>
+                            <span className="material-symbols material-symbols-rounded">
+                                {option.symbolText}
+                            </span>
+                            <span>{option.dispText}</span>
+                        </button>
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 }

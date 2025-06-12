@@ -1,13 +1,18 @@
 import { useContext, useEffect, useState } from "react";
-import { fanTimerOptions, getIsoDatePlusDuration, getFanTimerString } from "./utils";
+import { fanTimerOptions, getIsoDatePlusDuration, getFanTimerString, fanTimerDisplayUpdateInterval, isFanOn } from "./utils";
 import { TempDataContext } from "./temp_context";
 import { FanTimerMode } from "./types";
 
-function FanTimerDrawer() {
+interface ModalDrawerProps {
+    handleCloseModal: () => void
+}
+
+const FanTimerDrawer: React.FC<ModalDrawerProps> = ({ handleCloseModal }) => {
     const {selectedTempData: tempData, debounceTempData, setFanTimer} = useContext(TempDataContext);
 
     const [dispFanTimer, setDispFanTimer] = useState<string | null>(null);
     const [fanTimerString, setFanTimerString] = useState<string>("");
+    const fanIsActive: boolean = isFanOn(tempData.fanTimer, tempData.hvacStatus);
 
     useEffect (() => {
         setDispFanTimer(tempData.fanTimer);
@@ -17,7 +22,7 @@ function FanTimerDrawer() {
         // Update every 15 seconds
         const interval = setInterval(() => {
             setFanTimerString(getFanTimerString(tempData.fanTimer, tempData.hvacStatus));
-        }, 15000);
+        }, fanTimerDisplayUpdateInterval);
 
         return () => clearInterval(interval);
 
@@ -31,12 +36,20 @@ function FanTimerDrawer() {
             setDispFanTimer(getIsoDatePlusDuration(duration));
             debounceTempData(() => setFanTimer(newFanMode, duration), false);
         }
+        handleCloseModal();
     }
 
     return (
         <div className="drawer-content">
-            <h2>Current Fan Timer:</h2>
-            <div>{fanTimerString}</div>
+            <h2>Fan</h2>
+            <div className="current-tile-selection">
+                {fanIsActive ?
+                    <span className="material-symbols material-symbols-rounded hvac-icon hvac-on">mode_fan</span>
+                    :
+                    <span className="material-symbols material-symbols-rounded hvac-icon hvac-off">mode_fan_off</span>
+                }
+                <span>{fanTimerString}</span>
+            </div>
             <hr/>
             <ul className="button-select">
                 <li className={dispFanTimer === null ? "button-option-disabled" : ""}>

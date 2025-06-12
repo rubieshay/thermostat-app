@@ -16,6 +16,8 @@ console.log("Environment driven settings:", {demoMode, defaultAPIURL, dataRefres
 export const debounceTime: number = 3000;
 export const dataRefreshTime: number = 15000;
 export const setPointFadeDuration: number = 3000;
+export const drawerTimeoutDuration: number = 500;
+export const fanTimerDisplayUpdateInterval: number = 15000;
  
 export const minDialTemps: number[] = [9, 50];
 export const maxDialTemps: number[] = [32, 90];
@@ -23,17 +25,17 @@ export const minRangeGap: number[] = [1.5, 3]
 export const decimalPrecision: number[] = [0.5, 1.0];
 export const usedDialRatio: number = 5/6;
 
-export const tempModeOptions = [{"value": TempMode.heat, "IdText": "heat",
+export const tempModeOptions = [{"tempMode": TempMode.heat, "IdText": "heat",
                                  "dispText": "Heat", "symbolText": "heat"},
-                                {"value": TempMode.heatcool, "IdText": "heatcool",
+                                {"tempMode": TempMode.heatcool, "IdText": "heatcool",
                                  "dispText": "Heat • Cool", "symbolText": "mode_dual"},
-                                {"value": TempMode.cool, "IdText": "cool",
+                                {"tempMode": TempMode.cool, "IdText": "cool",
                                  "dispText": "Cool", "symbolText": "mode_cool"},
-                                {"value": TempMode.off, "IdText": "off",
+                                {"tempMode": TempMode.off, "IdText": "off",
                                  "dispText": "Off", "symbolText": "mode_off_on"}]
-export const ecoModeOptions = [{"value": EcoMode.on, "IdText": "on",
+export const ecoModeOptions = [{"ecoMode": EcoMode.on, "IdText": "on",
                                 "dispText": "On", "symbolText": "nest_eco_leaf"},
-                               {"value": EcoMode.off, "IdText": "off",
+                               {"ecoMode": EcoMode.off, "IdText": "off",
                                 "dispText": "Off", "symbolText": "thermostat"}]
 export const fanTimerOptions = [{"duration": 900, "dispText": "15 min"},
                                 {"duration": 1800, "dispText": "30 min"},
