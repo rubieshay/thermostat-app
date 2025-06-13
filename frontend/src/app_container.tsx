@@ -39,6 +39,8 @@ export function AppContainer() {
         SplashScreen.hide();
     }
 
+    console.log("App container rendering... initialLoadComplete:", initialLoadComplete);
+
     return (
         <>
             {initialLoadComplete ?

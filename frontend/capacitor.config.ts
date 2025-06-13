@@ -10,6 +10,10 @@ const config: CapacitorConfig = {
   plugins: {
     CapacitorHttp: {
       enabled: true
+    },
+    SplashScreen: {
+      launchShowDuration: 0, // Hide splash screen immediately after app load
+      launchAutoHide: false, // Automatically hide splash screen after launch
     }
   },
   android: {
