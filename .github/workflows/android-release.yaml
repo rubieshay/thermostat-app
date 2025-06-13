@@ -48,7 +48,8 @@ jobs:
     - name: Create env file
       run: |
         echo "DEFAULT_API_URL=${{ secrets.DEFAULT_API_URL }}" > .env
-        echo "LOG_LEVEL=info" >> .env
+        echo "DEMO_MODE=0" >> .env
+        echo "DATA_REFRESH_ENABLED=0" >> .env
         
     - name: Install dependencies
       working-directory: ./frontend
