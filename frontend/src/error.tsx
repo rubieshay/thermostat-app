@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { TempDataContext } from "./temp_context";
 
 function Error() {
     const { fetchTempData, lastAPIError, clearAPIError } = useContext(TempDataContext);
     const [errorText, setErrorText] = useState<string>("");
-    const [errorDialog, setErrorDialog] = useState<HTMLElement | null>(null);
+    const errorDialogRef = useRef<HTMLDialogElement | null>(null);
 
     useEffect(() => {
         if (lastAPIError.errorSeq === 0) {
@@ -17,21 +17,15 @@ function Error() {
             clearAPIError();
             fetchTempData(true);
         }
-        if (errorDialog) {
-            (errorDialog as HTMLDialogElement).showModal();
-        }
-    }, [lastAPIError.errorSeq, clearAPIError, fetchTempData, lastAPIError, errorDialog]);
-
-    useEffect(() => {
-        setErrorDialog(document.getElementById("error-dialog"));
-    }, [errorDialog]);
+        (errorDialogRef?.current as HTMLDialogElement).showModal();
+    }, [lastAPIError.errorSeq, clearAPIError, fetchTempData, lastAPIError]);
     
     function handleCloseModal() {
-        (errorDialog as HTMLDialogElement).close();
+        (errorDialogRef.current as HTMLDialogElement).close();
     }
 
     return (
-        <dialog id="error-dialog" className="modal-popup">
+        <dialog id="error-dialog" ref={errorDialogRef} className="modal-popup">
             <h2>Error Occurred:</h2>
             <p>{errorText}</p>
             <button onClick={handleCloseModal}>Close</button>

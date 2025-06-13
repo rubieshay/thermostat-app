@@ -4,10 +4,10 @@ import { TempDataContext } from "./temp_context";
 import { getFanTimerString, isFanOn, tempModeOptions, ecoModeOptions, fanTimerDisplayUpdateInterval } from "./utils";
 
 interface TileProps {
-    setModalDrawer: React.Dispatch<SetStateAction<ModalDrawerType | null>>
+    setModalDrawerType: React.Dispatch<SetStateAction<ModalDrawerType | null>>
 }
 
-const Tiles: React.FC<TileProps> = ({ setModalDrawer }) => {
+const Tiles: React.FC<TileProps> = ({ setModalDrawerType }) => {
     const {selectedTempData: tempData} = useContext(TempDataContext);
     const [fanTimerString, setFanTimerString] = useState<string>("");
     const fanIsActive: boolean = isFanOn(tempData.fanTimer, tempData.hvacStatus);
@@ -26,16 +26,16 @@ const Tiles: React.FC<TileProps> = ({ setModalDrawer }) => {
 
     }, [tempData.fanTimer, tempData.hvacStatus]);
 
-    function handleSetModalDrawer(drawerType: ModalDrawerType) {
+    function handleSetModalDrawerType(drawerType: ModalDrawerType) {
         // handleResetModal(false);
-        setModalDrawer(drawerType);
+        setModalDrawerType(drawerType);
     }
 
     return (
         <section id="info">
             {tempData.connectivity === Connectivity.online ?
                 <>
-                    <button className="tile" onClick={() => handleSetModalDrawer(ModalDrawerType.tempModeModal)}>
+                    <button className="tile" onClick={() => handleSetModalDrawerType(ModalDrawerType.tempModeModal)}>
                         <h2>Temperature Mode</h2>
                         <div className="current-tile-selection">
                             <span className="material-symbols material-symbols-rounded">
@@ -44,7 +44,7 @@ const Tiles: React.FC<TileProps> = ({ setModalDrawer }) => {
                             <span>{tempModeOptions.find((option) => option.tempMode === tempData.tempMode)?.dispText}</span>
                         </div>
                     </button>
-                    <button className="tile" onClick={() => handleSetModalDrawer(ModalDrawerType.ecoModeModal)}>
+                    <button className="tile" onClick={() => handleSetModalDrawerType(ModalDrawerType.ecoModeModal)}>
                         <h2>Eco Mode</h2>
                         <div className="current-tile-selection">
                             <span className="material-symbols material-symbols-rounded">
@@ -53,7 +53,7 @@ const Tiles: React.FC<TileProps> = ({ setModalDrawer }) => {
                             <span>{ecoModeOptions.find((option) => option.ecoMode === tempData.ecoMode)?.dispText}</span>
                         </div>
                     </button>
-                    <button className="tile" onClick={() => handleSetModalDrawer(ModalDrawerType.fanTimerModal)}>
+                    <button className="tile" onClick={() => handleSetModalDrawerType(ModalDrawerType.fanTimerModal)}>
                         <h2>Fan</h2>
                         <div className="current-tile-selection">
                             {fanIsActive ?

@@ -12,7 +12,7 @@ import { SplashScreen } from '@capacitor/splash-screen';;
 
 export function AppContainer() {
     const { initialLoadComplete, okToStartRefreshTimer, stopRefreshTimer, startRefreshTimer, fetchTempData } = useContext(TempDataContext);
-    const [modalDrawer, setModalDrawer] = useState<ModalDrawerType | null>(null);
+    const [modalDrawerType, setModalDrawerType] = useState<ModalDrawerType | null>(null);
     const fadeDrawerTimer = useRef<number | null>(null);
 
     const handleResetModal = useCallback((startTimer: boolean) => {
@@ -21,10 +21,10 @@ export function AppContainer() {
         }
         if (startTimer) {
             fadeDrawerTimer.current = window.setTimeout(() => {
-                setModalDrawer(null);
+                setModalDrawerType(null);
             }, drawerTimeoutDuration);
         }
-    }, [setModalDrawer]);
+    }, [setModalDrawerType]);
 
     usePageVisibilityRefresh({
         refreshData: fetchTempData,
@@ -46,9 +46,9 @@ export function AppContainer() {
                     <main>
                         <Title/>
                         <Dial/>
-                        <Tiles setModalDrawer={setModalDrawer}/>
+                        <Tiles setModalDrawerType={setModalDrawerType}/>
                     </main>
-                    <ModalDrawer modalDrawer={modalDrawer} setModalDrawer={setModalDrawer} handleResetModal={handleResetModal}/>
+                    <ModalDrawer modalDrawerType={modalDrawerType} handleResetModal={handleResetModal}/>
                     <Error/>
                 </>
                 :

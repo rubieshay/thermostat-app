@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext, useRef } from "react";
+import { useEffect, useState, useContext, useRef, useCallback } from "react";
 import { TempUnits, TempMode, EcoMode, HvacStatus, Connectivity, SetPointType } from "./types";
 import { roundedTemp, convertTemp, maxDialTemps, minDialTemps, usedDialRatio, decimalPrecision, minRangeGap, makeTempInRange, setPointFadeDuration, isFanOn } from "./utils";
 import { TempDataContext } from "./temp_context";
@@ -12,6 +12,7 @@ function Dial() {
     const [lastSetPoint, setLastSetPoint] = useState<SetPointType | null>(null);
     const [isDraggingTemp, setIsDraggingTemp] = useState<boolean>(false);
     const setPointFadeTimer = useRef<number | null>(null);
+    const dialRef = useRef<HTMLElement | null>(null);
 
     const dispAmbientTemp: number | null = roundedTemp(convertTemp(tempData.ambientTempCelsius, TempUnits.celsius, tempData.tempUnits), tempData.tempUnits);
     const fanIsActive: boolean = isFanOn(tempData.fanTimer, tempData.hvacStatus);
@@ -63,7 +64,7 @@ function Dial() {
 
     // SWAPPING AND FADING SETPOINTS
 
-    function fadeSetPoint(startFade: boolean): void {
+    const fadeSetPoint = useCallback((startFade: boolean) => {
         if (setPointFadeTimer.current) {
             clearTimeout(setPointFadeTimer.current);
         }
@@ -72,30 +73,19 @@ function Dial() {
                 setActiveSetPoint(null);
             }, setPointFadeDuration);
         }
-    }
+    }, []);
 
-    function changeActiveSetpoint(setPointType: SetPointType | null, startFade: boolean): void {
+    const changeActiveSetpoint = useCallback((setPointType: SetPointType | null, startFade: boolean) => {
         setActiveSetPoint(setPointType);
         if (setPointType !== null) {
             setLastSetPoint(setPointType);
         }
         fadeSetPoint(startFade);
-    }
-
-    // MANAGING DRAG RELATED EVENT LISTENERS
-    
-    useEffect(() => {
-        window.removeEventListener("pointermove", dragTemp);
-        window.removeEventListener("pointerup", finishDragTemp);
-        if (isDraggingTemp) {
-            window.addEventListener("pointermove", dragTemp);
-            window.addEventListener("pointerup", finishDragTemp);
-        }
-    }, [isDraggingTemp, lastSetPoint, activeSetPoint, dispCoolPoint, dispHeatPoint]);
+    }, [fadeSetPoint]);
 
     // SETTING/CHANGING TEMP SETPOINTS
 
-    function changeSingleTemp(newTemp: number, setPointType: SetPointType) {
+    const changeSingleTemp = useCallback((newTemp: number, setPointType: SetPointType) => {
         const fixedTemp = makeTempInRange(newTemp, tempData.tempUnits);
         if (setPointType === SetPointType.heat && tempData.tempMode === TempMode.heat) {
             setDispHeatPoint(roundedTemp(fixedTemp, tempData.tempUnits));
@@ -113,9 +103,9 @@ function Dial() {
         } else if (tempData.tempMode === TempMode.cool) {
             debounceTempData(() => setCoolCelsius(celsiusFixedTemp), true);
         }
-    }
+    }, [debounceTempData, setCoolCelsius, setHeatCelsius, tempData.tempMode, tempData.tempUnits]);
 
-    function changeRangeTemps(newTemp: number, setPointType: SetPointType) {
+    const changeRangeTemps = useCallback((newTemp: number, setPointType: SetPointType) => {
         if (dispHeatPoint === null || dispCoolPoint === null) {
             return;
         }
@@ -159,9 +149,9 @@ function Dial() {
             return;
         }
         debounceTempData(() => setRangeCelsius(heatCelsiusFixedTemp, coolCelsiusFixedTemp), true);
-    }
+    }, [debounceTempData, dispCoolPoint, dispHeatPoint, maxDialTemp, minDialTemp, setRangeCelsius, tempData.tempUnits]);
 
-    function changeTemp(newTemp: number, setPointType: SetPointType) {
+    const changeTemp = useCallback((newTemp: number, setPointType: SetPointType) => {
         if (tempData.tempMode === TempMode.off || tempData.ecoMode === EcoMode.on) {
             return;
         } else if (tempData.tempMode === TempMode.heatcool) {
@@ -170,7 +160,7 @@ function Dial() {
             changeSingleTemp(newTemp, setPointType);
         }
         fadeSetPoint(true);
-    }
+    }, [changeRangeTemps, changeSingleTemp, tempData.ecoMode, tempData.tempMode, fadeSetPoint]);
 
     function bumpTemp(diff: number) {
         // determine which setpoint to bump, and make active if needed
@@ -210,19 +200,11 @@ function Dial() {
 
     // DRAGGING TEMP SETPOINTS
 
-    function startDragTemp(setPointType: SetPointType): void {
-        // make setpoint active if needed but don't fade until pointerUp
-        changeActiveSetpoint(setPointType, false);
-        setIsDraggingTemp(true);
-        window.addEventListener("pointermove", dragTemp);
-        window.addEventListener("pointerup", finishDragTemp);
-    }
-
-    function dragTemp(event: PointerEvent) {
+    const dragTemp = useCallback((event: PointerEvent) => {
         if (activeSetPoint === null) {
             return;
         }
-        const dialBoundingRect = document.getElementById("dial")?.getBoundingClientRect();
+        const dialBoundingRect = dialRef.current?.getBoundingClientRect();
         if (dialBoundingRect === undefined) {
             return;
         }
@@ -242,14 +224,31 @@ function Dial() {
         }
         const newTemp = ((dialRange / usedDialRatio) * angleFraction) + midDialTemp;
         changeTemp(newTemp, activeSetPoint);
-    }
+    }, [activeSetPoint, changeTemp, dialRange, midDialTemp]);
 
-    function finishDragTemp(): void {
+    const finishDragTemp = useCallback(() => {
         setIsDraggingTemp(false);
         fadeSetPoint(true);
-        window.removeEventListener("pointermove", dragTemp);
-        window.removeEventListener("pointerup", finishDragTemp);
-    }
+    }, [fadeSetPoint]);
+
+    const startDragTemp = useCallback((setPointType: SetPointType) => {
+        // make setpoint active if needed but don't fade until pointerUp
+        changeActiveSetpoint(setPointType, false);
+        setIsDraggingTemp(true);
+    }, [changeActiveSetpoint]);
+    
+    useEffect(() => {
+        if (isDraggingTemp) {
+            window.addEventListener("pointermove", dragTemp);
+            window.addEventListener("pointerup", finishDragTemp);
+        }
+
+        return (() => {
+            window.removeEventListener("pointermove", dragTemp);
+            window.removeEventListener("pointerup", finishDragTemp);
+        });
+
+    }, [isDraggingTemp, dispCoolPoint, dispHeatPoint, dragTemp, finishDragTemp]);
 
     // DIALS AND THUMBS
 
@@ -281,7 +280,7 @@ function Dial() {
     }
 
     return (
-        <section id="dial"
+        <section id="dial" ref={dialRef}
             className={(tempData && tempData.connectivity === Connectivity.online &&
             tempData.hvacStatus !== HvacStatus.off) ?
             (tempData.hvacStatus === HvacStatus.cooling ? "hvac-status-cooling" :
