@@ -31,7 +31,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
-            debuggable true
         }
         applicationVariants.all{
             // this method is use to rename your all apk weather

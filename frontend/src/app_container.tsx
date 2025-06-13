@@ -8,7 +8,6 @@ import Error from "./error";
 import ModalDrawer from "./modal_drawer";
 import { ModalDrawerType } from "./types";
 import { dataRefreshTime, drawerTimeoutDuration, usePageVisibilityRefresh } from "./utils";
-import { SplashScreen } from '@capacitor/splash-screen';;
 
 export function AppContainer() {
     const { initialLoadComplete, okToStartRefreshTimer, stopRefreshTimer, startRefreshTimer, fetchTempData } = useContext(TempDataContext);
@@ -34,11 +33,6 @@ export function AppContainer() {
         okToStartRefresh: okToStartRefreshTimer
     });
     
-    if (initialLoadComplete) {
-        // Hide the splash screen after the initial load is complete
-        SplashScreen.hide();
-    }
-
     console.log("App container rendering... initialLoadComplete:", initialLoadComplete);
 
     return (
