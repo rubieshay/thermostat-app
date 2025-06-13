@@ -212,6 +212,7 @@ export async function getDeviceInfo() : Promise<FetchReturn> {
             }
             tempDataInfo.push(currTempData);
         });
+        console.log("Retrieved data from google API backend:", JSON.stringify(tempDataInfo));
         fetchReturn.success = true;
         fetchReturn.data = data;
     } catch (error) {

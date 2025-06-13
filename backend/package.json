@@ -12,6 +12,7 @@
   "description": "",
   "dependencies": {
     "@fastify/websocket": "^11.1.0",
+    "@google-cloud/pubsub": "^5.1.0",
     "dotenv": "^16.5.0",
     "fastify": "^5.3.3"
   },

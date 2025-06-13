@@ -12,12 +12,15 @@ export const googleClientId  = process.env.CLIENT_ID || "";
 export const googleClientSecret = process.env.CLIENT_SECRET || "";
 export const googleProjectId = process.env.PROJECT_ID || "";
 export const googleRefreshToken = process.env.REFRESH_TOKEN || "";
+export const googleTopicId = process.env.TOPIC_ID || "thermostat-topic-id";
 export const demoMode = ( process.env.DEMO_MODE?.toUpperCase() === "1" || process.env.DEMO_MODE?.toUpperCase() === "YES" || 
     process.env.DEMO_MODE?.toUpperCase() === "TRUE" ? true : false );
+export const environment = process.env.ENVIRONMENT || "prod";
 
 const httpPort = Number(process.env.PORT) || 3000;
 
 import {tempDataInfo} from "./googlesdm";
+import { removeSubscription } from "./googlepubsub";
 export let weatherData: WeatherData = structuredClone(initWeatherData);
 
 const fastify = Fastify({
@@ -156,3 +159,8 @@ const start = async () => {
 }
 
 start();
+
+process.on('exit', async (code) => {
+  console.log(`About to exit with code: ${code}`);
+  await removeSubscription(); 
+});
