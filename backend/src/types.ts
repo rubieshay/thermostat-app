@@ -130,3 +130,31 @@ export const noLastAPIError: LastAPIError = {
     lastErrorWasFetch: false,
     errorSeq: 0
 }
+
+export enum TempMessageType {
+    tempUpdate = "tempUpdate",
+    weatherUpdate = "weatherUpdate",
+    errorUpdate = "errorUpdate",
+    statusUpdate = "statusUpdate",
+}
+
+export type TempUpdateMessage = {
+    tempData: TempDataArray,
+}
+
+export type WeatherUpdateMessage = {
+    weatherData: WeatherData,
+}
+
+export type ErrorUpdateMessage = {
+    errorMessage: string,
+}
+
+export type StatusUpdateMessage = {
+    message: string
+}
+
+export type TempMessage = {
+    type: TempMessageType,
+    data: TempUpdateMessage | WeatherUpdateMessage | ErrorUpdateMessage | StatusUpdateMessage
+}

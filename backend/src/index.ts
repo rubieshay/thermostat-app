@@ -1,29 +1,33 @@
 import Fastify from "fastify";
 import fastifyWebSockets from "@fastify/websocket";
-import { FetchReturn, WeatherData, initWeatherData } from "./types";
+import { FetchReturn, TempMessageType, WeatherData, initWeatherData, TempMessage } from "./types";
 import { infoQuerySchema, InfoQueryString, latLongQuerySchema, latLongQueryString, setHeatSchema, SetHeatBody, 
         setCoolSchema, SetCoolBody, setRangeSchema, SetRangeBody, setTempModeSchema,
         SetTempModeBody, setEcoModeSchema, SetEcoModeBody, setFanTimerSchema, SetFanTimerBody} from "./schemas";
 import "dotenv/config";
 import { checkAndGetDeviceInfo, setHeat, setCool, setRange, setTempMode, setEcoMode, setFanTimer} from "./googlesdm";
 import { getCurrentObservation } from "./weather";
+import {tempDataInfo} from "./googlesdm";
+import { getDataAndSubscribe, removeSubscription } from "./googlepubsub";
+import { Mutex } from "./mutex";
 
 export const googleClientId  = process.env.CLIENT_ID || "";
 export const googleClientSecret = process.env.CLIENT_SECRET || "";
 export const googleProjectId = process.env.PROJECT_ID || "";
 export const googleRefreshToken = process.env.REFRESH_TOKEN || "";
 export const googleTopicId = process.env.TOPIC_ID || "thermostat-topic-id";
+export const googlePubSubProjectId = process.env.PUBSUB_PROJECT_ID;
 export const demoMode = ( process.env.DEMO_MODE?.toUpperCase() === "1" || process.env.DEMO_MODE?.toUpperCase() === "YES" || 
     process.env.DEMO_MODE?.toUpperCase() === "TRUE" ? true : false );
 export const environment = process.env.ENVIRONMENT || "prod";
 
 const httpPort = Number(process.env.PORT) || 3000;
 
-import {tempDataInfo} from "./googlesdm";
-import { removeSubscription } from "./googlepubsub";
 export let weatherData: WeatherData = structuredClone(initWeatherData);
 
-const fastify = Fastify({
+export const sharedMutex = new Mutex();
+
+export const fastify = Fastify({
     logger: true
 })
 
@@ -34,17 +38,13 @@ fastify.register( async function (fastify) {
         (socket, req) => {
             // TODO : initial connect action -- start regular thermostat polling
             console.log("Initial WS Connect");
-            let timer = setInterval(() => {
-            socket.send("TEST");
-        }, 1000);
+            let statusMessage: TempMessage = { type: TempMessageType.statusUpdate, data: { message: "Connected to Fastify WebSocket" } };
+            socket.send(JSON.stringify(statusMessage));
             socket.on("message", (msg: string) => {
-                socket.send(`Hello from Fastify. Your message is ${msg}`);
-                //TODO -- is there even a need for receiving messages from client?
-                // Those might normally just go over the regular API calls
+                console.log("Received message from client, no actions possible: :",msg)
             });
             socket.on("close", () => {
                 console.log("WS closed by client");
-                clearInterval(timer);
                 //TODO : stop regular thermostat polling
             })
         }
@@ -151,6 +151,7 @@ fastify.post<{ Body: SetFanTimerBody }>("/set_fan_timer", {schema: { body: setFa
 
 const start = async () => {
     try {
+        await getDataAndSubscribe();
         await fastify.listen({ port: httpPort, host: "0.0.0.0" })
     } catch (err) {
         fastify.log.error(err);
@@ -160,7 +161,19 @@ const start = async () => {
 
 start();
 
+async function cleanUp() {
+    await removeSubscription();
+    // something something websockets...
+    process.exit(0)
+}
+
+process.on('SIGINT', async () => {
+     console.log('Ctrl+C pressed. Cleaning up...');
+     await cleanUp();
+     process.exit(0); // Exit with success code 0
+   });
+
 process.on('exit', async (code) => {
   console.log(`About to exit with code: ${code}`);
-  await removeSubscription(); 
+  await cleanUp; 
 });

@@ -4,7 +4,7 @@ import { type SetHeatBody, type SetCoolBody, type SetRangeBody, type SetTempMode
 import { demoMode, debounceTime, defaultAPIURL, type ChildrenProviderProps, getIsoDatePlusDuration, arraysEqualIgnoreOrder, sleep, dataRefreshTime } from "./utils";
 
 export interface TempContextType {
-    tempDataArray: TempData[];
+    tempDataArray: TempDataArray;
     fetchTempData: (forceFlush: boolean) => Promise<FetchReturn>,
     selectedTempData: TempData,
     debounceTempData: (cbFunction: Function, letWait: boolean) => void,
@@ -21,7 +21,8 @@ export interface TempContextType {
     setRangeCelsius: (newHeatCelsius: number, newCoolCelsius: number) => void,
     setTempMode: (newTempMode: TempMode) => void,
     setEcoMode: (newEcoMode: EcoMode) => void,
-    setFanTimer: (newFanTimerMode: FanTimerMode, durationSecond?: number) => void
+    setFanTimer: (newFanTimerMode: FanTimerMode, durationSecond?: number) => void,
+    updateAllTempData: (newTempData: TempDataArray) => void
 }
 
 export const initTempContext: TempContextType = {
@@ -43,6 +44,7 @@ export const initTempContext: TempContextType = {
     setTempMode: async () => {},
     setEcoMode: async () => {},
     setFanTimer: async () => {},
+    updateAllTempData: () => {}
 }
 
 export const TempDataContext = createContext(initTempContext);
@@ -66,6 +68,11 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
     useEffect(() => {
         console.log("Initial Load Complete changed to:", initialLoadComplete);
     }, [initialLoadComplete]);
+
+    useEffect(() => {
+        console.log("Temp Data Array changed...:", structuredClone(tempDataArray));
+    }, [tempDataArray]);
+
 
     const fetchTempData = useCallback (async (forceFlush: boolean) => {
         console.log("IN FETCHING");
@@ -607,6 +614,11 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         }
     }, [selectedDeviceID, fetchTempData, lastAPIError.errorSeq]);
 
+    function updateAllTempData(newTempDataArray: TempDataArray) {
+        console.log("called Update All Tempdata with data to update: ",newTempDataArray)
+        setTempDataArray(structuredClone(newTempDataArray));
+    }
+
     // SETTING CONTEXT
 
     const cbDebounceTempData = useCallback((cbFunction: Function, letWait: boolean) => debounceTempData(cbFunction, letWait), []);
@@ -619,7 +631,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         debounceTempData : cbDebounceTempData, selectedDeviceID, changeDeviceID : cbChangeDeviceID,
         initialLoadComplete, okToStartRefreshTimer,
         startRefreshTimer, stopRefreshTimer, lastAPIError, clearAPIError,
-        setHeatCelsius, setCoolCelsius, setRangeCelsius, setTempMode, setEcoMode, setFanTimer
+        setHeatCelsius, setCoolCelsius, setRangeCelsius, setTempMode, setEcoMode, setFanTimer, updateAllTempData
     }), [tempDataArray, fetchTempData, selectedTempData, getSelectedTempData, cbDebounceTempData, selectedDeviceID, cbChangeDeviceID, initialLoadComplete, okToStartRefreshTimer, startRefreshTimer, stopRefreshTimer, lastAPIError, clearAPIError, setHeatCelsius, setCoolCelsius, setRangeCelsius, setTempMode, setEcoMode, setFanTimer]);
 
     return (

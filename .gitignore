@@ -15,4 +15,4 @@ frontend/android/local.properties
 # Keep template files but ignore the real ones
 !android/gradle.properties.template
 
-backend/service-account-key.json
+service-account-key.json

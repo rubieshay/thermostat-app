@@ -66,6 +66,12 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
+    '/api/ws': {
+        target: 'ws://localhost:3333',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+        ws: true
+    }
     }
   },
   plugins: [react(),

@@ -1,4 +1,4 @@
-import { googleClientSecret, googleRefreshToken, googleClientId, googleProjectId, demoMode } from "./index";
+import { googleClientSecret, googleRefreshToken, googleClientId, googleProjectId, demoMode, sharedMutex } from "./index";
 import { APIParams, CoolParams, EcoModeParams, HeatParams, TempModeParams, RangeParams, FanTimerParams } from "./schemas";
 import { Connectivity, FetchReturn, TempMode, HvacStatus, EcoMode,
         TempUnitsName, TempUnits, TempData, initTempData, FanTimerMode, 
@@ -81,14 +81,14 @@ function updateCachedData() {
 
 export async function checkAndGetDeviceInfo(forceFlush: boolean) : Promise<FetchReturn> {
     if (forceFlush || dataCacheExpirationTime === null) {
-        let fetchReturn = await getDeviceInfo();
+        let fetchReturn = await getExclusiveDeviceInfo();
         updateCachedData();
         console.log("Set initial cached Data or forced flush of data-- not previously set");
         return fetchReturn;
     }
     // check if cached version is recent enough;
     if ((new Date()) > dataCacheExpirationTime) {
-        let fetchReturn = await getDeviceInfo();
+        let fetchReturn = await getExclusiveDeviceInfo();
         updateCachedData();
         console.log("Cached data not recent enough - refreshing");
         return fetchReturn
@@ -97,6 +97,13 @@ export async function checkAndGetDeviceInfo(forceFlush: boolean) : Promise<Fetch
         console.log("Using cached data");
         return fetchReturn;
     }
+}
+
+async function getExclusiveDeviceInfo() : Promise<FetchReturn> {
+    // This function is used to get the device info with a mutex lock
+    return sharedMutex.runExclusive(async () => {
+        return await getDeviceInfo()
+    })
 }
 
 export async function getDeviceInfo() : Promise<FetchReturn> {
@@ -309,4 +316,9 @@ export async function setFanTimer(deviceID: string, timerMode: FanTimerMode, dur
         params.duration = durationSeconds.toString()+"s";
     }
     return await (makeGoogleAPICall(urlString,TempCommands.setFan, params, "Setting Fan Timer"));
+}
+
+export function updateTempDataInfoFull(tempData: TempData[]) {
+    tempDataInfo = structuredClone(tempData);
+    console.log("Updating tempdataInfo with full data. New array is: ", JSON.stringify(tempDataInfo,null,3));
 }

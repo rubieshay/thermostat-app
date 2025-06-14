@@ -6,6 +6,7 @@ import Dial from "./dial";
 import Tiles from "./tiles";
 import Error from "./error";
 import ModalDrawer from "./modal_drawer";
+import Websockets from "./websockets";
 import { ModalDrawerType } from "./types";
 import { dataRefreshTime, drawerTimeoutDuration, usePageVisibilityRefresh } from "./utils";
 
@@ -40,6 +41,7 @@ export function AppContainer() {
             {initialLoadComplete ?
                 <>
                     <main>
+                        <Websockets/>
                         <Title/>
                         <Dial/>
                         <Tiles setModalDrawerType={setModalDrawerType}/>
