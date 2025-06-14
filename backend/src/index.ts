@@ -23,8 +23,6 @@ export const subscriptionId = "thermostat-sub-id-" + environment;
 
 const httpPort = Number(process.env.PORT) || 3000;
 
-console.log("Environment is:", {googleClientId, googleClientSecret, googleProjectId, googleRefreshToken, googleTopicId, googlePubSubProjectId, demoMode, environment})
-
 export let weatherData: WeatherData = structuredClone(initWeatherData);
 
 export const sharedMutex = new Mutex();
