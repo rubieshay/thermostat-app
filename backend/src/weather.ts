@@ -1,13 +1,13 @@
 import { FetchReturn } from "./types";
 
-import { weatherData } from "./index";
+import { weatherData, weatherLatitude, weatherLongitude } from "./index";
 
 const weatherBaseURL = "https://api.weather.gov/"
 
 const weatherDataExpireDurationSecs = 180;
 
 async function getStationsFromLatLong(): Promise<FetchReturn> {
-    let pointsURL = encodeURI(weatherBaseURL + "/points/"+ weatherData.latitude + "," + weatherData.longitude);
+    let pointsURL = encodeURI(weatherBaseURL + "/points/"+ weatherLatitude + "," + weatherLongitude);
     let fetchReturn: FetchReturn = {success: false};
        try {
         const response = await fetch(pointsURL);

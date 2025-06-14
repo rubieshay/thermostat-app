@@ -20,6 +20,8 @@ export const demoMode = ( process.env.DEMO_MODE?.toUpperCase() === "1" || proces
     process.env.DEMO_MODE?.toUpperCase() === "TRUE" ? true : false );
 export const environment = process.env.ENVIRONMENT || "prod";
 export const subscriptionId = "thermostat-sub-id-" + environment;
+export let weatherLatitude = Number(process.env.WEATHER_LATITUDE) || 37.7749; // Default to San Francisco
+export let weatherLongitude = Number(process.env.WEATHER_LONGITUDE) || -122.4194; // Default to San Francisco
 
 const httpPort = Number(process.env.PORT) || 3000;
 
@@ -81,9 +83,9 @@ fastify.get("/weather", async (request, reply) => {
 fastify.get<{ Querystring: latLongQueryString }> ("/set_lat_long", { schema: { querystring: latLongQuerySchema } }, async (request, reply) => {
     const {lat, long} = request.query;
     weatherData = structuredClone(initWeatherData);
-    weatherData.latitude = lat;
-    weatherData.longitude = long;
-    reply.send("Latitude and Longitude have been updated:"+ JSON.stringify(weatherData));
+    weatherLatitude = lat;
+    weatherLongitude = long;
+    reply.send("Latitude and Longitude have been updated.");
 });
 
 fastify.post<{ Body: SetHeatBody }>("/set_heat", {schema: { body: setHeatSchema } }, async (request, reply) => {

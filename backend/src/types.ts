@@ -76,8 +76,6 @@ export const demoSetPointDefaults: SetPointDefaults = {
 }
 
 export type WeatherData = {
-    latitude: number,
-    longitude: number,
     gridId: string | null,
     observationStationsURL: string | null,
     lastCheckTime: Date | null,
@@ -91,8 +89,6 @@ export type WeatherData = {
 }
 
 export const initWeatherData: WeatherData = {
-    latitude: 0,
-    longitude: 0,
     gridId: null,
     observationStationsURL: null,
     lastCheckTime: null,
