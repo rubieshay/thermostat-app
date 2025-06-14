@@ -6,7 +6,7 @@ import Dial from "./dial";
 import Tiles from "./tiles";
 import Error from "./error";
 import ModalDrawer from "./modal_drawer";
-import Websockets from "./websockets";
+import { useSocketMessages } from "./websocket_messages";
 import { ModalDrawerType } from "./types";
 import { dataRefreshTime, drawerTimeoutDuration, usePageVisibilityRefresh } from "./utils";
 
@@ -14,6 +14,7 @@ export function AppContainer() {
     const { initialLoadComplete, okToStartRefreshTimer, stopRefreshTimer, startRefreshTimer, fetchTempData } = useContext(TempDataContext);
     const [modalDrawerType, setModalDrawerType] = useState<ModalDrawerType | null>(null);
     const fadeDrawerTimer = useRef<number | null>(null);
+    useSocketMessages()
 
     const handleResetModal = useCallback((startTimer: boolean) => {
         if (fadeDrawerTimer.current) {
@@ -41,7 +42,6 @@ export function AppContainer() {
             {initialLoadComplete ?
                 <>
                     <main>
-                        <Websockets/>
                         <Title/>
                         <Dial/>
                         <Tiles setModalDrawerType={setModalDrawerType}/>

@@ -9,9 +9,13 @@ function removeProtocol(url: string) {
   return url.replace(/^https?:\/\//, '');
 }
 
-const wsURL = "ws://" + removeProtocol(defaultAPIURL) + "/ws";
+function getWebsocketProtocol(url: string) {
+  return url.startsWith('https') ? 'wss' : 'ws';
+}
 
-export default function Websockets() {
+const wsURL = getWebsocketProtocol(defaultAPIURL) + "://" + removeProtocol(defaultAPIURL) + "/ws";
+
+export function useSocketMessages() {
     const {updateAllTempData} = useContext(TempDataContext);
 
     const { readyState } = useWebSocket(wsURL, {
@@ -46,7 +50,5 @@ export default function Websockets() {
   });
 
   console.log("Is WebSocket connected:", readyState)
-
-  return (<></>)
 
 }
