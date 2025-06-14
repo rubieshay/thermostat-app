@@ -36,7 +36,7 @@ export const tempModeOptions = [{"tempMode": TempMode.heat, "IdText": "heat",
 export const ecoModeOptions = [{"ecoMode": EcoMode.on, "IdText": "on",
                                 "dispText": "On", "symbolText": "nest_eco_leaf"},
                                {"ecoMode": EcoMode.off, "IdText": "off",
-                                "dispText": "Off", "symbolText": "thermostat"}]
+                                "dispText": "Off", "symbolText": "mode_off_on"}]
 export const fanTimerOptions = [{"duration": 900, "dispText": "15 min"},
                                 {"duration": 1800, "dispText": "30 min"},
                                 {"duration": 2700, "dispText": "45 min"},
@@ -45,6 +45,10 @@ export const fanTimerOptions = [{"duration": 900, "dispText": "15 min"},
                                 {"duration": 14400, "dispText": "4 hr"},
                                 {"duration": 28800, "dispText": "8 hr"},
                                 {"duration": 43200, "dispText": "12 hr"}]
+
+export const humidityRanges = [{"rangeEnd": 0, "symbolText": "humidity_low"},
+                                {"rangeEnd": 40, "symbolText": "humidity_mid"},
+                                {"rangeEnd": 60, "symbolText": "humidity_high"}]
 
 export function convertTemp(tempVal: number | null, inputUnits: TempUnits, outputUnits: TempUnits): number | null {
     if (tempVal === null){
@@ -140,6 +144,21 @@ export function isFanOn(fanTimer: string | null, hvacStatus: HvacStatus) {
             return true;
         }
     }
+}
+
+export function getHumidityIcon(humidityPercent: number | null): string {
+    let humiditySymbolText = humidityRanges[0].symbolText;
+    if (humidityPercent === null) {
+        return humiditySymbolText;
+    }
+    for (let i = 0; i < humidityRanges.length; i++) {
+        if (humidityPercent < humidityRanges[i].rangeEnd) {
+            return humiditySymbolText;
+        } else {
+            humiditySymbolText = humidityRanges[i].symbolText;
+        }
+    }
+    return humiditySymbolText;
 }
 
 export type ChildrenProviderProps = {

@@ -28,7 +28,7 @@ function Error() {
         <dialog id="error-dialog" ref={errorDialogRef} className="modal-popup">
             <h2>Error Occurred:</h2>
             <p>{errorText}</p>
-            <button onClick={handleCloseModal}>Close</button>
+            <button onClick={handleCloseModal} className="modal-close-button">Close</button>
         </dialog>
     );
 }

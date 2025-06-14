@@ -354,7 +354,3 @@ button, #main-numbers * {
 #dial .hvac-icon {
     bottom: calc(0.22*var(--dial-size));
 }
-/* also used in tiles */
-.hvac-icon.hvac-on {
-    animation: spin 4s linear infinite normal forwards;
-}

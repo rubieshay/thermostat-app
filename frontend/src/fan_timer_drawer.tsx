@@ -57,7 +57,7 @@ const FanTimerDrawer: React.FC<ModalDrawerProps> = ({ handleCloseModal }) => {
                 </li>
                 {fanTimerOptions.map((option) => (
                     <li key={option.duration}>
-                        <button onClick={() => changeFanTimer(FanTimerMode.on, option.duration)}>
+                        <button className="icon-text-group" onClick={() => changeFanTimer(FanTimerMode.on, option.duration)}>
                             {option.dispText}
                         </button>
                     </li>

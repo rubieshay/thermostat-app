@@ -4,8 +4,7 @@ import "./styles/style.css";
 import "./styles/dial.css";
 import "./styles/tiles.css";
 import "./styles/loading.css";
-import "./styles/modal_popup.css";
-import "./styles/modal_drawer.css";
+import "./styles/modals.css";
 import App from "./app";
 
 createRoot(document.getElementById("root")!).render(

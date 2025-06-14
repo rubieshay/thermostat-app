@@ -83,7 +83,7 @@
     background: var(--main-bg);
     color: var(--main-text);
 
-    --dial-size: max(min(100vh - 20.875rem, 92vw, 32rem), min(20rem, 92vw));
+    --dial-size: max(min(100vh - 29.5rem, 92vw, 32rem), min(20rem, 92vw));
 
     font-family: "Outfit", system-ui, sans-serif;
     font-variation-settings: "wght" 400;
@@ -135,3 +135,42 @@ button {
     outline-offset: 3px;
     border-radius: 8px;
 }
+
+/* Icons with text labels */
+.icon-text-group {
+    display: flex;
+    gap: 0.5rem;
+}
+.icon-text-group span {
+    display: block;
+    line-height: 1.5;
+}
+.icon-text-group span.material-symbols {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+/* custom and rotating fan icons */
+.hvac-icon {
+    position: relative;
+}
+.hvac-icon.hvac-on {
+    animation: spin 4s linear infinite normal forwards;
+}
+/* #dial .hvac-off {
+    rotate: 15deg;
+}
+#dial .hvac-off::after {
+    display: block;
+    content: "horizontal_rule";
+    position: absolute;
+    color: inherit;
+    width: 100%;
+    aspect-ratio: 1;
+    font-size: 1em;
+    rotate: 30deg;
+    scale: 1.75;
+    font-variation-settings: "wght" 300;
+    top: 0;
+    left: 0;
+} */
