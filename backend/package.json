@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --watch src src/index.ts",
+    "dev": "nodemon --env-file=.env",
     "build": "tsc -p tsconfig.json"
   },
   "keywords": [],
@@ -13,7 +13,6 @@
   "dependencies": {
     "@fastify/websocket": "^11.1.0",
     "@google-cloud/pubsub": "^5.1.0",
-    "dotenv": "^16.5.0",
     "fastify": "^5.3.3"
   },
   "devDependencies": {

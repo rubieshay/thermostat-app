@@ -1,5 +1,6 @@
-{ 
-    "execMap": {
-        "ts": "ts-node"
-    }
+{
+  "watch": ["src"],
+  "ext": "ts,json",
+  "ignore": ["src/**/*.spec.ts"],
+  "exec": "node --env-file=.env -r ts-node/register src/index.ts"
 }

@@ -1,10 +1,9 @@
-import { googleTopicId, environment, demoMode, googlePubSubProjectId, sharedMutex } from "./index";
+import { googleTopicId, subscriptionId, demoMode, googlePubSubProjectId, sharedMutex } from "./index";
 import { Message, PubSub, StatusError, Subscription } from "@google-cloud/pubsub";
 import { checkAndGetDeviceInfo, getDeviceInfo, tempDataInfo, updateTempDataInfoFull } from "./googlesdm";
 import { TempMessageType, TempMode, TempMessage } from "./types";
 import { fastify } from "./index";
 
-const subscriptionId = "thermostat-sub-id-" + environment;
 let pubSub : PubSub 
 let thermoSub : Subscription
 
@@ -54,7 +53,7 @@ export async function removeSubscription() {
         return;
     }
     console.log("Subscription " + subscriptionId + " removed from pub/sub");
-    pubSub.subscription(subscriptionId).delete();
+    await pubSub.subscription(subscriptionId).delete();
 }
 
 const thermostatEventHandler = async (message: Message) => {

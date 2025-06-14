@@ -4,7 +4,6 @@ import { FetchReturn, TempMessageType, WeatherData, initWeatherData, TempMessage
 import { infoQuerySchema, InfoQueryString, latLongQuerySchema, latLongQueryString, setHeatSchema, SetHeatBody, 
         setCoolSchema, SetCoolBody, setRangeSchema, SetRangeBody, setTempModeSchema,
         SetTempModeBody, setEcoModeSchema, SetEcoModeBody, setFanTimerSchema, SetFanTimerBody} from "./schemas";
-import "dotenv/config";
 import { checkAndGetDeviceInfo, setHeat, setCool, setRange, setTempMode, setEcoMode, setFanTimer} from "./googlesdm";
 import { getCurrentObservation } from "./weather";
 import {tempDataInfo} from "./googlesdm";
@@ -16,12 +15,15 @@ export const googleClientSecret = process.env.CLIENT_SECRET || "";
 export const googleProjectId = process.env.PROJECT_ID || "";
 export const googleRefreshToken = process.env.REFRESH_TOKEN || "";
 export const googleTopicId = process.env.TOPIC_ID || "thermostat-topic-id";
-export const googlePubSubProjectId = process.env.PUBSUB_PROJECT_ID;
+export const googlePubSubProjectId = process.env.PUBSUB_PROJECT_ID || "";
 export const demoMode = ( process.env.DEMO_MODE?.toUpperCase() === "1" || process.env.DEMO_MODE?.toUpperCase() === "YES" || 
     process.env.DEMO_MODE?.toUpperCase() === "TRUE" ? true : false );
 export const environment = process.env.ENVIRONMENT || "prod";
+export const subscriptionId = "thermostat-sub-id-" + environment;
 
 const httpPort = Number(process.env.PORT) || 3000;
+
+console.log("Environment is:", {googleClientId, googleClientSecret, googleProjectId, googleRefreshToken, googleTopicId, googlePubSubProjectId, demoMode, environment})
 
 export let weatherData: WeatherData = structuredClone(initWeatherData);
 
@@ -173,7 +175,12 @@ process.on('SIGINT', async () => {
      process.exit(0); // Exit with success code 0
    });
 
+process.on('SIGTERM', async () => {
+     console.log('Received SIGTERM. Cleaning up...');
+     await cleanUp();
+     process.exit(0); // Exit with success code 0
+   });
+
 process.on('exit', async (code) => {
   console.log(`About to exit with code: ${code}`);
-  await cleanUp; 
 });
