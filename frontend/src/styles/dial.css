@@ -1,0 +1,357 @@
+/* PROPERTIES */
+@property --start-range {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0turn;
+}
+@property --end-range {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0turn;
+}
+@property --thumb-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0turn;
+}
+@property --cap-active-start-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0turn;
+}
+@property --cap-active-end-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0turn;
+}
+@property --dial-bg {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #00000000;
+}
+@property --cap-bg {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #00000000;
+}
+@property --track-bg {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #00000000;
+}
+@property --track-range-bg {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #00000000;
+}
+@property --button-bg {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #00000000;
+}
+
+
+
+/* ANIMATIONS */
+@keyframes spin {
+    0% {
+        rotate: 0deg;
+    }
+    100% {
+        rotate: 360deg;
+    }
+}
+
+
+
+/* MAIN DIAL AND COVER */
+#dial {
+    --spin-time: 400ms;
+    --dial-bg: var(--color-gray-5);
+    display: grid;
+    place-items: center;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr;
+    width: var(--dial-size);
+    height: var(--dial-size);
+    border-radius: 50%;
+    background: var(--dial-bg);
+    position: relative;
+    transition: background-color var(--spin-time) ease-in-out;
+}
+#dial.hvac-status-cooling {
+    --dial-bg: var(--color-cool-5);
+}
+#dial.hvac-status-heating  {
+    --dial-bg: var(--color-heat-5);
+}
+#dial > * {
+    position: absolute;
+    grid-row: 1;
+    grid-column: 1;
+    z-index: 10;
+}
+
+
+/* CENTER MAIN NUMBERS */
+#main-numbers {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: calc(0.05*var(--dial-size));
+    position: relative;
+    top: calc(-0.06*var(--dial-size));
+}
+.main-number-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+#main-numbers-setpoints {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(0.075*var(--dial-size));
+}
+#main-numbers h2, #main-numbers h3 {
+    text-align: center;
+    transition: font-variation-settings 400ms ease-in-out, color 400ms ease-in-out;
+}
+#main-numbers h2 {
+    font-size: calc(0.05*var(--dial-size));
+    font-variation-settings: "wght" 100;
+}
+#main-numbers h3 {
+    font-size: calc(0.125*var(--dial-size));
+    font-variation-settings: "wght" 300;
+}
+#main-numbers #main-numbers-ambient h3 {
+    font-size: calc(0.2*var(--dial-size));
+}
+#main-numbers-heatpoint.setpoint-number-active {
+    color: var(--color-heat-1);
+}
+#main-numbers-coolpoint.setpoint-number-active {
+    color: var(--color-cool-1);
+}
+#main-numbers .setpoint-number-active h2 {
+    font-variation-settings: "wght" 400;
+}
+#main-numbers .setpoint-number-active h3 {
+    font-variation-settings: "wght" 600;
+}
+
+h2#offline-message {
+    font-size: calc(0.1*var(--dial-size));
+}
+button, #main-numbers * {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+
+
+/* DIAL TRACK AND RANGES */
+#dial .dial-track {
+    --start-dial: calc(-1*var(--used-dial-ratio)/2);
+    --start-range: calc(var(--start-thumb) - var(--start-dial));
+    --end-range: calc(var(--end-thumb) - var(--start-dial));
+    --track-bg: var(--color-gray-4);
+    --track-range-bg: var(--color-gray-3);
+    width: calc(0.84*var(--dial-size));
+    height: calc(0.84*var(--dial-size));
+    border-radius: 50%;
+    margin: calc(0.08*var(--dial-size));
+    position: relative;
+    background: conic-gradient(from var(--start-dial), transparent var(--start-range), var(--track-range-bg)
+                var(--start-range), var(--track-range-bg) var(--end-range), transparent var(--end-range)),
+                conic-gradient(from var(--start-dial), var(--track-bg) var(--used-dial-ratio),
+                transparent var(--used-dial-ratio));
+    transition: --start-range var(--spin-time) ease-in-out,
+                --end-range var(--spin-time) ease-in-out,
+                --track-bg var(--spin-time) ease-in-out,
+                --track-range-bg var(--spin-time) ease-in-out;
+    z-index: 2;
+}
+#dial.hvac-status-cooling .dial-track {
+    --track-bg: var(--color-cool-4);
+    --track-range-bg: var(--color-cool-3);
+}
+#dial.hvac-status-heating .dial-track {
+    --track-bg: var(--color-heat-4);
+    --track-range-bg: var(--color-heat-3);
+}
+#dial .track-cover {
+    display: block;
+    background: var(--dial-bg);
+    width: calc(0.78*var(--dial-size));
+    height: calc(0.78*var(--dial-size));
+    margin: calc(0.03*var(--dial-size));
+    border-radius: 50%;
+    transition: background-color var(--spin-time) ease-in-out;
+    z-index: 7;
+}
+#dial .track-cap {
+    /* angle arm */
+    width: calc(0.03*var(--dial-size));
+    height: calc(0.81*var(--dial-size));
+}
+#dial .track-cap-active-start {
+    rotate: var(--cap-active-start-angle);
+    transition: --cap-active-start-angle var(--spin-time) ease-in-out;
+}
+#dial .track-cap-active-end {
+    rotate: var(--cap-active-end-angle);
+    transition: --cap-active-end-angle var(--spin-time) ease-in-out;
+}
+#dial .track-cap-active {
+    z-index: 4;
+}
+#dial .track-cap-outer {
+    rotate: var(--cap-angle);
+    z-index: 3;
+}
+#dial .track-cap::before {
+    /* displayed cap */
+    content: "";
+    display: block;
+    width: calc(0.03*var(--dial-size));
+    height: calc(0.03*var(--dial-size));
+    border-radius: 50%;
+    background: var(--cap-bg);
+    position: absolute;
+    top: 0;
+    transform: translateY(-50%);
+    transition: background-color var(--spin-time) ease-in-out;
+}
+#dial .track-cap-active::before {
+    --cap-bg: var(--color-gray-3);
+}
+#dial .track-cap-outer::before, #dial .track-cap-active-off::before {
+    --cap-bg: var(--color-gray-4);
+}
+#dial.hvac-status-cooling .track-cap-active::before {
+    --cap-bg: var(--color-cool-3);
+}
+#dial.hvac-status-cooling .track-cap-outer::before, #dial.hvac-status-cooling .track-cap-active-off::before {
+    --cap-bg: var(--color-cool-4);
+}
+#dial.hvac-status-heating .track-cap-active::before {
+    --cap-bg: var(--color-heat-3);
+}
+#dial.hvac-status-heating .track-cap-outer::before, #dial.hvac-status-heating .track-cap-active-off::before {
+    --cap-bg: var(--color-heat-4);
+}
+
+
+
+.dial-thumb-container {
+    /* thumb arm */
+    width: calc(0.03*var(--dial-size));
+    height: calc(0.81*var(--dial-size));
+    rotate: var(--thumb-angle);
+    transition: --thumb-angle var(--spin-time) ease-in-out;
+    z-index: 5;
+    position: relative;
+    touch-action: none;
+}
+.dial-thumb {
+    /* clickable area for thumb */
+    display: block;
+    width: calc(0.1*var(--dial-size));
+    height: calc(0.1*var(--dial-size));
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.setpoint-thumb {
+    cursor: pointer;
+}
+.dial-thumb::after {
+    /* displayed thumb */
+    content: "";
+    display: block;
+    width: calc(0.03*var(--dial-size));
+    height: calc(0.03*var(--dial-size));
+    border-radius: 50%;
+    background: var(--color-gray-1);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}
+.setpoint-thumb::after {
+    transition: width 200ms ease-in-out, height 200ms ease-in-out;
+}
+.setpoint-thumb-active::after {
+    width: calc(0.045*var(--dial-size));
+    height: calc(0.045*var(--dial-size));
+}
+#ambient-thumb-container .dial-thumb::after {
+    z-index: 6;
+}
+#coolpoint-thumb-container .dial-thumb::after {
+    background: var(--color-cool-1);
+}
+#heatpoint-thumb-container .dial-thumb::after {
+    background: var(--color-heat-1);
+}
+
+
+
+/* BOTTOM BUTTONS/STATUS */
+.dial-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: calc(0.02*var(--dial-size));
+    margin-inline: auto;
+    position: relative;
+    bottom: calc(0.06*var(--dial-size));
+}
+.dial-buttons button {
+    --button-bg: var(--color-gray-5);
+    text-align: center;
+    width: calc(0.12*var(--dial-size));
+    height: calc(0.12*var(--dial-size));
+    border-radius: calc(0.03*var(--dial-size));
+    cursor: pointer;
+    background: var(--button-bg);
+    transition: background-color var(--spin-time) ease-in-out, color var(--spin-time) ease-in-out;
+    touch-action: none;
+}
+.dial-buttons button, #dial .mode-icon, #dial .hvac-icon {
+    font-size: calc(0.06*var(--dial-size));
+    font-variation-settings: "FILL" 0,
+                             "wght" 500,
+                             "GRAD" 0,
+                             "opsz" 24;
+}
+#dial.hvac-status-cooling .dial-buttons button {
+    --button-bg: var(--color-cool-5);
+}
+#dial.hvac-status-heating .dial-buttons button {
+    --button-bg: var(--color-heat-5);
+}
+.dial-buttons button:focus-visible, .dial-buttons button:hover {
+    --button-bg: var(--color-gray-3);
+    color: var(--color-gray-0);
+}
+#dial.hvac-status-cooling .dial-buttons button:focus-visible, #dial.hvac-status-cooling .dial-buttons button:hover {
+    --button-bg: var(--color-cool-3);
+}
+#dial.hvac-status-heating .dial-buttons button:focus-visible, #dial.hvac-status-heating .dial-buttons button:hover {
+    --button-bg: var(--color-heat-3);
+}
+#dial .mode-icon {
+    bottom: calc(0.08*var(--dial-size));
+}
+#dial .hvac-icon {
+    bottom: calc(0.22*var(--dial-size));
+}

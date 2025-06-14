@@ -1,0 +1,127 @@
+name: Android Release Build
+
+on:
+   workflow_dispatch:
+   push:
+     branches:
+      - main
+     paths:
+      - 'frontend/**'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: 'frontend/package-lock.json'
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Set Version from package.json
+      run: |
+        VERSION=$(jq -r '.version' frontend/package.json)
+        # Convert version to version code (remove dots, pad if needed)
+        MAJOR_V=$(echo "$VERSION" | awk -F'.' '{print $1}')
+        MINOR_V=$(echo "$VERSION" | awk -F'.' '{print $2}')
+        PATCH_V=$(echo "$VERSION" | awk -F'.' '{print $3}')
+        VERSION_CODE=$(printf "%03d%03d%03d\n" "$MAJOR_V" "$MINOR_V" "$PATCH_V")
+        
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
+        
+        # Update Android build.gradle
+        sed -i "s/versionCode [0-9]*/versionCode $VERSION_CODE/" frontend/android/app/build.gradle
+        sed -i "s/versionName \".*\"/versionName \"$VERSION\"/" frontend/android/app/build.gradle
+
+    - name: Create env file
+      run: |
+        echo "DEFAULT_API_URL=${{ secrets.DEFAULT_API_URL }}" > frontend/.env
+        echo "DEMO_MODE=0" >> frontend/.env
+        echo "DATA_REFRESH_ENABLED=1" >> frontend/.env
+        
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: npm ci
+
+    - name: Build React app
+      working-directory: ./frontend
+      run: npm run build
+
+    - name: Sync Capacitor
+      working-directory: ./frontend
+      run: npx cap sync android
+
+    - name: Decode Keystore
+      run: |
+        echo "${{ secrets.UPLOAD_KEYSTORE_BASE64 }}" | base64 -d > frontend/android/app/upload-keystore.jks
+
+    - name: Create gradle.properties
+      run: |
+        cat > frontend/android/gradle.properties << EOF
+        android.useAndroidX=true
+        android.enableJetifier=true
+        UPLOAD_STORE_FILE=upload-keystore.jks
+        UPLOAD_KEY_ALIAS=upload
+        UPLOAD_STORE_PASSWORD=${{ secrets.UPLOAD_STORE_PASSWORD }}
+        UPLOAD_KEY_PASSWORD=${{ secrets.UPLOAD_KEY_PASSWORD }}
+        EOF
+
+    - name: Build AAB
+      run: |
+        cd frontend/android
+        ./gradlew bundleRelease
+
+    - name: Build APK
+      run: |
+        cd frontend/android
+        ./gradlew assembleRelease
+    
+    - name: Copy for Artifact Upload
+      run: |
+        mkdir -p /tmp/upload
+        cp frontend/android/app/build/outputs/bundle/release/app-release.aab /tmp/upload/app-release.aab
+        cp frontend/android/app/build/outputs/apk/release/gthermostat.apk /tmp/upload/gthermostat.apk
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-artifacts
+        path: |
+          /tmp/upload/app-release.aab
+          /tmp/upload/gthermostat.apk
+
+    - name: Upload to Play Console (Internal Testing)
+      if: github.ref == 'refs/heads/main'
+      uses: r0adkll/upload-google-play@v1
+      with:
+        serviceAccountJsonPlainText: ${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_JSON }}
+        packageName: net.shaytech.gthermostat
+        releaseFiles: frontend/android/app/build/outputs/bundle/release/app-release.aab
+        mappingFile: frontend/android/app/build/outputs/mapping/release/mapping.txt
+        track: internal
+        status: draft
+        inAppUpdatePriority: 2
+
+    # - name: Create GitHub Release
+    #   if: startsWith(github.ref, 'refs/tags/v')
+    #   uses: softprops/action-gh-release@v1
+    #   with:
+    #     files: |
+    #       android/app/build/outputs/bundle/release/app-release.aab
+    #       android/app/build/outputs/apk/release/app-release.apk
+    #     generate_release_notes: true

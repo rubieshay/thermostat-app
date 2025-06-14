@@ -1,0 +1,9 @@
+android.useAndroidX=true
+android.enableJetifier=true
+android.bundle.enableUncompressedNativeLibs=false
+
+# Signing Config
+UPLOAD_STORE_FILE=upload-keystore.jks
+UPLOAD_KEY_ALIAS=upload
+UPLOAD_STORE_PASSWORD=PLACEHOLDER_STORE_PASSWORD
+UPLOAD_KEY_PASSWORD=PLACEHOLDER_KEY_PASSWORD

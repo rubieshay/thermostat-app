@@ -1,0 +1,45 @@
+{
+  "name": "thermostat-app",
+  "private": true,
+  "version": "0.2.6",
+  "type": "module",
+  "scripts": {
+    "predev": "bin/updateenv.sh",
+    "realdev": "vite",
+    "dev": "bash -c 'while true; do npm run realdev; echo \"Restarting in 1 second...\"; sleep 1; done'",
+    "prebuild": "bin/updateenv.sh",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "watchlint": "tsc --noEmit --watch",
+    "android:build": "npm run build && npx cap sync android && cd android && ./gradlew assembleRelease",
+    "android:bundle": "npm run build && npx cap sync android && cd android && ./gradlew bundleRelease",
+    "android:clean": "cd android && ./gradlew clean",
+    "version:sync": "cap-set-version"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.3.0",
+    "@capacitor/core": "^7.3.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-use-websocket": "^4.13.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^7.3.0",
+    "@eslint/js": "^9.25.0",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.4.1",
+    "capacitor-set-version": "^2.2.0",
+    "eslint": "^9.25.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "json-schema-to-ts": "^3.1.1",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.30.1",
+    "vite": "^6.3.5",
+    "vite-plugin-checker": "^0.9.3"
+  }
+}
