@@ -42,7 +42,7 @@ const FanTimerDrawer: React.FC<ModalDrawerProps> = ({ handleCloseModal }) => {
     return (
         <div className="drawer-content">
             <h2>Fan</h2>
-            <div className="current-tile-selection">
+            <div className="icon-text-group">
                 {fanIsActive ?
                     <span className="material-symbols material-symbols-rounded hvac-icon hvac-on">mode_fan</span>
                     :
