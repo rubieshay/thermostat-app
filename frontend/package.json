@@ -1,7 +1,7 @@
 {
   "name": "thermostat-app",
   "private": true,
-  "version": "0.2.2",
+  "version": "0.2.3",
   "type": "module",
   "scripts": {
     "predev": "bin/updateenv.sh",
@@ -24,6 +24,7 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^7.3.0",
     "@eslint/js": "^9.25.0",
     "@types/react": "^19.1.2",
