@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext, useRef, useCallback } from "react";
 import { TempUnits, TempMode, EcoMode, HvacStatus, Connectivity, SetPointType } from "./types";
 import { roundedTemp, convertTemp, maxDialTemps, minDialTemps, usedDialRatio, decimalPrecision, minRangeGap, makeTempInRange, setPointFadeDuration, isFanOn } from "./utils";
-import { TempDataContext } from "./temp_context";
+import { TempDataContext } from "./temp_data_context";
 
 function Dial() {
     const {selectedTempData: tempData, debounceTempData, setHeatCelsius, setCoolCelsius, setRangeCelsius} = useContext(TempDataContext);

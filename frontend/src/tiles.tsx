@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect, type SetStateAction } from "react";
 import { Connectivity, ModalDrawerType, TempUnits } from "./types";
-import { TempDataContext } from "./temp_context";
-import { getFanTimerString, isFanOn, tempModeOptions, ecoModeOptions, fanTimerDisplayUpdateInterval, getHumidityIcon, convertTemp } from "./utils";
+import { TempDataContext } from "./temp_data_context";
+import { getFanTimerString, isFanOn, tempModeOptions, ecoModeOptions, fanTimerDisplayUpdateInterval, getHumidityIcon, convertTemp, roundedTemp } from "./utils";
 
 interface TileProps {
     setModalDrawerType: React.Dispatch<SetStateAction<ModalDrawerType | null>>
@@ -12,7 +12,7 @@ const Tiles: React.FC<TileProps> = ({ setModalDrawerType }) => {
     const [fanTimerString, setFanTimerString] = useState<string>("");
     const fanIsActive: boolean = isFanOn(tempData.fanTimer, tempData.hvacStatus);
 
-    const ambientIndoorTempString = convertTemp(tempData.ambientTempCelsius, TempUnits.celsius, tempData.tempUnits) ? convertTemp(tempData.ambientTempCelsius, TempUnits.celsius, tempData.tempUnits)!.toString() + "\u00B0" : "not found";
+    const ambientIndoorTempString = roundedTemp(convertTemp(tempData.ambientTempCelsius, TempUnits.celsius, tempData.tempUnits), tempData.tempUnits) ? roundedTemp(convertTemp(tempData.ambientTempCelsius, TempUnits.celsius, tempData.tempUnits), tempData.tempUnits)!.toString() + "\u00B0" : "not found";
     const ambientIndoorHumidityString = tempData.ambientHumidity ? Math.round(tempData.ambientHumidity).toString() + "%" : "not found";
 
     // this should maybe use the same data as the modal timer
