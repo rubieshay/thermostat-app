@@ -1,4 +1,3 @@
-
 export function AppLoading() {
     return (
         <main id="loading-container">

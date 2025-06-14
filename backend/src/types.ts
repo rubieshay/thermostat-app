@@ -61,7 +61,7 @@ export const demoTempDataArray: TempData[] = [
         fanTimer: null,
         connectivity: Connectivity.online,
         deviceName: "My Demo Thermostat",
-        ambientHumidity: 50
+        ambientHumidity: 52
     }
 ];
 
@@ -91,8 +91,8 @@ export type WeatherData = {
 }
 
 export const initWeatherData: WeatherData = {
-    latitude: 41.098946,
-    longitude: -81.644569,
+    latitude: 0,
+    longitude: 0,
     gridId: null,
     observationStationsURL: null,
     lastCheckTime: null,

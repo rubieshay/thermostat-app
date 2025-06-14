@@ -324,6 +324,7 @@ button, #main-numbers * {
     cursor: pointer;
     background: var(--button-bg);
     transition: background-color var(--spin-time) ease-in-out, color var(--spin-time) ease-in-out;
+    touch-action: none;
 }
 .dial-buttons button, #dial .mode-icon, #dial .hvac-icon {
     font-size: calc(0.06*var(--dial-size));
@@ -353,8 +354,4 @@ button, #main-numbers * {
 }
 #dial .hvac-icon {
     bottom: calc(0.22*var(--dial-size));
-}
-/* also used in tiles */
-.hvac-icon.hvac-on {
-    animation: spin 4s linear infinite normal forwards;
 }

@@ -28,7 +28,7 @@ const EcoModeDrawer: React.FC<ModalDrawerProps> = ({ handleCloseModal }) => {
             <ul className="radio-select">
                 {ecoModeOptions.map((option) => (
                     <li key={option.ecoMode} id={"eco-mode-select-" + option.IdText} className={dispEcoMode === option.ecoMode ? "radio-selected" : ""}>
-                        <button onClick={() => changeEcoMode(option.ecoMode)}>
+                        <button className="icon-text-group" onClick={() => changeEcoMode(option.ecoMode)}>
                             <span className="material-symbols material-symbols-rounded">
                                 {option.symbolText}
                             </span>

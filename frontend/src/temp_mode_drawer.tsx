@@ -28,7 +28,7 @@ const TempModeDrawer: React.FC<ModalDrawerProps> = ({ handleCloseModal }) => {
             <ul className="radio-select">
                 {tempModeOptions.map((option) => (
                     <li key={option.tempMode} id={"temp-mode-select-" + option.IdText} className={dispTempMode === option.tempMode ? "radio-selected" : ""}>
-                        <button onClick={() => changeTempMode(option.tempMode)}>
+                        <button className="icon-text-group" onClick={() => changeTempMode(option.tempMode)}>
                             <span className="material-symbols material-symbols-rounded">
                                 {option.symbolText}
                             </span>
