@@ -10,7 +10,6 @@ function Error() {
         if (lastAPIError.errorSeq === 0) {
             return;
         }
-        console.log("Error Sequence incremented... lastAPIError:", structuredClone(lastAPIError));
         const newErrorText = String(lastAPIError.fetchReturn.error);
         setErrorText(newErrorText);
         if (!lastAPIError.lastErrorWasFetch) {

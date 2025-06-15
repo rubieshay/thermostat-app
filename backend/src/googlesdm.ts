@@ -63,7 +63,7 @@ export async function getAccessToken() : Promise<FetchReturn> {
         accessToken = data.access_token; // Assuming the response contains an access token
         accessTokenExpireSeconds = data.expires_in; // Assuming the response contains an expiration time in seconds
         accessTokenExpirationTime = (new Date(new Date().getTime() + 1000*(accessTokenExpireSeconds - TokenExpireBufferSeconds)))
-        console.log("New Access Token retrieved, Expiration Date with buffer:" + accessTokenExpirationTime);
+        console.debug("New Access Token retrieved, Expiration Date with buffer:" + accessTokenExpirationTime);
     } catch (error) {
         // Handle network errors or errors thrown by the if statement above
         if (error instanceof Error) {
@@ -83,18 +83,17 @@ export async function checkAndGetDeviceInfo(forceFlush: boolean) : Promise<Fetch
     if (forceFlush || dataCacheExpirationTime === null) {
         let fetchReturn = await getExclusiveDeviceInfo();
         updateCachedData();
-        console.log("Set initial cached Data or forced flush of data-- not previously set");
+        console.debug("Set initial cached Data or forced flush of data-- not previously set");
         return fetchReturn;
     }
     // check if cached version is recent enough;
     if ((new Date()) > dataCacheExpirationTime) {
         let fetchReturn = await getExclusiveDeviceInfo();
         updateCachedData();
-        console.log("Cached data not recent enough - refreshing");
+        console.debug("Cached data not recent enough - refreshing");
         return fetchReturn
     } else {
         let fetchReturn: FetchReturn = {success: true, httpCode: 302}
-        console.log("Using cached data");
         return fetchReturn;
     }
 }
@@ -219,7 +218,6 @@ export async function getDeviceInfo() : Promise<FetchReturn> {
             }
             tempDataInfo.push(currTempData);
         });
-        console.log("Retrieved data from google API backend:", JSON.stringify(tempDataInfo));
         fetchReturn.success = true;
         fetchReturn.data = data;
     } catch (error) {
@@ -320,5 +318,4 @@ export async function setFanTimer(deviceID: string, timerMode: FanTimerMode, dur
 
 export function updateTempDataInfoFull(tempData: TempData[]) {
     tempDataInfo = structuredClone(tempData);
-    console.log("Updating tempdataInfo with full data. New array is: ", JSON.stringify(tempDataInfo,null,3));
 }

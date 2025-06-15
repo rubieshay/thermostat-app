@@ -66,24 +66,12 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
 
     // GETTING/RESETTING TEMP DATA
 
-    useEffect(() => {
-        console.log("Initial Load Complete changed to:", initialLoadComplete);
-    }, [initialLoadComplete]);
-
-    useEffect(() => {
-        console.log("Temp Data Array changed...:", structuredClone(tempDataArray));
-    }, [tempDataArray]);
-
-
     const fetchTempData = useCallback (async (forceFlush: boolean) => {
-        console.log("IN FETCHING");
         const fetchError: LastAPIError = structuredClone(initLastAPIError);
         if (isFetching.current) {
-            console.log("Fetch already in progress. Ignoring");
             return fetchError.fetchReturn;
         }
         if (demoMode && initialFetchSuccess.current) {
-            console.log("In Demo mode, already did initial population. Ignoring.");
             fetchError.fetchReturn.success = true;
             return fetchError.fetchReturn;
         }
@@ -135,7 +123,6 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                 setLastAPIError(fetchError)
                 console.error("Invalid temp data format:", data);
             }
-            console.log("DATA:", data);
         } catch (error) {
             console.error("Error fetching temp data info:", error);
             fetchError.fetchReturn.error = "Other error fetching temp data info";
@@ -147,7 +134,6 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
 
     useEffect(() => {
         if (hasFetchedInitial.current) {
-            console.log("Initial fetch has already occured. Skipping new request");
             return;
         }
         const fetchData = async () => {
@@ -159,12 +145,12 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                 if (fetchReturn.success) {
                     initialFetchSuccess.current = true;
                     setInitialLoadComplete(true);
-                    console.log("Initial load completed successfully");
+                    console.debug("Initial load completed successfully");
                 } else {
-                    console.log("Initial fetch failed on retry count:", retryCount, "pausing 15s");
+                    console.error("Initial fetch failed on retry count:", retryCount, "pausing 15s");
                     retryCount++;
                     await sleep(dataRefreshTime);
-                    console.log("Pause finished, doing next retry");
+                    console.error("Pause finished, doing next retry");
                 }
             }
             if (initialFetchSuccess.current) {
@@ -176,7 +162,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                 apiError.fetchReturn.success = false;
                 apiError.fetchReturn.error = "Initial fetch failed:" + fetchReturn.error;
                 setLastAPIError(apiError);
-                console.log("Initial fetch not successful after 10 retries");
+                console.error("Initial fetch not successful after 10 retries");
             }
 
         }
@@ -216,11 +202,11 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
     // REFRESH TIMER
     
     const startRefreshTimer = useCallback(()=> {
-        console.log("Starting refresh timer...")
+//        console.log("Starting refresh timer...")
     }, []);
 
     const stopRefreshTimer = useCallback(()=> {
-        console.log("Stopping refresh timer...")
+//        console.log("Stopping refresh timer...")
     }, []);
 
     // ERROR DISPLAY
@@ -364,7 +350,6 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
     }, [selectedDeviceID, makeBackendAPICall]);
 
     function updateAllTempData(newTempDataArray: TempDataArray) {
-        console.log("called Update All Tempdata with data to update: ",newTempDataArray)
         setTempDataArray(structuredClone(newTempDataArray));
     }
 

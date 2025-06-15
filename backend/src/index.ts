@@ -39,14 +39,14 @@ fastify.register( async function (fastify) {
     fastify.get("/ws", { websocket: true,},
         (socket, req) => {
             // TODO : initial connect action -- start regular thermostat polling
-            console.log("Initial WS Connect");
+            console.debug("Initial WS Connect");
             let statusMessage: TempMessage = { type: TempMessageType.statusUpdate, data: { message: "Connected to Fastify WebSocket" } };
             socket.send(JSON.stringify(statusMessage));
             socket.on("message", (msg: string) => {
-                console.log("Received message from client, no actions possible: :",msg)
+                console.error("Received message from client, no actions possible: :",msg)
             });
             socket.on("close", () => {
-                console.log("WS closed by client");
+                console.debug("WS closed by client");
                 //TODO : stop regular thermostat polling
             })
         }
@@ -59,11 +59,10 @@ fastify.get("/", async (request, reply) => {
 
 fastify.get<{ Querystring: InfoQueryString }>("/info", {schema: {querystring: infoQuerySchema}}, async (request, reply) => {
     const {force_flush} = request.query;
-    console.log("INFO BODY:", JSON.stringify(request.query));
     let fetchReturn: FetchReturn;
     fetchReturn = await checkAndGetDeviceInfo(force_flush);
     if (!fetchReturn.success) {
-        console.log("Got an error in getDeviceInfo:", fetchReturn.error);
+        console.error("Got an error in getDeviceInfo:", fetchReturn.error);
         if (!fetchReturn.httpCode) {fetchReturn.httpCode = 500;}
         return reply.status(fetchReturn.httpCode).send({ error: fetchReturn.error || "Failed to get device info" });
     }
@@ -74,7 +73,7 @@ fastify.get("/weather", async (request, reply) => {
     let fetchReturn: FetchReturn;
     fetchReturn = await getCurrentObservation();
     if (!fetchReturn.success) {
-        console.log("Got an error in getObservation:", fetchReturn.error);
+        console.error("Got an error in getObservation:", fetchReturn.error);
         return reply.status(500).send({ error: fetchReturn.error || "Failed to get weather" });
     }
     reply.send(weatherData);
@@ -90,7 +89,6 @@ fastify.get<{ Querystring: latLongQueryString }> ("/set_lat_long", { schema: { q
 
 fastify.post<{ Body: SetHeatBody }>("/set_heat", {schema: { body: setHeatSchema } }, async (request, reply) => {
     const { deviceID, heatCelsius } = request.body;
-    console.log("got a setheat request", deviceID, heatCelsius);
     let fetchReturn = await setHeat(deviceID, heatCelsius);
     if (!fetchReturn.success) {
         reply.status(500).send({ error: fetchReturn.error || "Failed to set heat" });
@@ -130,7 +128,6 @@ fastify.post<{ Body: SetTempModeBody }>("/set_temp_mode", {schema: { body: setTe
 });
 
 fastify.post<{ Body: SetEcoModeBody }>("/set_eco_mode", {schema: { body: setEcoModeSchema } }, async (request, reply) => {
-    console.log("Got a setEcoMode request");
     const { deviceID, ecoMode } = request.body;
     let fetchReturn = await setEcoMode(deviceID,ecoMode);
     if (!fetchReturn.success) {
@@ -141,7 +138,6 @@ fastify.post<{ Body: SetEcoModeBody }>("/set_eco_mode", {schema: { body: setEcoM
 });
 
 fastify.post<{ Body: SetFanTimerBody }>("/set_fan_timer", {schema: { body: setFanTimerSchema } }, async (request, reply) => {
-    console.log("Got set fan timer request: ",request.body);
     const { deviceID, timerMode, durationSeconds } = request.body;
     let fetchReturn = await setFanTimer(deviceID,timerMode, durationSeconds);
     if (!fetchReturn.success) {

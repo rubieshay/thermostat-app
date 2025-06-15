@@ -34,8 +34,6 @@ export function AppContainer() {
         refreshInterval: dataRefreshTime,
         okToStartRefresh: okToStartRefreshTimer
     });
-    
-    console.log("App container rendering... initialLoadComplete:", initialLoadComplete);
 
     return (
         <>

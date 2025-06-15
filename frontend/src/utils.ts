@@ -2,7 +2,6 @@ import { useEffect, useRef, useCallback } from "react";
 import { HvacStatus, TempUnits, TempMode, EcoMode, type FetchReturn } from "./types";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-console.log("ENV IS: " +  JSON.stringify((window as any)._env_))
 export const demoMode = ((window as any)._env_.DEMO_MODE === "TRUE" ||
                          (window as any)._env_.DEMO_MODE === "1" ||
                          (window as any)._env_.DEMO_MODE === "YES") ? true : false;
@@ -11,7 +10,7 @@ export const dataRefreshEnabled =((window as any)._env_.DATA_REFRESH_ENABLED ===
                                   (window as any)._env_.DATA_REFRESH_ENABLED === "1" ||
                                   (window as any)._env_.DATA_REFRESH_ENABLED === "YES") ? true : false;
 /* eslint-enable @typescript-eslint/no-explicit-any */                                  
-console.log("Environment driven settings:", {demoMode, defaultAPIURL, dataRefreshEnabled});
+console.debug("Environment driven settings:", {demoMode, defaultAPIURL, dataRefreshEnabled});
 
 export const debounceTime: number = 3000;
 export const dataRefreshTime: number = 60000;
@@ -246,21 +245,18 @@ export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshI
 
     const startIntervalRefresh = useCallback(() => {
         if (isRefreshingRef.current || !dataRefreshEnabled || !okToStartRefresh) {
-            console.log("NOT starting timer because:", {isRefreshingRef: isRefreshingRef.current, dataRefreshEnabled, okToStartRefresh});
             return;
         }        
         isRefreshingRef.current = true;
         onStart?.(); // Optional callback when starting
         
         intervalRef.current = setInterval(() => {
-            console.log("Triggering refreshData from page vis timer");
             refreshData(false); // Call refreshData every interval
         }, refreshInterval);
     }, [okToStartRefresh, refreshData, onStart, refreshInterval]);
 
     const stopIntervalRefresh = useCallback( () => {
         if (!isRefreshingRef.current || !dataRefreshEnabled) {
-            console.log("Stop Interval Refresh cancelled - not currently refreshing or refresh not enabled");
             return;
         }
         
@@ -268,11 +264,10 @@ export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshI
         onStop?.(); // Optional callback when stopping
         
         if (intervalRef.current) {
-            console.log("Actually clearing interval in stopIntervalRefresh");
             clearInterval(intervalRef.current);
             intervalRef.current = null;
         } else {
-            console.log("No interval to clear in stop Interval Refresh");
+            console.error("No interval to clear in stop Interval Refresh");
         }
     }, [onStop])
 
@@ -280,10 +275,8 @@ export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshI
 
         const handleVisibilityChange = (evt: Event) => {
             if (document.visibilityState === "hidden" || evt.type === "pagehide") {
-                console.log("Page hidden, stopping interval timer");
                 stopIntervalRefresh();
             } else {
-                console.log("Page back, starting refresh cycles");
                 startIntervalRefresh();
             }
         };
@@ -294,14 +287,11 @@ export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshI
 
         // Start refresh if page is initially visible
         if (document.visibilityState !== "hidden" && okToStartRefresh) {
-            console.log("Page visible at startup, NOT YET... starting first load and timer...");
             startIntervalRefresh();
-//            doInitialAndStart();
         }
 
         // Cleanup function
         return () => {
-            console.log("Cleaning up interval timers and visibility listeners");
             document.removeEventListener("visibilitychange", handleVisibilityChange);
             document.removeEventListener("pagehide", handleVisibilityChange);
             stopIntervalRefresh();

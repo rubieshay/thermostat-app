@@ -18,16 +18,14 @@ const wsURL = getWebsocketProtocol(defaultAPIURL) + "://" + removeProtocol(defau
 export function useSocketMessages() {
     const {updateAllTempData} = useContext(TempDataContext);
 
-    const { readyState } = useWebSocket(wsURL, {
+    useWebSocket(wsURL, {
     onMessage: (message) => {
-        console.log('Received message:', message);
         try {
             const tempMessage: TempMessage = JSON.parse(message.data); 
-            console.log("Parsed json of message:",tempMessage);
+            console.debug("Parsed json of message:",tempMessage);
           // Handle specific event types
             if (tempMessage.type === TempMessageType.tempUpdate) {
                 const messageData: TempUpdateMessage = tempMessage.data as TempUpdateMessage
-                console.log("about to update temp data array with:",messageData.tempData);
                 updateAllTempData(messageData.tempData);
             }
         } catch (error) {
@@ -36,10 +34,10 @@ export function useSocketMessages() {
       
     },
     onOpen: () => {
-      console.log('Connected to WebSocket server');
+      console.debug('Connected to WebSocket server');
     },
     onClose: () => {
-      console.log('Disconnected from WebSocket server');
+      console.debug('Disconnected from WebSocket server');
     },
     onError: (error) => {
       console.error('WebSocket error:', error);
@@ -48,7 +46,5 @@ export function useSocketMessages() {
     reconnectAttempts: 10,
     reconnectInterval: 3000
   });
-
-  console.log("Is WebSocket connected:", readyState)
 
 }
