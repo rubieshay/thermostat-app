@@ -1,9 +1,7 @@
 import { type TempDataArray, type TempData, HvacStatus, TempMode, demoSetPointDefaults, EcoMode, FanTimerMode } from "./types";
 import { getIsoDatePlusDuration } from "./utils";
 
-export function setDemoHeatCelsius({newHeatCelsius, selectedDeviceID, selectedTempData, setTempDataArray}: 
-    {newHeatCelsius: number, selectedDeviceID: string, selectedTempData: TempData,setTempDataArray: React.Dispatch<React.SetStateAction<TempDataArray>>}) {
-
+export function setDemoHeatCelsius(newHeatCelsius: number, selectedDeviceID: string, selectedTempData: TempData,setTempDataArray: React.Dispatch<React.SetStateAction<TempDataArray>>) {
     setTempDataArray((prevState: TempDataArray) => 
         prevState.map(item => item.deviceID === selectedDeviceID ?
         { ...item, heatCelsius: newHeatCelsius } :
@@ -28,8 +26,7 @@ export function setDemoHeatCelsius({newHeatCelsius, selectedDeviceID, selectedTe
     }    
 }
 
-export function setDemoCoolCelsius({newCoolCelsius, selectedDeviceID, selectedTempData, setTempDataArray}: 
-    {newCoolCelsius: number, selectedDeviceID: string, selectedTempData: TempData,setTempDataArray: React.Dispatch<React.SetStateAction<TempDataArray>>}) {
+export function setDemoCoolCelsius(newCoolCelsius: number, selectedDeviceID: string, selectedTempData: TempData,setTempDataArray: React.Dispatch<React.SetStateAction<TempDataArray>>) {
 
     setTempDataArray((prevState: TempDataArray) => 
         prevState.map(item => item.deviceID === selectedDeviceID ?
@@ -54,8 +51,7 @@ export function setDemoCoolCelsius({newCoolCelsius, selectedDeviceID, selectedTe
     }
 }
 
-export function setDemoRangeCelsius({newHeatCelsius, newCoolCelsius, selectedDeviceID, selectedTempData, setTempDataArray}: 
-    {newHeatCelsius: number, newCoolCelsius: number, selectedDeviceID: string, selectedTempData: TempData,setTempDataArray: React.Dispatch<React.SetStateAction<TempDataArray>>}) {
+export function setDemoRangeCelsius(newHeatCelsius: number, newCoolCelsius: number, selectedDeviceID: string, selectedTempData: TempData, setTempDataArray: React.Dispatch<React.SetStateAction<TempDataArray>>) {
 
     setTempDataArray((prevState: TempDataArray) => 
         prevState.map(item => item.deviceID === selectedDeviceID ?
@@ -87,11 +83,10 @@ export function setDemoRangeCelsius({newHeatCelsius, newCoolCelsius, selectedDev
     }
 }
 
-export function setDemoTempMode({newTempMode, selectedDeviceID, selectedTempData, setTempDataArray} : 
-    { newTempMode: TempMode, selectedDeviceID: string, selectedTempData: TempData, setTempDataArray: React.Dispatch<React.SetStateAction<TempDataArray>>}) {
+export function setDemoTempMode(newTempMode: TempMode, selectedDeviceID: string, selectedTempData: TempData, setTempDataArray: React.Dispatch<React.SetStateAction<TempDataArray>>) {
 
-            // because we aren't getting the real tempData, we need to determine new setpoints
-            // these will be based on default setpoints
+    // because we aren't getting the real tempData, we need to determine new setpoints
+    // these will be based on default setpoints
     let newHeatCelsius = null;
     let newCoolCelsius = null;
     if (newTempMode === TempMode.heat || newTempMode === TempMode.heatcool) {
@@ -116,12 +111,9 @@ export function setDemoTempMode({newTempMode, selectedDeviceID, selectedTempData
         { ...item, tempMode: newTempMode, heatCelsius: newHeatCelsius, coolCelsius: newCoolCelsius, hvacStatus: newHvacStatus} :
         item)
     );
-
 }
 
-export function setDemoEcoMode({newEcoMode, selectedDeviceID, selectedTempData, setTempDataArray} : 
-    { newEcoMode: EcoMode, selectedDeviceID: string, selectedTempData: TempData, setTempDataArray: React.Dispatch<React.SetStateAction<TempDataArray>>}) {
-
+export function setDemoEcoMode(newEcoMode: EcoMode, selectedDeviceID: string, selectedTempData: TempData, setTempDataArray: React.Dispatch<React.SetStateAction<TempDataArray>>) {
 
     let newHvacStatus = HvacStatus.off;
     let newCoolCelsius = null;
@@ -153,12 +145,9 @@ export function setDemoEcoMode({newEcoMode, selectedDeviceID, selectedTempData, 
         { ...item, ecoMode: newEcoMode, hvacStatus: newHvacStatus, coolCelsius: newCoolCelsius, heatCelsius: newHeatCelsius } :
         item)
     );
-
 }
 
-export function setDemoFanTime({newFanTimerMode, durationSeconds, selectedDeviceID, setTempDataArray} : 
-    { newFanTimerMode: FanTimerMode, durationSeconds: number , selectedDeviceID: string, setTempDataArray: React.Dispatch<React.SetStateAction<TempDataArray>>}) {
-
+export function setDemoFanTime(newFanTimerMode: FanTimerMode, durationSeconds: number , selectedDeviceID: string, setTempDataArray: React.Dispatch<React.SetStateAction<TempDataArray>>) {
 
     if (newFanTimerMode === FanTimerMode.off) {
         setTempDataArray((prevState: TempDataArray) => 

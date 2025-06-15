@@ -16,8 +16,7 @@ export const googleProjectId = process.env.PROJECT_ID || "";
 export const googleRefreshToken = process.env.REFRESH_TOKEN || "";
 export const googleTopicId = process.env.TOPIC_ID || "thermostat-topic-id";
 export const googlePubSubProjectId = process.env.PUBSUB_PROJECT_ID || "";
-export const demoMode = ( process.env.DEMO_MODE?.toUpperCase() === "1" || process.env.DEMO_MODE?.toUpperCase() === "YES" || 
-    process.env.DEMO_MODE?.toUpperCase() === "TRUE" ? true : false );
+export const demoMode = ( process.env.DEMO_MODE?.toUpperCase() === "1" || process.env.DEMO_MODE?.toUpperCase() === "YES" || process.env.DEMO_MODE?.toUpperCase() === "TRUE" ? true : false );
 export const environment = process.env.ENVIRONMENT || "prod";
 export const subscriptionId = "thermostat-sub-id-" + environment;
 export let weatherLatitude = Number(process.env.WEATHER_LATITUDE) || 37.7749; // Default to San Francisco

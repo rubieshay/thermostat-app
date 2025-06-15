@@ -61,8 +61,6 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
     const isFetching = useRef<boolean>(false);
     const debounceTimer = useRef<number | null>(null);
     
-    // time to wait before getting data after setting for tempMode and ecoMode
-    //const setGetDelay = 3000;
 
     // GETTING/RESETTING TEMP DATA
 
@@ -202,11 +200,11 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
     // REFRESH TIMER
     
     const startRefreshTimer = useCallback(()=> {
-//        console.log("Starting refresh timer...")
+        // console.log("Starting refresh timer...");
     }, []);
 
     const stopRefreshTimer = useCallback(()=> {
-//        console.log("Stopping refresh timer...")
+        // console.log("Stopping refresh timer...");
     }, []);
 
     // ERROR DISPLAY
@@ -235,21 +233,20 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
                 setLastAPIError(fetchError)
                 return;
             }
-//            fetchTempData(true); // This should no longer be necessary, as the websocket will update the data
+            // fetchTempData(true); // This should no longer be necessary, as the websocket will update the data
         } catch (error) {
             fetchError.fetchReturn.error = "Error in " + description + " : " + error;
             setLastAPIError(fetchError)
             console.error("Error in " + description + " : " , error);
         }
-    }
-    ,[lastAPIError.errorSeq]);
+    }, [lastAPIError.errorSeq]);
 
     const setHeatCelsius = useCallback(async (newHeatCelsius: number) => {
         if (newHeatCelsius === null || selectedDeviceID === null) {
             return;
         };
         if (demoMode) {
-            setDemoHeatCelsius({newHeatCelsius, selectedDeviceID, selectedTempData: getSelectedTempData(), setTempDataArray});
+            setDemoHeatCelsius(newHeatCelsius, selectedDeviceID, getSelectedTempData(), setTempDataArray);
             return;
         }
 
@@ -258,7 +255,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             heatCelsius: newHeatCelsius
         };
 
-        await makeBackendAPICall("set_heat",reqBody, "setting heatpoint");
+        await makeBackendAPICall("set_heat", reqBody, "setting heatpoint");
         
     }, [getSelectedTempData, selectedDeviceID, makeBackendAPICall]);
 
@@ -267,7 +264,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             return;
         };
         if (demoMode) {
-            setDemoCoolCelsius({newCoolCelsius, selectedDeviceID, selectedTempData: getSelectedTempData(), setTempDataArray});
+            setDemoCoolCelsius(newCoolCelsius, selectedDeviceID, getSelectedTempData(), setTempDataArray);
             return;
         }
         const reqBody: SetCoolBody = {
@@ -284,7 +281,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             return;
         };
         if (demoMode) {
-            setDemoRangeCelsius({newHeatCelsius, newCoolCelsius, selectedDeviceID, selectedTempData: getSelectedTempData(), setTempDataArray});
+            setDemoRangeCelsius(newHeatCelsius, newCoolCelsius, selectedDeviceID, getSelectedTempData(), setTempDataArray);
             return;
         }
         const reqBody: SetRangeBody = {
@@ -302,7 +299,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             return;
         }
         if (demoMode) {
-            setDemoTempMode({newTempMode, selectedDeviceID, selectedTempData: getSelectedTempData(), setTempDataArray});
+            setDemoTempMode(newTempMode, selectedDeviceID, getSelectedTempData(), setTempDataArray);
             return;
         }
         const reqBody: SetTempModeBody = {
@@ -319,7 +316,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             return;
         }
         if (demoMode) {
-            setDemoEcoMode({newEcoMode, selectedDeviceID, selectedTempData: getSelectedTempData(), setTempDataArray});
+            setDemoEcoMode(newEcoMode, selectedDeviceID, getSelectedTempData(), setTempDataArray);
             return;
         }
         const reqBody: SetEcoModeBody = {
@@ -337,7 +334,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             return;
         };
         if (demoMode) {
-            setDemoFanTime({newFanTimerMode, durationSeconds: durationSeconds!, selectedDeviceID, setTempDataArray});
+            setDemoFanTime(newFanTimerMode, durationSeconds!, selectedDeviceID, setTempDataArray);
             return;
         }
         const reqBody: SetFanTimerBody = {

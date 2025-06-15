@@ -13,7 +13,7 @@ async function getStationsFromLatLong(): Promise<FetchReturn> {
         const response = await fetch(pointsURL);
         if (!response.ok) {
             fetchReturn.httpCode = response.status;
-            fetchReturn.error = "Get Weather Stations Failed:"+response.statusText;
+            fetchReturn.error = "Get Weather Stations Failed:" + response.statusText;
             return fetchReturn;
         }
         const data = await response.json(); // Or response.text() for text responses

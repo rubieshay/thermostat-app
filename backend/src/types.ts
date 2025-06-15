@@ -101,6 +101,19 @@ export const initWeatherData: WeatherData = {
     currentWeatherIconURL: null
 }
 
+export const demoWeatherData: WeatherData = {
+    gridId: null,
+    observationStationsURL: null,
+    lastCheckTime: null,
+    observationStation: null,
+    observationURL: null,
+    forecastURL: null,
+    currentTemperature: 19.4,
+    currentRelativeHumidity: 63,
+    currentTextDescription: "Mostly Cloudy",
+    currentWeatherIconURL: "https://api.weather.gov/icons/land/day/bkn?size=medium"
+}
+
 export type FetchReturn = {
     success: boolean,
     httpCode?: number,
