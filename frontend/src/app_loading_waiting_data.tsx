@@ -1,4 +1,4 @@
-export function AppLoading() {
+export function AppLoadingWaitingData() {
     return (
         <main id="loading-container">
             <div className="material-symbols material-symbols-rounded loading-icon">mode_fan</div>
@@ -6,4 +6,4 @@ export function AppLoading() {
     );
 }
 
-export default AppLoading;
+export default AppLoadingWaitingData;

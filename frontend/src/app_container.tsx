@@ -1,6 +1,7 @@
 import { useCallback, useContext, useRef, useState } from "react";
 import { TempDataContext } from "./temp_data_context";
-import AppLoading from "./app_loading";
+import AppLoadingWaitingData from "./app_loading_waiting_data";
+import AppLoadingNoFont from "./app_loading_no_font"
 import Title from "./title";
 import Dial from "./dial";
 import Tiles from "./tiles";
@@ -9,12 +10,14 @@ import ModalDrawer from "./modal_drawer";
 import { useSocketMessages } from "./websocket_messages";
 import { ModalDrawerType } from "./types";
 import { dataRefreshTime, drawerTimeoutDuration, usePageVisibilityRefresh, demoMode } from "./utils";
+import { useFontLoader } from "./font_loader";
 
 export function AppContainer() {
     const { initialLoadComplete, okToStartRefreshTimer, stopRefreshTimer, startRefreshTimer, fetchTempData } = useContext(TempDataContext);
     const [modalDrawerType, setModalDrawerType] = useState<ModalDrawerType | null>(null);
     const fadeDrawerTimer = useRef<number | null>(null);
     useSocketMessages(demoMode)
+    const [fontsLoaded] = useFontLoader();
 
     const handleResetModal = useCallback((startTimer: boolean) => {
         if (fadeDrawerTimer.current) {
@@ -35,6 +38,10 @@ export function AppContainer() {
         okToStartRefresh: okToStartRefreshTimer
     });
 
+    if (!fontsLoaded) {
+        return (<AppLoadingNoFont/>)
+    }
+
     return (
         <>
             {initialLoadComplete ?
@@ -48,7 +55,7 @@ export function AppContainer() {
                     <Error/>
                 </>
                 :
-                <AppLoading/>
+                <AppLoadingWaitingData/>
             }
         </>
     );

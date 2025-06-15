@@ -59,7 +59,7 @@
 
 
 /* FONTS */
-
+/* 
 @font-face {
     font-family: "Outfit";
     src: url("../assets/fonts/outfit.ttf");
@@ -68,7 +68,7 @@
     font-family: "Material Symbols Rounded";
     font-style: normal;
     src: url("../assets/fonts/material_symbols_rounded.ttf");
-}
+} */
 
 :root {
     font-family: "Outfit", system-ui, sans-serif;
