@@ -7,7 +7,6 @@ import materialSymbolsRoundedFontURL from "./assets/fonts/material_symbols_round
 export function useFontLoader() {
 
   const [fontsLoaded, setFontsLoaded] = useState(false);
-  const [cssLoaded, setCSSLoaded] = useState(false);
 
   useEffect(() => {
     const loadFonts = async () => {
@@ -32,34 +31,7 @@ export function useFontLoader() {
     loadFonts();
   }, []);
 
-  useEffect(() => {
-        const checkCSSLoaded = async () => {
-      // Wait for all stylesheets to load
-      console.log("Waiting on CSS to load...");
-      const styleSheets = Array.from(document.styleSheets);
-      const cssPromises = styleSheets.map(sheet => {
-        return new Promise((resolve) => {
-          if (sheet.href) {
-            const link = document.querySelector(`link[href="${sheet.href}"]`) as HTMLLinkElement;
-            if (link?.sheet) {
-              resolve(true);
-            } else {
-              link?.addEventListener('load', () => resolve(true));
-            }
-          } else {
-            resolve(true);
-          }
-        });
-      });
 
-      await Promise.all(cssPromises);
-      console.log("CSS Loaded");
-
-      setCSSLoaded(true);
-    }
-    checkCSSLoaded();
-  },[])
-
-  return [fontsLoaded, cssLoaded];
+  return [fontsLoaded];
 
 }
