@@ -56,6 +56,50 @@
     border-radius: 0;
 }
 
+
+
+/* FONTS */
+
+@font-face {
+    font-family: "Outfit";
+    src: url("../assets/fonts/outfit.ttf");
+}
+@font-face {
+    font-family: "Material Symbols Rounded";
+    font-style: normal;
+    src: url("../assets/fonts/material_symbols_rounded.ttf");
+}
+
+:root {
+    font-family: "Outfit", system-ui, sans-serif;
+    font-variation-settings: "wght" 400;
+}
+.material-symbols {
+    font-weight: normal;
+    font-style: normal;
+    font-variation-settings: "FILL" 0,
+                             "wght" 250,
+                             "GRAD" 0,
+                             "opsz" 24;
+    font-size: 1rem;
+    display: block;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    aspect-ratio: 1;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.material-symbols-rounded {
+    font-family: "Material Symbols Rounded";
+}
+
+
+
+/* GLOBAL COLOR AND SIZE VARIABLES */
+
 :root {
     --color-gray-0: #f4f3f3;
     --color-gray-1: #c4b8b4;
@@ -80,21 +124,17 @@
     --main-bg: var(--color-gray-6);
     --main-text: var(--color-gray-1);
 
-    background: var(--main-bg);
-    color: var(--main-text);
-
     --dial-size: max(min(100vh - 29.5rem, 92vw, 32rem), min(20rem, 92vw));
-
-    font-family: "Outfit", system-ui, sans-serif;
-    font-variation-settings: "wght" 400;
 }
 
 
 
-/* GENERAL  */
+/* GENERAL/PAGE STYLING  */
 
 body {
     position: relative;
+    background: var(--main-bg);
+    color: var(--main-text);
 }
 main {
     display: flex;
@@ -115,17 +155,6 @@ h1 {
 button {
     cursor: pointer;
 }
-.material-symbols {
-    font-variation-settings: "FILL" 0,
-                             "wght" 400,
-                             "GRAD" 0,
-                             "opsz" 24;
-    font-size: 1rem;
-    display: block;
-    aspect-ratio: 1;
-    -webkit-user-select: none;
-    user-select: none;
-}
 ::selection {
     background: #f4f3f344;
     opacity: 0.5;
@@ -135,6 +164,10 @@ button {
     outline-offset: 3px;
     border-radius: 8px;
 }
+
+
+
+/* OTHER */
 
 /* Icons with text labels */
 .icon-text-group {
@@ -150,7 +183,7 @@ button {
     line-height: 1;
 }
 
-/* custom and rotating fan icons */
+/* Custom and rotating fan icons */
 .hvac-icon {
     position: relative;
 }
