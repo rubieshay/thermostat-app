@@ -17,7 +17,7 @@ export function AppContainer() {
     const [modalDrawerType, setModalDrawerType] = useState<ModalDrawerType | null>(null);
     const fadeDrawerTimer = useRef<number | null>(null);
     useSocketMessages(demoMode)
-    const [fontsLoaded] = useFontLoader();
+    const [fontsLoaded, cssLoaded] = useFontLoader();
 
     const handleResetModal = useCallback((startTimer: boolean) => {
         if (fadeDrawerTimer.current) {
@@ -37,6 +37,10 @@ export function AppContainer() {
         refreshInterval: dataRefreshTime,
         okToStartRefresh: okToStartRefreshTimer
     });
+
+    if (!cssLoaded) {
+        return (<div/>)
+    }
 
     if (!fontsLoaded) {
         return (<AppLoadingNoFont/>)
