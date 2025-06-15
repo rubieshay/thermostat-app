@@ -10,10 +10,9 @@
     height: calc(100vh - 4rem);
 }
 .loading-icon {
-    font-size: min(40vw, 40vh, 20rem);
+    display: block;
+    width: min(40vw, 40vh, 20rem);
+    aspect-ratio: 1;
+    fill: var(--color-gray-1);
     animation: spin 4s linear infinite normal forwards;
-    font-variation-settings: "FILL" 0,
-                             "wght" 200,
-                             "GRAD" 0,
-                             "opsz" 24;
 }

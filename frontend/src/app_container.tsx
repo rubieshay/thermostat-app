@@ -1,7 +1,6 @@
 import { useCallback, useContext, useRef, useState } from "react";
 import { TempDataContext } from "./temp_data_context";
-import AppLoadingWaitingData from "./app_loading_waiting_data";
-import AppLoadingNoFont from "./app_loading_no_font"
+import AppLoading from "./app_loading";
 import Title from "./title";
 import Dial from "./dial";
 import Tiles from "./tiles";
@@ -38,13 +37,9 @@ export function AppContainer() {
         okToStartRefresh: okToStartRefreshTimer
     });
 
-    if (!fontsLoaded) {
-        return (<AppLoadingNoFont/>)
-    }
-
     return (
         <>
-            {initialLoadComplete ?
+            {fontsLoaded && initialLoadComplete ?
                 <>
                     <main>
                         <Title/>
@@ -55,7 +50,7 @@ export function AppContainer() {
                     <Error/>
                 </>
                 :
-                <AppLoadingWaitingData/>
+                <AppLoading/>
             }
         </>
     );

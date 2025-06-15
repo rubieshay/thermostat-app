@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import outfitFontURL from "./assets/fonts/outfit.ttf?url";
 import materialSymbolsRoundedFontURL from "./assets/fonts/material_symbols_rounded.ttf?url";
 
@@ -6,32 +6,30 @@ import materialSymbolsRoundedFontURL from "./assets/fonts/material_symbols_round
 
 export function useFontLoader() {
 
-  const [fontsLoaded, setFontsLoaded] = useState(false);
+    const [fontsLoaded, setFontsLoaded] = useState(false);
 
-  useEffect(() => {
-    const loadFonts = async () => {
-      const font1 = new FontFace('Outfit',`url(${outfitFontURL})`);
-      const font2 = new FontFace('Material Symbols Rounded', `url(${materialSymbolsRoundedFontURL})`, {style: "normal"});
+    useEffect(() => {
+        const loadFonts = async () => {
+            const outfitFont = new FontFace("Outfit", `url(${outfitFontURL})`);
+            const materialSymbolsRoundedFont = new FontFace("Material Symbols Rounded", `url(${materialSymbolsRoundedFontURL})`, {style: "normal"});
 
-      console.log("About to add fonts to document");
-      document.fonts.add(font1);
-      document.fonts.add(font2);
-      console.log("fonts added to document");
+            console.log("About to add fonts to document");
+            document.fonts.add(outfitFont);
+            document.fonts.add(materialSymbolsRoundedFont);
+            console.log("fonts added to document");
 
-      await Promise.all([font1.load(), font2.load()]);
+            await Promise.all([outfitFont.load(), materialSymbolsRoundedFont.load()]);
 
-      console.log("Promises resolved fonts loaded...")
+            console.log("Promises resolved fonts loaded...")
 
-      await document.fonts.ready;
+            await document.fonts.ready;
 
-      console.log("Fonts are ready");
+            console.log("Fonts are ready");
 
-      setFontsLoaded(true);
-    };
-    loadFonts();
-  }, []);
+            setFontsLoaded(true);
+        };
+        loadFonts();
+    }, []);
 
-
-  return [fontsLoaded];
-
+    return [fontsLoaded];
 }
