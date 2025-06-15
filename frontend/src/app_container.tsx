@@ -8,13 +8,13 @@ import Error from "./error";
 import ModalDrawer from "./modal_drawer";
 import { useSocketMessages } from "./websocket_messages";
 import { ModalDrawerType } from "./types";
-import { dataRefreshTime, drawerTimeoutDuration, usePageVisibilityRefresh } from "./utils";
+import { dataRefreshTime, drawerTimeoutDuration, usePageVisibilityRefresh, demoMode } from "./utils";
 
 export function AppContainer() {
     const { initialLoadComplete, okToStartRefreshTimer, stopRefreshTimer, startRefreshTimer, fetchTempData } = useContext(TempDataContext);
     const [modalDrawerType, setModalDrawerType] = useState<ModalDrawerType | null>(null);
     const fadeDrawerTimer = useRef<number | null>(null);
-    useSocketMessages()
+    useSocketMessages(demoMode)
 
     const handleResetModal = useCallback((startTimer: boolean) => {
         if (fadeDrawerTimer.current) {
