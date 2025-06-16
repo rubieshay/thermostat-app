@@ -24,18 +24,61 @@ export const minRangeGap: number[] = [1.5, 3]
 export const decimalPrecision: number[] = [0.5, 1.0];
 export const usedDialRatio: number = 5/6;
 
+
+// Material Symbols unicode values for reference
+
+// \ue145 - add
+// \ue15b - remove
+
+// \uf168 - mode_fan
+// \uec17 - mode_fan_off
+// \uf537 - heat
+// \uf557 - mode_dual
+// \uf166 - mode_cool
+// \uf16f - mode_off_on
+// \uf8be - nest_eco_leaf
+
+// \ue629 - sync_problem
+// \ue575 - not_listed_location
+
+// \ue88a - home
+
+// \uf163 - humidity_high
+// \uf164 - humidity_low
+// \uf165 - humidity_mid
+
+// \ue81a - sunny
+// \uf172 - partly_cloudy_day
+// \ue2bd - cloud
+// \uf176 - rainy
+// \ue2cd - weather_snowy
+// \uf60b - weather_mix
+// \uf67f - weather_hail
+// \uebdb - thunderstorm
+// \ue818 - foggy
+// \ue188 - mist
+// \ue199 - tornado
+// \uebd5 - cyclone
+// \uf070 - storm
+// \uebd3 - severe_cold
+// \uf4e5 - emergency_heat_2
+
+// \uf34f - moon_stars
+// \uf174 - partly_cloudy_night
+
+
 export const tempModeOptions = [{tempMode: TempMode.heat, idText: "heat",
-                                 dispText: "Heat", symbolText: "heat"},
+                                 dispText: "Heat", symbolText: "\uf537"},
                                 {tempMode: TempMode.heatcool, idText: "heatcool",
-                                 dispText: "Heat • Cool", symbolText: "mode_dual"},
+                                 dispText: "Heat • Cool", symbolText: "\uf557"},
                                 {tempMode: TempMode.cool, idText: "cool",
-                                 dispText: "Cool", symbolText: "mode_cool"},
+                                 dispText: "Cool", symbolText: "\uf166"},
                                 {tempMode: TempMode.off, idText: "off",
-                                 dispText: "Off", symbolText: "mode_off_on"}]
+                                 dispText: "Off", symbolText: "\uf16f"}]
 export const ecoModeOptions = [{"ecoMode": EcoMode.on, idText: "on",
-                                dispText: "On", symbolText: "nest_eco_leaf"},
+                                dispText: "On", symbolText: "\uf8be"},
                                {"ecoMode": EcoMode.off, idText: "off",
-                                dispText: "Off", symbolText: "mode_off_on"}]
+                                dispText: "Off", symbolText: "\uf16f"}]
 export const fanTimerOptions = [{duration: 900, dispText: "15 min"},
                                 {duration: 1800, dispText: "30 min"},
                                 {duration: 2700, dispText: "45 min"},
@@ -45,56 +88,56 @@ export const fanTimerOptions = [{duration: 900, dispText: "15 min"},
                                 {duration: 28800, dispText: "8 hr"},
                                 {duration: 43200, dispText: "12 hr"}]
 
-export const humidityRanges = [{rangeEnd: 0, symbolText: "humidity_low"},
-                                {rangeEnd: 40, symbolText: "humidity_mid"},
-                                {rangeEnd: 60, symbolText: "humidity_high"}]
+export const humidityRanges = [{rangeEnd: 0, symbolText: "\uf164"},
+                                {rangeEnd: 40, symbolText: "\uf165"},
+                                {rangeEnd: 60, symbolText: "\uf163"}]
 
 export const weatherIcons = {
     day: {
-        skc: "sunny",
-        few: "sunny",
-        sct: "partly_cloudy_day",
-        bkn: "partly_cloudy_day",
-        ovc: "cloud",
-        wind_skc: "sunny",
-        wind_few: "sunny",
-        wind_sct: "partly_cloudy_day",
-        wind_bkn: "partly_cloudy_day",
-        wind_ovc: "cloud",
-        snow: "weather_snowy",
-        rain_snow: "weather_mix",
-        rain_sleet: "weather_mix",
-        snow_sleet: "weather_mix",
-        fzra: "weather_hail",
-        rain_fzra: "weather_mix",
-        snow_fzra: "weather_mix",
-        sleet: "weather_hail",
-        rain: "rainy",
-        rain_showers: "rainy",
-        rain_showers_hi: "rainy",
-        tsra: "thunderstorm",
-        tsra_sct: "thunderstorm",
-        tsra_hi: "thunderstorm",
-        tornado: "tornado",
-        hurricane: "hurricane",
-        tropical_storm: "storm",
-        dust: "mist",
-        smoke: "mist",
-        haze: "foggy",
-        hot: "emergency_heat_2",
-        cold: "severe_cold",
-        blizzard: "weather_snowy",
-        fog: "foggy"
+        skc: {symbolText: "\ue81a", ariaText: "Sunny"},
+        few: {symbolText: "\ue81a", ariaText: "Sunny"},
+        sct: {symbolText: "\uf172", ariaText: "Partly Cloudy (Day)"},
+        bkn: {symbolText: "\uf172", ariaText: "Partly Cloudy (Day)"},
+        ovc: {symbolText: "\ue2bd", ariaText: "Cloudy"},
+        wind_skc: {symbolText: "\ue81a", ariaText: "Sunny"},
+        wind_few: {symbolText: "\ue81a", ariaText: "Sunny"},
+        wind_sct: {symbolText: "\uf172", ariaText: "Partly Cloudy (Day)"},
+        wind_bkn: {symbolText: "\uf172", ariaText: "Partly Cloudy (Day)"},
+        wind_ovc: {symbolText: "\ue2bd", ariaText: "Cloudy"},
+        snow: {symbolText: "\ue2cd", ariaText: "Snowy"},
+        rain_snow: {symbolText: "\uf60b", ariaText: "Wintry Mix"},
+        rain_sleet: {symbolText: "\uf60b", ariaText: "Wintry Mix"},
+        snow_sleet: {symbolText: "\uf60b", ariaText: "Wintry Mix"},
+        fzra: {symbolText: "\uf67f", ariaText: "Freezing Rain / Sleet / Hail"},
+        rain_fzra: {symbolText: "\uf60b", ariaText: "Wintry Mix"},
+        snow_fzra: {symbolText: "\uf60b", ariaText: "Wintry Mix"},
+        sleet: {symbolText: "\uf67f", ariaText: "Freezing Rain / Sleet / Hail"},
+        rain: {symbolText: "\uf176", ariaText: "Rainy"},
+        rain_showers: {symbolText: "\uf176", ariaText: "Rainy"},
+        rain_showers_hi: {symbolText: "\uf176", ariaText: "Rainy"},
+        tsra: {symbolText: "\uebdb", ariaText: "Thunderstorms"},
+        tsra_sct: {symbolText: "\uebdb", ariaText: "Thunderstorms"},
+        tsra_hi: {symbolText: "\uebdb", ariaText: "Thunderstorms"},
+        tornado: {symbolText: "\ue199", ariaText: "Tornado"},
+        hurricane: {symbolText: "\uebd5", ariaText: "Hurricane"},
+        tropical_storm: {symbolText: "\uf070", ariaText: "Tropical Storm"},
+        dust: {symbolText: "\ue188", ariaText: "Dust / Smoke"},
+        smoke: {symbolText: "\ue188", ariaText: "Dust / Smoke"},
+        haze: {symbolText: "\ue818", ariaText: "Foggy / Haze"},
+        hot: {symbolText: "\uf4e5", ariaText: "Extreme Heat"},
+        cold: {symbolText: "\uebd3", ariaText: "Extreme Cold"},
+        blizzard: {symbolText: "\ue2cd", ariaText: "Snowy"},
+        fog: {symbolText: "\ue818", ariaText: "Foggy / Haze"}
     },
     night: {
-        skc: "moon_stars",
-        few: "moon_stars",
-        sct: "partly_cloudy_night",
-        bkn: "partly_cloudy_night",
-        wind_skc: "moon_stars",
-        wind_few: "moon_stars",
-        wind_sct: "partly_cloudy_night",
-        wind_bkn: "partly_cloudy_night",
+        skc: {symbolText: "\uf34f", ariaText: "Clear Night"},
+        few: {symbolText: "\uf34f", ariaText: "Clear Night"},
+        sct: {symbolText: "\uf174", ariaText: "Partly Cloudy (Night)"},
+        bkn: {symbolText: "\uf174", ariaText: "Partly Cloudy (Night)"},
+        wind_skc: {symbolText: "\uf34f", ariaText: "Clear Night"},
+        wind_few: {symbolText: "\uf34f", ariaText: "Clear Night"},
+        wind_sct: {symbolText: "\uf174", ariaText: "Partly Cloudy (Night)"},
+        wind_bkn: {symbolText: "\uf174", ariaText: "Partly Cloudy (Night)"},
     }
 }
 
@@ -209,7 +252,7 @@ export function getHumidityIcon(humidityPercent: number | null): string {
     return humiditySymbolText;
 }
 
-export function getWeatherIcon(apiIconString: string | null): string {
+export function getWeatherIcon(apiIconString: string | null) {
     if (apiIconString?.includes("night")) {
         for (const [key, value] of Object.entries(weatherIcons.night)) {
             if (apiIconString.includes(key)) {
@@ -224,7 +267,7 @@ export function getWeatherIcon(apiIconString: string | null): string {
         }
     }
     // default icon if icon url isn't given or something goes wrong
-    return "thermostat";
+    return {symbolText: "\ue575", ariaText: "Weather Not Found"};
 }
 
 export type ChildrenProviderProps = {

@@ -13,11 +13,13 @@ function IndoorAmbientTile() {
         <div className="tile">
             <h2>Indoor</h2>
             <div className="icon-text-group">
-                <span className="material-symbols material-symbols-rounded">home</span>
+                <span className="material-symbols material-symbols-rounded" aria-label="Indoor Temperature">
+                    {"\ue88a"}
+                </span>
                 <span>{ambientIndoorTempString}</span>
             </div>
             <div className="icon-text-group">
-                <span className="material-symbols material-symbols-rounded">{getHumidityIcon(tempData.ambientHumidity)}</span>
+                <span className="material-symbols material-symbols-rounded" aria-label="Indoor Humidity">{getHumidityIcon(tempData.ambientHumidity)}</span>
                 <span>{ambientIndoorHumidityString}</span>
             </div>
         </div>

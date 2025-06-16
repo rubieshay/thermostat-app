@@ -184,16 +184,16 @@ button {
 }
 
 /* Custom and rotating fan icons */
-.hvac-icon {
+.fan-icon {
     position: relative;
 }
-.hvac-icon.hvac-on {
+.fan-icon.fan-on {
     animation: spin 4s linear infinite normal forwards;
 }
-/* #dial .hvac-off {
+/* #dial .fan-off {
     rotate: 15deg;
 }
-#dial .hvac-off::after {
+#dial .fan-off::after {
     display: block;
     content: "horizontal_rule";
     position: absolute;

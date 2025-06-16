@@ -326,7 +326,7 @@ button, #main-numbers * {
     transition: background-color var(--spin-time) ease-in-out, color var(--spin-time) ease-in-out;
     touch-action: none;
 }
-.dial-buttons button, #dial .mode-icon, #dial .hvac-icon {
+.dial-buttons button, #dial .mode-icon, #dial .fan-icon {
     font-size: calc(0.06*var(--dial-size));
     font-variation-settings: "FILL" 0,
                              "wght" 350,
@@ -352,6 +352,6 @@ button, #main-numbers * {
 #dial .mode-icon {
     bottom: calc(0.08*var(--dial-size));
 }
-#dial .hvac-icon {
+#dial .fan-icon {
     bottom: calc(0.22*var(--dial-size));
 }

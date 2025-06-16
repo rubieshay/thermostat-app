@@ -44,9 +44,13 @@ const FanTimerDrawer: React.FC<ModalDrawerProps> = ({ handleCloseModal }) => {
             <h2>Fan</h2>
             <div className="icon-text-group">
                 {fanIsActive ?
-                    <span className="material-symbols material-symbols-rounded hvac-icon hvac-on">mode_fan</span>
+                    <span className="material-symbols material-symbols-rounded fan-icon fan-on" aria-hidden="true">
+                        {"\uf168"}
+                    </span>
                     :
-                    <span className="material-symbols material-symbols-rounded hvac-icon hvac-off">mode_fan_off</span>
+                    <span className="material-symbols material-symbols-rounded fan-icon fan-off" aria-hidden="true">
+                        {"\uec17"}
+                    </span>
                 }
                 <span>{fanTimerString}</span>
             </div>

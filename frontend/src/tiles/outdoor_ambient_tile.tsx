@@ -7,7 +7,7 @@ function OutdoorAmbientTile() {
     const {selectedTempData: tempData} = useContext(TempDataContext);
     const [ambientOutdoorTemp, setAmbientOutdoorTemp] = useState<number | null>(null);
     const [ambientOutdoorHumidity, setAmbientOutdoorHumidity] = useState<number | null>(null);
-    const [weatherIconSymbolText, setWeatherIconSymbolText] = useState<string>(getWeatherIcon(null));
+    const [weatherIcon, setWeatherIcon] = useState<{symbolText: string, ariaText: string}>(getWeatherIcon(null));
     const humidityIconSymbolText = getHumidityIcon(ambientOutdoorHumidity);
 
     useEffect(() => {
@@ -21,7 +21,7 @@ function OutdoorAmbientTile() {
         if (demoMode) {
             setAmbientOutdoorTemp(demoWeatherData.currentTemperature);
             setAmbientOutdoorHumidity(demoWeatherData.currentRelativeHumidity);
-            setWeatherIconSymbolText(getWeatherIcon(demoWeatherData.currentWeatherIconURL));
+            setWeatherIcon(getWeatherIcon(demoWeatherData.currentWeatherIconURL));
             return;
         }
         const url = defaultAPIURL + "/weather";
@@ -40,7 +40,7 @@ function OutdoorAmbientTile() {
             const weatherData = await response.json();
             setAmbientOutdoorTemp(weatherData.currentTemperature);
             setAmbientOutdoorHumidity(weatherData.currentRelativeHumidity);
-            setWeatherIconSymbolText(getWeatherIcon(weatherData.currentWeatherIconURL));
+            setWeatherIcon(getWeatherIcon(weatherData.currentWeatherIconURL));
         } catch (error) {
             console.error("Error with weather api:", error);
         }
@@ -50,11 +50,15 @@ function OutdoorAmbientTile() {
         <div className="tile">
             <h2>Outdoor</h2>
             <div className="icon-text-group">
-                <span className="material-symbols material-symbols-rounded">{weatherIconSymbolText}</span>
+                <span className="material-symbols material-symbols-rounded" aria-label={weatherIcon.ariaText}>
+                    {weatherIcon.symbolText}
+                </span>
                 <span>{ambientOutdoorTempString}</span>
             </div>
             <div className="icon-text-group">
-                <span className="material-symbols material-symbols-rounded">{humidityIconSymbolText}</span>
+                <span className="material-symbols material-symbols-rounded" aria-label="Outdoor Humidity">
+                    {humidityIconSymbolText}
+                    </span>
                 <span>{ambientOutdoorHumidityString}</span>
             </div>
         </div>

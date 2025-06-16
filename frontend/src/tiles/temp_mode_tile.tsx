@@ -14,7 +14,7 @@ const TempModeTile: React.FC<TileProps> = ({ setModalDrawerType }) => {
         <button className="tile" onClick={() => setModalDrawerType(ModalDrawerType.tempModeModal)}>
             <h2>HVAC Mode</h2>
             <div className="icon-text-group">
-                <span className="material-symbols material-symbols-rounded">
+                <span className="material-symbols material-symbols-rounded" aria-hidden="true">
                     {tempModeOptions.find((option) => option.tempMode === tempData.tempMode)?.symbolText}
                 </span>
                 <span>{tempModeOptions.find((option) => option.tempMode === tempData.tempMode)?.dispText}</span>

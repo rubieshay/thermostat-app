@@ -365,24 +365,25 @@ function Dial() {
 
                     {/* PLUS/MINUS BUTTONS AND BOTTOM SYMBOLS */}
                     {fanIsActive ?
-                        <span className="material-symbols material-symbols-rounded hvac-icon hvac-on">mode_fan</span>
+                        // the aria-labels should possibly consider saying "heating" and "cooling" - this information is purely coming from the color at the moment (and should maybe be shown somewhere with an icon too)
+                        <span className="material-symbols material-symbols-rounded fan-icon fan-on" aria-label="Fan On">{"\uf168"}</span>
                         :
-                        <span className="material-symbols material-symbols-rounded hvac-icon hvac-off">mode_fan_off</span>
+                        <span className="material-symbols material-symbols-rounded fan-icon fan-off" aria-label="Fan Off">{"\uec17"}</span>
                     }
                     {tempData.ecoMode === EcoMode.on ?
-                        <span className="material-symbols material-symbols-rounded mode-icon">nest_eco_leaf</span>
+                        <span className="material-symbols material-symbols-rounded mode-icon" aria-label="Eco Mode">{"\uf8be"}</span>
                         :
                         (tempData.tempMode === TempMode.off ?
-                            <span className="material-symbols material-symbols-rounded mode-icon">mode_off_on</span>
+                            <span className="material-symbols material-symbols-rounded mode-icon" aria-label="AC Off">{"\uf16f"}</span>
                             : 
                             <div className="dial-buttons">
-                                <button className="material-symbols material-symbols-rounded"
+                                <button className="material-symbols material-symbols-rounded" aria-label="Temperature Down"
                                     onClick={() => bumpTemp(-decimalPrecision[tempData.tempUnits])}>
-                                    remove
+                                    {"\ue15b"}
                                 </button>
-                                <button className="material-symbols material-symbols-rounded"
+                                <button className="material-symbols material-symbols-rounded" aria-label="Temperature Up"
                                     onClick={() => bumpTemp(decimalPrecision[tempData.tempUnits])}>
-                                    add
+                                    {"\ue145"}
                                 </button>
                             </div>
                         )
@@ -403,7 +404,7 @@ function Dial() {
                         style={{"--cap-angle": usedDialRatio/2 + "turn"} as React.CSSProperties}>
                     </div>
                     <h2 id="offline-message">OFFLINE</h2>
-                    <span className="material-symbols material-symbols-rounded mode-icon">sync_problem</span>
+                    <span className="material-symbols material-symbols-rounded mode-icon" aria-hidden="true">{"\ue629"}</span>
                 </>
             }
         </section>

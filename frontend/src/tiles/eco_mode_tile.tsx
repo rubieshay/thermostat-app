@@ -14,7 +14,7 @@ const EcoModeTile: React.FC<TileProps> = ({ setModalDrawerType }) => {
         <button className="tile" onClick={() => setModalDrawerType(ModalDrawerType.ecoModeModal)}>
             <h2>Eco Mode</h2>
             <div className="icon-text-group">
-                <span className="material-symbols material-symbols-rounded">
+                <span className="material-symbols material-symbols-rounded" aria-hidden="true">
                     {ecoModeOptions.find((option) => option.ecoMode === tempData.ecoMode)?.symbolText}
                 </span>
                 <span>{ecoModeOptions.find((option) => option.ecoMode === tempData.ecoMode)?.dispText}</span>

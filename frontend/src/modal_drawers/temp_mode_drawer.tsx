@@ -23,13 +23,13 @@ const TempModeDrawer: React.FC<ModalDrawerProps> = ({ handleCloseModal }) => {
 
     return (
         <div className="drawer-content">
-            <h2>Temperature Mode</h2>
+            <h2>HVAC Mode</h2>
             <hr/>
             <ul className="radio-select">
                 {tempModeOptions.map((option) => (
                     <li key={option.tempMode} id={"temp-mode-select-" + option.idText} className={dispTempMode === option.tempMode ? "radio-selected" : ""}>
                         <button className="icon-text-group" onClick={() => changeTempMode(option.tempMode)}>
-                            <span className="material-symbols material-symbols-rounded">
+                            <span className="material-symbols material-symbols-rounded" aria-hidden="true">
                                 {option.symbolText}
                             </span>
                             <span>{option.dispText}</span>

@@ -74,6 +74,10 @@ ul.button-select li button {
     color: var(--color-gray-0);
     padding: 1rem 1.25rem;
     border-radius: 0.5rem;
+    transition: scale 200ms ease-in-out;
+}
+.button-select button:hover, .button-select button:focus-visible {
+    scale: 1.075;
 }
 ul.button-select li.button-option-disabled button {
     background: var(--color-gray-4);
