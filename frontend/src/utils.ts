@@ -260,7 +260,7 @@ export function getWeatherIcon(apiIconString: string | null) {
             }
         }
     } else {
-        for (const [key, value] of Object.entries(weatherIcons.night)) {
+        for (const [key, value] of Object.entries(weatherIcons.day)) {
             if (apiIconString?.includes(key)) {
                 return value;
             }
