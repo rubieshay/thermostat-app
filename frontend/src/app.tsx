@@ -6,8 +6,14 @@ import InitialLoader from "./initial_loader";
 import EnterURL from "./enter_url"
 import { SettingsContextProvider } from "./settings_context";
 import Settings from "./settings";
+import { useFontLoader } from "./font_loader";
 
 function App() {
+    const [fontsLoaded] = useFontLoader();
+    
+    if (!fontsLoaded) {
+        return <></>
+    }
     return (
         <APIContextProvider>
             <SettingsContextProvider>

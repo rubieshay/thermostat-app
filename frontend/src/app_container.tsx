@@ -9,14 +9,12 @@ import ModalDrawer from "./modal_drawer";
 import { useSocketMessages } from "./websocket_messages";
 import { ModalDrawerType } from "./types";
 import { dataRefreshTime, drawerTimeoutDuration, usePageVisibilityRefresh, demoMode } from "./utils";
-import { useFontLoader } from "./font_loader";
 
 export function AppContainer() {
     const { initialLoadComplete, okToStartRefreshTimer, stopRefreshTimer, startRefreshTimer, fetchTempData } = useContext(TempDataContext);
     const [modalDrawerType, setModalDrawerType] = useState<ModalDrawerType | null>(null);
     const fadeDrawerTimer = useRef<number | null>(null);
-    useSocketMessages(demoMode || !initialLoadComplete)
-    const [fontsLoaded] = useFontLoader();
+    useSocketMessages(demoMode || !initialLoadComplete);
 
     const handleResetModal = useCallback((startTimer: boolean) => {
         if (fadeDrawerTimer.current) {
@@ -39,7 +37,7 @@ export function AppContainer() {
 
     return (
         <>
-            {fontsLoaded && initialLoadComplete ?
+            {initialLoadComplete ?
                 <>
                     <main>
                         <Title/>
