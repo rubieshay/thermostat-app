@@ -52,8 +52,8 @@ fastify.register( async function (fastify) {
     );
 });
 
-fastify.get("/", async (request, reply) => {
-    return { hello: "world" }
+fastify.get("/healthz", async (request, reply) => {
+    reply.status(200).send({ status: "OK"});
 })
 
 fastify.get<{ Querystring: InfoQueryString }>("/info", {schema: {querystring: infoQuerySchema}}, async (request, reply) => {
