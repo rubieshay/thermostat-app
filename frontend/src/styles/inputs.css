@@ -1,0 +1,125 @@
+/* BUTTONS */
+
+button, input[type="button"], input[type="submit"] {
+    cursor: pointer;
+    transition: scale 200ms ease-in-out;
+}
+.standard-button {
+    width: fit-content;
+    display: block;
+    padding: 1rem;
+    border-radius: 1rem;
+    background: var(--color-gray-3);
+    color: var(--color-gray-0);
+}
+.standard-button:hover, .standard-button:focus-visible {
+    scale: 1.025;
+}
+
+.standard-button.button-disabled {
+    background: var(--color-gray-4);
+    color: var(--color-gray-5);
+    cursor: default;
+    pointer-events: none;
+}
+
+
+/* INPUT TEXT */
+
+input[type="text"] {
+    appearance: none;
+    -webkit-appearance: none;
+    display: block;
+    /* min-height: 0; */
+    padding: calc(0.75rem - 2px);
+    border-radius: 1rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    background: var(--color-gray-5);
+    color: var(--color-gray-0);
+    border: 2px solid var(--color-gray-3);
+}
+
+
+
+/* FORM ELEMENTS */
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+label {
+    font-size: 0.875rem;
+    color: var(--color-gray-3);
+}
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+
+
+/* SPECIFIC FORM ELEMENTS */
+
+#input-url-page form {
+    max-width: 20rem;
+}
+#input-url-page form > div {
+    line-height: 1.25;
+}
+
+
+
+/* CONTROL TILE MODALS */
+
+ul.radio-select {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.radio-select li {
+    display: block;
+}
+.radio-select button {
+    width: 100%;
+    /* padding: 1rem;
+    border-radius: 1rem; */
+    background: var(--color-gray-4);
+    /* transition: scale 200ms ease-in-out; */
+}
+/* .radio-select button:hover, .radio-select button:focus-visible {
+    scale: 1.025;
+} */
+.radio-select li.radio-selected button {
+    background: var(--color-gray-3);
+    color: var(--color-gray-0);
+}
+.drawer-content hr {
+    height: 1rem;
+}
+ul.button-select {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+ul.button-select li {
+    display: block;
+}
+/* ul.button-select li button {
+    background: var(--color-gray-3);
+    color: var(--color-gray-0);
+    padding: 1rem 1.25rem;
+    border-radius: 0.5rem;
+    transition: scale 200ms ease-in-out;
+} */
+/* .button-select button:hover, .button-select button:focus-visible {
+    scale: 1.075;
+} */
+/* ul.button-select li.button-option-disabled button {
+    background: var(--color-gray-4);
+    color: var(--color-gray-5);
+    cursor: default;
+    pointer-events: none;
+} */

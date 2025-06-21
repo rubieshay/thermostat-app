@@ -373,7 +373,7 @@ export function arraysEqualIgnoreOrder<T extends Record<string, any>>(arr1: T[],
       const val2 = obj2[key];
 
       // Handle nested objects recursively
-      if (typeof val1 === 'object' && val1 !== null && typeof val2 === 'object' && val2 !== null) {
+      if (typeof val1 === "object" && val1 !== null && typeof val2 === "object" && val2 !== null) {
         if (Array.isArray(val1) && Array.isArray(val2)) {
           // For arrays, do a simple comparison (you might want to make this recursive too)
           if (JSON.stringify(val1) !== JSON.stringify(val2)) {

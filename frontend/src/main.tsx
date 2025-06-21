@@ -1,8 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from 'react-router';
+import { BrowserRouter } from "react-router";
 import "./styles/style.css";
 import "./styles/loading.css";
+import "./styles/inputs.css";
 import "./styles/dial.css";
 import "./styles/tiles.css";
 import "./styles/modals.css";

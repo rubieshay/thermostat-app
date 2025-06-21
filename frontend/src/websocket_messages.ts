@@ -1,7 +1,7 @@
 import { useContext} from "react";
 import { TempMessageType, type TempUpdateMessage, type TempMessage } from "./types";
 import { TempDataContext } from "./temp_data_context";
-import useWebSocket from 'react-use-websocket';
+import useWebSocket from "react-use-websocket";
 import { APIContext } from "./api_context";
 
 
@@ -9,7 +9,7 @@ function removeProtocol(url: string | null) {
     if (url === null) {
         return "";
     } else {
-        return url.replace(/^https?:\/\//, '');
+        return url.replace(/^https?:\/\//, "");
     }
 }
 
@@ -17,7 +17,7 @@ function getWebsocketProtocol(url: string | null) {
     if (url === null) {
         return "";
     } else {
-        return url.startsWith('https') ? 'wss' : 'ws';
+        return url.startsWith("https") ? "wss" : "ws";
     }
 }
 
@@ -42,13 +42,13 @@ export function useSocketMessages(socketsDisabled: boolean) {
         
         },
         onOpen: () => {
-            console.debug('Connected to WebSocket server');
+            console.debug("Connected to WebSocket server");
         },
         onClose: () => {
-            console.debug('Disconnected from WebSocket server');
+            console.debug("Disconnected from WebSocket server");
         },
         onError: (error) => {
-            console.error('WebSocket error:', error);
+            console.error("WebSocket error:", error);
         },
         shouldReconnect: () => true,
         reconnectAttempts: 10,

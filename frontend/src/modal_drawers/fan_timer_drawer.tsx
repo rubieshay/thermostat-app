@@ -56,12 +56,13 @@ const FanTimerDrawer: React.FC<ModalDrawerProps> = ({ handleCloseModal }) => {
             </div>
             <hr/>
             <ul className="button-select">
-                <li className={dispFanTimer === null ? "button-option-disabled" : ""}>
-                    <button onClick={() => changeFanTimer(FanTimerMode.off)}>Off</button>
+                <li>
+                    <button className={"standard-button" + (dispFanTimer === null ? " button-disabled" : "")}
+                    onClick={() => changeFanTimer(FanTimerMode.off)}>Off</button>
                 </li>
                 {fanTimerOptions.map((option) => (
                     <li key={option.duration}>
-                        <button className="icon-text-group" onClick={() => changeFanTimer(FanTimerMode.on, option.duration)}>
+                        <button className="standard-button icon-text-group" onClick={() => changeFanTimer(FanTimerMode.on, option.duration)}>
                             {option.dispText}
                         </button>
                     </li>

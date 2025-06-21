@@ -128,11 +128,18 @@ body {
 }
 main {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
     gap: 2rem;
     padding: 2rem 4vw;
+}
+.centered-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
 }
 h1, h2, h3, h4, h5, h6 {
     display: block;
@@ -142,8 +149,21 @@ h1 {
     text-align: center;
     line-height: 1.25;
 }
-button {
-    cursor: pointer;
+.icon-title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+.icon-title h1 {
+    font-size: 2rem;
+}
+.icon-title img {
+    height: 3.5rem;
+    width: 3.5rem;
+    background: var(--color-gray-0);
+    border-radius: 25%;
 }
 ::selection {
     background: #f4f3f344;
@@ -160,8 +180,9 @@ button {
 /* OTHER */
 
 /* Icons with text labels */
-.icon-text-group {
+.icon-text-group, .standard-button.icon-text-group {
     display: flex;
+    flex-direction: row;
     gap: 0.5rem;
 }
 .icon-text-group span {
@@ -171,6 +192,7 @@ button {
 .icon-text-group span.material-symbols {
     font-size: 1.5rem;
     line-height: 1;
+    height: 1.5rem;
 }
 
 /* Text ellipses */
