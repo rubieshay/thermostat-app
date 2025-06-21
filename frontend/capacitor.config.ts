@@ -22,7 +22,8 @@ const config: CapacitorConfig = {
       keystorePath: 'upload-keystore.jks',
       keystoreAlias: 'upload',
       // Don't put passwords here - use environment variables
-    }
+    },
+    adjustMarginsForEdgeToEdge: "force"
   }
 };
 

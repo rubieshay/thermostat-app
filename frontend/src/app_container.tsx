@@ -15,7 +15,7 @@ export function AppContainer() {
     const { initialLoadComplete, okToStartRefreshTimer, stopRefreshTimer, startRefreshTimer, fetchTempData } = useContext(TempDataContext);
     const [modalDrawerType, setModalDrawerType] = useState<ModalDrawerType | null>(null);
     const fadeDrawerTimer = useRef<number | null>(null);
-    useSocketMessages(demoMode)
+    useSocketMessages(demoMode || !initialLoadComplete)
     const [fontsLoaded] = useFontLoader();
 
     const handleResetModal = useCallback((startTimer: boolean) => {
