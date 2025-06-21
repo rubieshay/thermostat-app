@@ -5,12 +5,20 @@ import { TempDataContext } from "./temp_data_context";
 import useWebSocket from 'react-use-websocket';
 
 
-function removeProtocol(url: string) {
-  return url.replace(/^https?:\/\//, '');
+function removeProtocol(url: string | null) {
+  if (url === null) {
+    return "";
+  } else {
+    return url.replace(/^https?:\/\//, '');
+  }
 }
 
-function getWebsocketProtocol(url: string) {
-  return url.startsWith('https') ? 'wss' : 'ws';
+function getWebsocketProtocol(url: string | null) {
+  if (url === null) {
+    return "";
+  } else {
+    return url.startsWith('https') ? 'wss' : 'ws';
+  }
 }
 
 const wsURL = getWebsocketProtocol(defaultAPIURL) + "://" + removeProtocol(defaultAPIURL) + "/ws";
