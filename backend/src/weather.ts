@@ -66,6 +66,8 @@ async function getObservationStations(): Promise<FetchReturn> {
         fetchReturn.success = true;
         console.log("Got observations station data:",JSON.stringify(data.features[0]));
         weatherData.observationStation = data.features[0].properties.stationIdentifier;
+        const cityAirportName = data.features[0].properties.name;
+        weatherData.observationCity = cityAirportName.split(",")[0]; 
         weatherData.observationURL = encodeURI(weatherBaseURL + "stations/" + weatherData.observationStation + "/observations/latest");
         console.log("New observation station data retrieved:" + JSON.stringify(weatherData));
     } catch (error) {
