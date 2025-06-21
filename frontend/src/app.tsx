@@ -4,17 +4,22 @@ import { APIContextProvider } from "./api_context";
 import { Routes, Route } from "react-router";
 import InitialLoader from "./initial_loader";
 import EnterURL from "./enter_url"
+import { SettingsContextProvider } from "./settings_context";
+import Settings from "./settings";
 
 function App() {
     return (
         <APIContextProvider>
-            <TempDataProvider>
-                <Routes>
-                    <Route path="/" element={<InitialLoader />} />
-                    <Route path="/enterurl" element={<EnterURL />} />
-                    <Route path="/app" element={<AppContainer />} />
-                </Routes>
-            </TempDataProvider>
+            <SettingsContextProvider>
+                <TempDataProvider>
+                    <Routes>
+                        <Route path="/" element={<InitialLoader />} />
+                        <Route path="/enterurl" element={<EnterURL />} />
+                        <Route path="/app" element={<AppContainer />} />
+                        <Route path="/settings" element={<Settings />} />
+                    </Routes>
+                </TempDataProvider>
+            </SettingsContextProvider>
         </APIContextProvider>
     );
 }
