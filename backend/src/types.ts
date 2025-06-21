@@ -109,7 +109,7 @@ export const demoWeatherData: WeatherData = {
     lastCheckTime: null,
     observationStation: null,
     observationURL: null,
-    observationCity: "Mooselookmeguntic",
+    observationCity: "Demo City",
     forecastURL: null,
     currentTemperature: 19.4,
     currentRelativeHumidity: 63,

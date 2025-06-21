@@ -8,6 +8,7 @@ function OutdoorAmbientTile() {
     const [ambientOutdoorTemp, setAmbientOutdoorTemp] = useState<number | null>(null);
     const [ambientOutdoorHumidity, setAmbientOutdoorHumidity] = useState<number | null>(null);
     const [weatherIcon, setWeatherIcon] = useState<{symbolText: string, ariaText: string}>(getWeatherIcon(null));
+    const [weatherCity, setWeatherCity] = useState<string | null>(null);
     const humidityIconSymbolText = getHumidityIcon(ambientOutdoorHumidity);
 
     useEffect(() => {
@@ -22,6 +23,7 @@ function OutdoorAmbientTile() {
             setAmbientOutdoorTemp(demoWeatherData.currentTemperature);
             setAmbientOutdoorHumidity(demoWeatherData.currentRelativeHumidity);
             setWeatherIcon(getWeatherIcon(demoWeatherData.currentWeatherIconURL));
+            setWeatherCity(demoWeatherData.observationCity);
             return;
         }
         const url = defaultAPIURL + "/weather";
@@ -41,6 +43,7 @@ function OutdoorAmbientTile() {
             setAmbientOutdoorTemp(weatherData.currentTemperature);
             setAmbientOutdoorHumidity(weatherData.currentRelativeHumidity);
             setWeatherIcon(getWeatherIcon(weatherData.currentWeatherIconURL));
+            setWeatherCity(weatherData.observationCity);
         } catch (error) {
             console.error("Error with weather api:", error);
         }
@@ -48,7 +51,7 @@ function OutdoorAmbientTile() {
 
     return (
         <div className="tile">
-            <h2>Outdoor</h2>
+            <h2 className="text-ellipses">Outdoor {(weatherCity !== null && weatherCity !== "") ? "(" + weatherCity + ")" : ""}</h2>
             <div className="icon-text-group">
                 <span className="material-symbols material-symbols-rounded" aria-label={weatherIcon.ariaText}>
                     {weatherIcon.symbolText}
