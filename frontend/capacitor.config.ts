@@ -14,7 +14,16 @@ const config: CapacitorConfig = {
     SplashScreen: {
       launchShowDuration: 0, // Hide splash screen immediately after app load
       launchAutoHide: false, // Automatically hide splash screen after launch
-    }
+    },
+    SafeArea: {
+      enabled: true,
+      customColorsForSystemBars: true,
+      statusBarColor: '#000000',
+      statusBarContent: 'light',
+      navigationBarColor: '#000000',
+      navigationBarContent: 'light',
+      offset: 0,
+    },
   },
   android: {
     // allowMixedContent: true,
@@ -23,7 +32,7 @@ const config: CapacitorConfig = {
       keystoreAlias: 'upload',
       // Don't put passwords here - use environment variables
     },
-    adjustMarginsForEdgeToEdge: "force"
+//    adjustMarginsForEdgeToEdge: "auto"
   }
 };
 

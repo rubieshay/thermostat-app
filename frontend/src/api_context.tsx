@@ -1,4 +1,4 @@
-import { createContext, useState, useMemo, useCallback, useEffect} from "react";
+import { createContext, useState, useMemo, useCallback} from "react";
 import { Preferences } from "@capacitor/preferences";
 import { defaultAPIURL, type ChildrenProviderProps } from "./utils";
 
@@ -32,10 +32,6 @@ export const APIContextProvider: React.FC<ChildrenProviderProps> = (props: Child
     const [apiURL, setAPIURLState] = useState<string | null>(null);
     const [apiIsHealthy, setAPIIsHealthy] = useState(false);
     const [initialAPICheckComplete, setInitialAPICheckComplete] = useState(false);
-
-    useEffect(() => {
-        console.log("changed", {apiIsHealthy, initialAPICheckComplete});
-    }, [apiIsHealthy, initialAPICheckComplete]);
 
     // try to retrieve and set API URL from preferences. If not there, default to environment
     // variable if it exists. If have a non-null URL, poll /healthz endpoint to see if up

@@ -143,6 +143,12 @@ export const noLastAPIError: LastAPIError = {
     errorSeq: 0
 }
 
+export enum ThemeMode {
+    LightMode = "L",
+    DarkMode = "D",
+    SystemMode = "S"
+}
+
 export enum TempMessageType {
     tempUpdate = "tempUpdate",
     weatherUpdate = "weatherUpdate",
