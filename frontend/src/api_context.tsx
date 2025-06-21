@@ -1,14 +1,17 @@
-import { createContext, useState, useMemo, useCallback} from "react";
+import { createContext, useState, useMemo, useCallback, useEffect} from "react";
 import { Preferences } from "@capacitor/preferences";
 import { defaultAPIURL, type ChildrenProviderProps } from "./utils";
 
 export interface APIContextType {
     apiURL: string | null,
-    setAPIURL: (url: string) => void,
+    setAPIURL: (url: string) => Promise<void>,
     validateURL: (url: string) => Promise<boolean>,
     retrieveAndValidateAPIURL: () => void,
     apiIsHealthy: boolean,
-    initialAPICheckComplete: boolean
+    setAPIIsHealthy: (healthy: boolean) => void,
+    initialAPICheckComplete: boolean,
+    setInitialAPICheckComplete: (complete: boolean) => void,
+    setAPIValidated: () => void
 }
 
 export const initAPIContext: APIContextType = {
@@ -17,32 +20,42 @@ export const initAPIContext: APIContextType = {
     validateURL: async () => {return false},
     retrieveAndValidateAPIURL: () => {},
     apiIsHealthy: false,
-    initialAPICheckComplete: false
+    setAPIIsHealthy: () => {},
+    initialAPICheckComplete: false,
+    setInitialAPICheckComplete: () => {},
+    setAPIValidated: () => {}
 }
 
 export const APIContext = createContext(initAPIContext);
 
 export const APIContextProvider: React.FC<ChildrenProviderProps> = (props: ChildrenProviderProps) => {
-    const [apiURL, setAPIURLState] = useState<string|null>(null);
-    const [apiIsHealthy,setAPIIsHealthy] = useState(false);
-    const [initialAPICheckComplete,setInitialAPICheckComplete] = useState(false);
+    const [apiURL, setAPIURLState] = useState<string | null>(null);
+    const [apiIsHealthy, setAPIIsHealthy] = useState(false);
+    const [initialAPICheckComplete, setInitialAPICheckComplete] = useState(false);
+
+    useEffect(() => {
+        console.log("changed", {apiIsHealthy, initialAPICheckComplete});
+    }, [apiIsHealthy, initialAPICheckComplete]);
 
     // try to retrieve and set API URL from preferences. If not there, default to environment
     // variable if it exists. If have a non-null URL, poll /healthz endpoint to see if up
     // if not up, or null, set validAPIURL to false;
 
-
     async function validateURL(url: string) : Promise<boolean> {
         // got a URL, see if it is healthy
+        if (!(url.startsWith("https://") || url.startsWith("http://"))) {
+            return false;
+        }
+        console.log("URL:", url);
         const healthURL = url + "/healthz";
         try {
             const response = await fetch(healthURL);
-            if (response.ok) {return true;}
+            console.log(response);
+            return response.ok;
         } catch (error) {
             console.error("Tried to access API server " + healthURL + ". Error occurred: ", error);
             return false;
         }
-        return false;
     }
 
     const retrieveAndValidateAPIURL = useCallback( async() => {
@@ -89,9 +102,14 @@ export const APIContextProvider: React.FC<ChildrenProviderProps> = (props: Child
         })
     }
 
+    function setAPIValidated() {
+        setAPIIsHealthy(true);
+        setInitialAPICheckComplete(true);
+    }
+
     const memoedValue = useMemo(() => ({
-        apiURL, setAPIURL, validateURL, retrieveAndValidateAPIURL, apiIsHealthy, initialAPICheckComplete
-    }),[apiURL, apiIsHealthy, retrieveAndValidateAPIURL,initialAPICheckComplete])
+        apiURL, setAPIURL, validateURL, retrieveAndValidateAPIURL, apiIsHealthy, setAPIIsHealthy, initialAPICheckComplete, setInitialAPICheckComplete, setAPIValidated
+    }), [apiURL, apiIsHealthy, retrieveAndValidateAPIURL, initialAPICheckComplete])
 
     return (
         <APIContext.Provider value={memoedValue}>{props.children}</APIContext.Provider>

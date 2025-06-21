@@ -253,21 +253,24 @@ export function getHumidityIcon(humidityPercent: number | null): string {
 }
 
 export function getWeatherIcon(apiIconString: string | null) {
+    // default icon if icon url isn't given or something goes wrong
+    const weatherNotFound = {symbolText: "\ue575", ariaText: "Weather Not Found"};
+    if (apiIconString === null) {
+        return weatherNotFound;
+    }
     if (apiIconString?.includes("night")) {
         for (const [key, value] of Object.entries(weatherIcons.night)) {
             if (apiIconString.includes(key)) {
                 return value;
             }
         }
-    } else {
-        for (const [key, value] of Object.entries(weatherIcons.day)) {
-            if (apiIconString?.includes(key)) {
-                return value;
-            }
+    }
+    for (const [key, value] of Object.entries(weatherIcons.day)) {
+        if (apiIconString?.includes(key)) {
+            return value;
         }
     }
-    // default icon if icon url isn't given or something goes wrong
-    return {symbolText: "\ue575", ariaText: "Weather Not Found"};
+    return weatherNotFound;
 }
 
 export type ChildrenProviderProps = {

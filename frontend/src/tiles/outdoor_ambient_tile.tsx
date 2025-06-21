@@ -1,32 +1,39 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useCallback, useRef } from "react";
 import { TempDataContext } from "../temp_data_context";
+import { APIContext } from "../api_context";
 import { demoWeatherData, TempUnits } from "../types";
-import { convertTemp, defaultAPIURL, demoMode, getHumidityIcon, getWeatherIcon, roundedTemp } from "../utils";
+import { convertTemp, demoMode, getHumidityIcon, getWeatherIcon, roundedTemp } from "../utils";
 
 function OutdoorAmbientTile() {
     const {selectedTempData: tempData} = useContext(TempDataContext);
+    const {apiURL, apiIsHealthy, initialAPICheckComplete} = useContext(APIContext);
     const [ambientOutdoorTemp, setAmbientOutdoorTemp] = useState<number | null>(null);
     const [ambientOutdoorHumidity, setAmbientOutdoorHumidity] = useState<number | null>(null);
     const [weatherIcon, setWeatherIcon] = useState<{symbolText: string, ariaText: string}>(getWeatherIcon(null));
     const [weatherCity, setWeatherCity] = useState<string | null>(null);
-    const humidityIconSymbolText = getHumidityIcon(ambientOutdoorHumidity);
+    const weatherDataLoading = useRef(false);
 
-    useEffect(() => {
-        getWeather();
-    }, []);
-    
+    const humidityIconSymbolText = getHumidityIcon(ambientOutdoorHumidity);
     const ambientOutdoorTempString = roundedTemp(convertTemp(ambientOutdoorTemp, TempUnits.celsius, tempData.tempUnits), tempData.tempUnits) ? roundedTemp(convertTemp(ambientOutdoorTemp, TempUnits.celsius, tempData.tempUnits), tempData.tempUnits)!.toString() + "\u00B0" : "Not Found";
     const ambientOutdoorHumidityString = ambientOutdoorHumidity ? Math.round(ambientOutdoorHumidity).toString() + "%" : "Not Found";
 
-    async function getWeather() {
+    const getWeather = useCallback(async () => {
         if (demoMode) {
+            console.log("demo")
             setAmbientOutdoorTemp(demoWeatherData.currentTemperature);
             setAmbientOutdoorHumidity(demoWeatherData.currentRelativeHumidity);
             setWeatherIcon(getWeatherIcon(demoWeatherData.currentWeatherIconURL));
             setWeatherCity(demoWeatherData.observationCity);
             return;
         }
-        const url = defaultAPIURL + "/weather";
+        if (!apiIsHealthy || !initialAPICheckComplete) {
+            return;
+        }
+        if (weatherDataLoading.current) {
+            return;
+        }
+        weatherDataLoading.current = true;
+        const url = apiURL + "/weather";
         console.log("URL:", url);
         try {
             const response = await fetch(url, {
@@ -39,6 +46,7 @@ function OutdoorAmbientTile() {
                 console.error("Failed to get weather : " + response.statusText);
                 return;
             }
+            console.log("fetched weather");
             const weatherData = await response.json();
             setAmbientOutdoorTemp(weatherData.currentTemperature);
             setAmbientOutdoorHumidity(weatherData.currentRelativeHumidity);
@@ -47,7 +55,11 @@ function OutdoorAmbientTile() {
         } catch (error) {
             console.error("Error with weather api:", error);
         }
-    }
+    }, [apiURL, apiIsHealthy, initialAPICheckComplete]);
+
+    useEffect(() => {
+        getWeather();
+    }, [getWeather]);
 
     return (
         <div className="tile">

@@ -1,8 +1,9 @@
-import { createContext, useState, useRef, useCallback, useMemo} from "react";
+import { createContext, useState, useRef, useCallback, useMemo, useContext} from "react";
 import { type TempData, type TempDataArray, type FetchReturn, type LastAPIError, initLastAPIError, noLastAPIError, initTempData, demoTempDataArray, TempMode, EcoMode, FanTimerMode} from "./types";
 import { type SetHeatBody, type SetCoolBody, type SetRangeBody, type SetTempModeBody, type SetEcoModeBody, type SetFanTimerBody, type ValidTempBackendBody } from "./schemas";
-import { demoMode, debounceTime, defaultAPIURL, type ChildrenProviderProps, arraysEqualIgnoreOrder, sleep, dataRefreshTime } from "./utils";
+import { demoMode, debounceTime, type ChildrenProviderProps, arraysEqualIgnoreOrder, sleep, dataRefreshTime } from "./utils";
 import { setDemoCoolCelsius, setDemoEcoMode, setDemoFanTime, setDemoHeatCelsius, setDemoRangeCelsius, setDemoTempMode } from "./temp_data_utils";
+import { APIContext } from "./api_context";
 
 export interface TempContextType {
     tempDataArray: TempDataArray;
@@ -53,6 +54,7 @@ export const initTempContext: TempContextType = {
 export const TempDataContext = createContext(initTempContext);
 
 export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: ChildrenProviderProps) => {
+    const {apiURL} = useContext(APIContext); 
     const [tempDataArray, setTempDataArray] = useState<TempDataArray>([structuredClone(initTempData)]);
     const [selectedDeviceID, setSelectedDeviceID] = useState<string | null>(null);
     const [initialLoadComplete, setInitialLoadComplete] = useState<boolean>(false);
@@ -88,7 +90,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             return(fetchError.fetchReturn);
         }
         // REAL DATA
-        const url = defaultAPIURL + "/info";
+        const url = apiURL + "/info";
         try {
             const fetchParams = new URL(url);
             fetchParams.searchParams.append("force_flush", forceFlush.toString());
@@ -129,7 +131,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         }
         isFetching.current = false;
         return fetchError.fetchReturn;
-    }, [lastAPIError.errorSeq, selectedDeviceID, tempDataArray]);
+    }, [lastAPIError.errorSeq, selectedDeviceID, tempDataArray, apiURL]);
 
     const fetchInitialData = useCallback(async () => {
         let retryCount = 0;
@@ -217,7 +219,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
     // SETTING DATA FUNCTIONS
 
     const makeBackendAPICall = useCallback(async (apiEndpoint: string, reqBody: ValidTempBackendBody, description: string) => {
-        const url = defaultAPIURL + "/" + apiEndpoint;
+        const url = apiURL + "/" + apiEndpoint;
         const fetchError: LastAPIError = structuredClone(initLastAPIError);
         fetchError.errorSeq = lastAPIError.errorSeq + 1;
         try {
@@ -240,7 +242,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             setLastAPIError(fetchError)
             console.error("Error in " + description + " : " , error);
         }
-    }, [lastAPIError.errorSeq]);
+    }, [lastAPIError.errorSeq, apiURL]);
 
     const setHeatCelsius = useCallback(async (newHeatCelsius: number) => {
         if (newHeatCelsius === null || selectedDeviceID === null) {

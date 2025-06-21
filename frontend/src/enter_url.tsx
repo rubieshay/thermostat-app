@@ -1,8 +1,34 @@
+import { useContext, useState, type FormEvent } from "react";
+import { APIContext } from "./api_context";
+import { useNavigate } from "react-router";
+
 function EnterURL() {
+    const {setAPIURL, validateURL, setAPIValidated} = useContext(APIContext);
+    const [inputURL, setInputURL] = useState<string>("");
+    const navigate = useNavigate();
+
+    async function handleSubmit(event: FormEvent) {
+        event.preventDefault();
+        const isValid = await validateURL(inputURL);
+        if (isValid) {
+            console.log("valid api");
+            await setAPIURL(inputURL);
+            setAPIValidated();
+            navigate("/", {replace: true});
+        } else {
+            console.log("invalid api");
+        }
+    }
+
     return (
-        <div>
-            <h1>Please enter the URL</h1>
-        </div>
+        <form onSubmit={(event) => handleSubmit(event)}>
+            <div>
+                <label id="input-url-label">Input API URL</label>
+                <input type="text" value={inputURL} aria-labelledby="input-url-label"
+                onChange={(event) => setInputURL(event.target.value)}/>
+            </div>
+            <input type="submit"/>
+        </form>
     )
 }
 

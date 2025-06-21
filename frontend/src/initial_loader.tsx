@@ -1,18 +1,18 @@
 import { useEffect, useContext, useRef } from "react";
-import { useNavigate } from 'react-router';
+import { useNavigate } from "react-router";
 import { TempDataContext } from "./temp_data_context";
 import { APIContext } from "./api_context";
+import { demoMode } from "./utils";
 
 function InitialLoader() {
     const navigate = useNavigate();
     const { loadInitialTempData } = useContext(TempDataContext);
-    const { retrieveAndValidateAPIURL, apiIsHealthy, initialAPICheckComplete } = useContext(APIContext);
+    const { retrieveAndValidateAPIURL, apiIsHealthy, setAPIIsHealthy, initialAPICheckComplete, setInitialAPICheckComplete } = useContext(APIContext);
     const initialAPICheckAttempted = useRef(false);
     const initialLoadAttempted = useRef(false);
 
-
-// when initially loaded, get URL from preferences/environment 
-    useEffect( () => {
+    // when initially loaded, get URL from preferences/environment 
+    useEffect(() => {
         const checkURL = async() => {
             if (initialAPICheckAttempted.current) {
                 console.log("Already attempted initial API Check. staying on page");
@@ -21,21 +21,29 @@ function InitialLoader() {
             initialAPICheckAttempted.current = true;
             retrieveAndValidateAPIURL();
         }
-        checkURL();
-    },[retrieveAndValidateAPIURL])
+        if (!demoMode) {
+            checkURL();
+        } else {
+            setInitialAPICheckComplete(true);
+            setAPIIsHealthy(true);
+        }
+    }, [retrieveAndValidateAPIURL, setAPIIsHealthy, setInitialAPICheckComplete])
 
-// if isAPIHealthy is still false and initialAPICheck is complete, navigate to url entry page
-    useEffect( () => {
+    // if isAPIHealthy is still false and initialAPICheck is complete, navigate to url entry page
+    useEffect(() => {
         if (initialAPICheckComplete && !apiIsHealthy) {
+            setInitialAPICheckComplete(false);
+            initialAPICheckAttempted.current = false;
+            initialLoadAttempted.current = false;
             navigate("/enterurl", {replace: true});
         }
-    },[initialAPICheckComplete,apiIsHealthy,navigate])
+    }, [initialAPICheckComplete, setInitialAPICheckComplete, apiIsHealthy, navigate])
 
-// if API is healthy and good, then attempt to load initial data from backend API
+    // if API is healthy and good, then attempt to load initial data from backend API
     useEffect(() => {
         const loadAndNav = async() => {
             if (initialLoadAttempted.current) {
-                console.log("Already attempted initial load... staying on page)");
+                console.log("Already attempted initial load... staying on page");
                 return;
             }
             initialLoadAttempted.current = true;
@@ -44,10 +52,11 @@ function InitialLoader() {
             console.log("data loaded, about to navigate to /app");
             navigate("/app", { replace: true });
         }
+        console.log({apiIsHealthy, initialAPICheckComplete});
         if (apiIsHealthy && initialAPICheckComplete) {
             loadAndNav();
         }
-    },[navigate, loadInitialTempData, apiIsHealthy,initialAPICheckComplete]);
+    }, [navigate, loadInitialTempData, apiIsHealthy,initialAPICheckComplete]);
 
 
     return (
