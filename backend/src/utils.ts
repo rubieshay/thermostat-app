@@ -9,6 +9,71 @@ export enum TempCommands {
 
 export const deviceTypeThermostat = "sdm.devices.types.THERMOSTAT";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function arraysEqualIgnoreOrder<T extends Record<string, any>>(arr1: T[], arr2: T[]): boolean {
+    // Check if arrays have the same length
+    if (arr1.length !== arr2.length) {
+        return false;
+    }
+
+    // Helper function to deeply compare two objects
+    function objectsEqual(obj1: T, obj2: T): boolean {
+        const keys1 = Object.keys(obj1);
+        const keys2 = Object.keys(obj2);
+
+        // Check if objects have the same number of keys
+        if (keys1.length !== keys2.length) {
+            return false;
+        }
+
+        // Check if all keys and values match
+        for (const key of keys1) {
+            if (!(key in obj2)) {
+                return false;
+            }
+
+            const val1 = obj1[key];
+            const val2 = obj2[key];
+
+            // Handle nested objects recursively
+            if (typeof val1 === "object" && val1 !== null && typeof val2 === "object" && val2 !== null) {
+                if (Array.isArray(val1) && Array.isArray(val2)) {
+                    // For arrays, do a simple comparison (you might want to make this recursive too)
+                    if (JSON.stringify(val1) !== JSON.stringify(val2)) {
+                        return false;
+                    }
+                } else if (!Array.isArray(val1) && !Array.isArray(val2)) {
+                    if (!objectsEqual(val1 as T, val2 as T)) {
+                        return false;
+                    }
+                } else {
+                    return false; // One is array, one is not
+                }
+            } else if (val1 !== val2) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // For each object in arr1, find a matching object in arr2
+    for (const obj1 of arr1) {
+        let found = false;
+        for (const obj2 of arr2) {
+        if (objectsEqual(obj1, obj2)) {
+            found = true;
+            break;
+        }
+        }
+        if (!found) {
+        return false;
+        }
+    }
+
+    return true;
+}
+
 export function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }

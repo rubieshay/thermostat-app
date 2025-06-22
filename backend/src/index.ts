@@ -5,7 +5,7 @@ import { infoQuerySchema, InfoQueryString, latLongQuerySchema, latLongQueryStrin
         setCoolSchema, SetCoolBody, setRangeSchema, SetRangeBody, setTempModeSchema,
         SetTempModeBody, setEcoModeSchema, SetEcoModeBody, setFanTimerSchema, SetFanTimerBody} from "./schemas";
 import { checkAndGetDeviceInfo, setHeat, setCool, setRange, setTempMode, setEcoMode, setFanTimer} from "./googlesdm";
-import { getCurrentObservation } from "./weather";
+import { getCurrentObservation, initializeWeatherAndRefresh } from "./weather";
 import {tempDataInfo} from "./googlesdm";
 import { getDataAndSubscribe, removeSubscription } from "./googlepubsub";
 import { Mutex } from "./mutex";
@@ -149,7 +149,8 @@ fastify.post<{ Body: SetFanTimerBody }>("/set_fan_timer", {schema: { body: setFa
 const start = async () => {
     try {
         await getDataAndSubscribe();
-        await fastify.listen({ port: httpPort, host: "0.0.0.0" })
+        await fastify.listen({ port: httpPort, host: "0.0.0.0" });
+        await initializeWeatherAndRefresh();
     } catch (err) {
         fastify.log.error(err);
         process.exit(1);

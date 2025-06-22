@@ -42,11 +42,11 @@ export const APIContextProvider: React.FC<ChildrenProviderProps> = (props: Child
         if (!(url.startsWith("https://") || url.startsWith("http://"))) {
             return false;
         }
-        console.log("URL:", url);
+//        console.log("URL:", url);
         const healthURL = url + "/healthz";
         try {
             const response = await fetch(healthURL);
-            console.log(response);
+//            console.log(response);
             return response.ok;
         } catch (error) {
             console.error("Tried to access API server " + healthURL + ". Error occurred: ", error);
@@ -55,17 +55,17 @@ export const APIContextProvider: React.FC<ChildrenProviderProps> = (props: Child
     }
 
     const retrieveAndValidateAPIURL = useCallback( async() => {
-        console.log("retrieving and validating API URL");
+//        console.log("retrieving and validating API URL");
         let tempURL : string|null = null;
         const { value } = await Preferences.get({ key: "apiURL"});
         if (value === null) {
             // get from default environment variable if exists
-            console.log("not stored in preferences, getting from env var")
+//            console.log("not stored in preferences, getting from env var")
             tempURL = defaultAPIURL;
-            console.log("From environment variable, test URL is now: "+tempURL);
+//            console.log("From environment variable, test URL is now: "+tempURL);
         } else {
             // use what was in preferences API
-            console.log("preferences had api stored:",value);
+//            console.log("preferences had api stored:",value);
             tempURL = value;
         }
         if (tempURL === null) {
@@ -76,7 +76,7 @@ export const APIContextProvider: React.FC<ChildrenProviderProps> = (props: Child
             return;
         }
         // got a URL, see if it is healthy
-        console.log("checking healthz URL on found endpoint: " + tempURL);
+//        console.log("checking healthz URL on found endpoint: " + tempURL);
         const healthURL = tempURL;
         if (await validateURL(healthURL)) {
             console.log("URL validated, healthy");

@@ -9,10 +9,12 @@ import ModalDrawer from "./modal_drawer";
 import { useSocketMessages } from "./utils/websocket_messages";
 import { ModalDrawerType } from "./types";
 import { dataRefreshTime, drawerTimeoutDuration, demoMode } from "./utils/constants";
-import { usePageVisibilityRefresh } from "./utils/functions";
+import { usePageVisibilityRefresh } from "./utils/hooks";
+import { WeatherContext } from "./contexts/weather_context";
 
 export function AppContainer() {
     const { initialLoadComplete, okToStartRefreshTimer, stopRefreshTimer, startRefreshTimer, fetchTempData } = useContext(TempDataContext);
+    const { weatherDataLoaded } = useContext(WeatherContext);
     const [modalDrawerType, setModalDrawerType] = useState<ModalDrawerType | null>(null);
     const fadeDrawerTimer = useRef<number | null>(null);
     useSocketMessages(demoMode || !initialLoadComplete);
@@ -38,7 +40,7 @@ export function AppContainer() {
 
     return (
         <>
-            {initialLoadComplete ?
+            {initialLoadComplete && weatherDataLoaded ?
                 <>
                     <main>
                         <Title/>

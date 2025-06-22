@@ -1,10 +1,13 @@
-import { FetchReturn } from "./types";
-
+import { FetchReturn, TempMessage, TempMessageType } from "./types";
 import { weatherData, weatherLatitude, weatherLongitude } from "./index";
+import { arraysEqualIgnoreOrder } from "./utils";
+import { fastify } from "./index";
 
 const weatherBaseURL = "https://api.weather.gov/"
 
 const weatherDataExpireDurationSecs = 180;
+
+const weatherDataAutoRefreshSecs = 300;
 
 async function getStationsFromLatLong(): Promise<FetchReturn> {
     let pointsURL = encodeURI(weatherBaseURL + "/points/"+ weatherLatitude + "," + weatherLongitude);
@@ -132,3 +135,39 @@ export async function getCurrentObservation(): Promise<FetchReturn> {
     }
     return fetchReturn;
 }
+
+async function broadcastNewWeatherData() {
+    let tempMessage: TempMessage = {
+        type: TempMessageType.tempUpdate,
+        data: {
+            weatherData: weatherData
+        }
+    }
+    console.debug("Received an update to weather data, broadcasting to clients...");
+    fastify.websocketServer.clients.forEach((client) => {
+        if (client.readyState === client.OPEN) {
+            try {
+                client.send(JSON.stringify(tempMessage));
+            } catch (error) {
+                console.error("Error sending data to client:", error);
+            }
+        }
+    })
+}
+
+
+async function getWeatherCheckAndSend() {
+    let oldWeatherData = weatherData;
+    await getCurrentObservation();
+    if (!arraysEqualIgnoreOrder([oldWeatherData],[weatherData])) {
+        await broadcastNewWeatherData()
+    }
+}
+
+export async function initializeWeatherAndRefresh() {
+    await getCurrentObservation();
+    setInterval( () => {getWeatherCheckAndSend()},weatherDataAutoRefreshSecs*1000)
+
+}
+
+
