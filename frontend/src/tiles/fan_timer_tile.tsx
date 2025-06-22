@@ -1,7 +1,8 @@
 import { useContext, useState, useEffect, type SetStateAction } from "react";
 import { ModalDrawerType } from "../types";
-import { TempDataContext } from "../temp_data_context";
-import { getFanTimerString, isFanOn, fanTimerDisplayUpdateInterval } from "../utils";
+import { TempDataContext } from "../contexts/temp_data_context";
+import { fanTimerDisplayUpdateInterval } from "../utils/constants";
+import { getFanTimerString, isFanOn } from "../utils/functions";
 
 interface TileProps {
     setModalDrawerType: React.Dispatch<SetStateAction<ModalDrawerType | null>>

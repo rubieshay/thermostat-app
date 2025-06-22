@@ -1,7 +1,7 @@
 import { useContext } from "react";
-import { TempDataContext } from "../temp_data_context";
+import { TempDataContext } from "../contexts/temp_data_context";
 import { TempUnits } from "../types";
-import { getHumidityIcon, convertTemp, roundedTemp } from "../utils";
+import { getHumidityIcon, convertTemp, roundedTemp } from "../utils/functions";
 
 function IndoorAmbientTile() {
     const {selectedTempData: tempData} = useContext(TempDataContext);

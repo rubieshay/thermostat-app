@@ -3,7 +3,7 @@ import { ModalDrawerType } from "./types";
 import TempModeDrawer from "./modal_drawers/temp_mode_drawer";
 import EcoModeDrawer from "./modal_drawers/eco_mode_drawer";
 import FanTimerDrawer from "./modal_drawers/fan_timer_drawer";
-import { drawerTimeoutDuration } from "./utils";
+import { drawerTimeoutDuration } from "./utils/constants";
 
 interface ModalDrawerProps {
     modalDrawerType: ModalDrawerType | null,

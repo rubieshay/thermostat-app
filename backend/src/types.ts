@@ -7,6 +7,8 @@ export enum Connectivity {online="ONLINE", offline="OFFLINE"};
 export enum FanTimerMode {on="ON", off="OFF"};
 export enum SetPointType {heat="HEAT", cool="COOL"};
 export enum ModalDrawerType {tempModeModal="TEMP_MODE_MODAL", ecoModeModal="ECO_MODE_MODAL", fanTimerModal="FAN_TIMER_MODAL"};
+export enum ThemeSetting {light = "LIGHT", dark = "DARK", system = "SYSTEM"};
+export enum TempUnitsSetting {celsius="CELSIUS", fahrenheit="FAHRENHEIT", system = "SYSTEM"};
 
 export type TempData = {
     deviceID: string | null,
@@ -141,12 +143,6 @@ export const noLastAPIError: LastAPIError = {
     fetchReturn: {success: true},
     lastErrorWasFetch: false,
     errorSeq: 0
-}
-
-export enum ThemeMode {
-    LightMode = "L",
-    DarkMode = "D",
-    SystemMode = "S"
 }
 
 export enum TempMessageType {

@@ -1,8 +1,9 @@
 import { createContext, useState, useRef, useCallback, useMemo, useContext} from "react";
-import { type TempData, type TempDataArray, type FetchReturn, type LastAPIError, initLastAPIError, noLastAPIError, initTempData, demoTempDataArray, TempMode, EcoMode, FanTimerMode} from "./types";
-import { type SetHeatBody, type SetCoolBody, type SetRangeBody, type SetTempModeBody, type SetEcoModeBody, type SetFanTimerBody, type ValidTempBackendBody } from "./schemas";
-import { demoMode, debounceTime, type ChildrenProviderProps, arraysEqualIgnoreOrder, sleep, dataRefreshTime } from "./utils";
-import { setDemoCoolCelsius, setDemoEcoMode, setDemoFanTime, setDemoHeatCelsius, setDemoRangeCelsius, setDemoTempMode } from "./temp_data_utils";
+import { type TempData, type TempDataArray, type FetchReturn, type LastAPIError, initLastAPIError, noLastAPIError, initTempData, demoTempDataArray, TempMode, EcoMode, FanTimerMode} from "../types";
+import { type SetHeatBody, type SetCoolBody, type SetRangeBody, type SetTempModeBody, type SetEcoModeBody, type SetFanTimerBody, type ValidTempBackendBody } from "../schemas";
+import { demoMode, debounceTime, type ChildrenProviderProps, dataRefreshTime } from "../utils/constants";
+import { arraysEqualIgnoreOrder, sleep } from "../utils/functions";
+import { setDemoCoolCelsius, setDemoEcoMode, setDemoFanTime, setDemoHeatCelsius, setDemoRangeCelsius, setDemoTempMode } from "../utils/temp_data_utils";
 import { APIContext } from "./api_context";
 
 export interface TempContextType {

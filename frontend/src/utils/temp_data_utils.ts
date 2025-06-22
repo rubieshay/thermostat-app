@@ -1,5 +1,5 @@
-import { type TempDataArray, type TempData, HvacStatus, TempMode, demoSetPointDefaults, EcoMode, FanTimerMode } from "./types";
-import { getIsoDatePlusDuration } from "./utils";
+import { type TempDataArray, type TempData, HvacStatus, TempMode, demoSetPointDefaults, EcoMode, FanTimerMode } from "../types";
+import { getIsoDatePlusDuration } from "./functions";
 
 export function setDemoHeatCelsius(newHeatCelsius: number, selectedDeviceID: string, selectedTempData: TempData,setTempDataArray: React.Dispatch<React.SetStateAction<TempDataArray>>) {
     setTempDataArray((prevState: TempDataArray) => 

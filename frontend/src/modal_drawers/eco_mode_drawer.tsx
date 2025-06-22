@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import { ecoModeOptions } from "../utils";
-import { TempDataContext } from "../temp_data_context";
+import { ecoModeOptions } from "../utils/constants";
+import { TempDataContext } from "../contexts/temp_data_context";
 import { EcoMode } from "../types";
 
 interface ModalDrawerProps {

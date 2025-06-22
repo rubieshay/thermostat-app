@@ -1,12 +1,12 @@
 import { AppContainer } from "./app_container";
-import { TempDataProvider } from "./temp_data_context";
-import { APIContextProvider } from "./api_context";
+import { TempDataProvider } from "./contexts/temp_data_context";
+import { APIContextProvider } from "./contexts/api_context";
 import { Routes, Route } from "react-router";
-import InitialLoader from "./initial_loader";
+import InitialLoader from "./loading/initial_loader";
 import EnterURL from "./enter_url"
-import { SettingsContextProvider } from "./settings_context";
+import { SettingsContextProvider } from "./contexts/settings_context";
 import Settings from "./settings";
-import { useFontLoader } from "./font_loader";
+import { useFontLoader } from "./loading/font_loader";
 
 function App() {
     const [fontsLoaded] = useFontLoader();

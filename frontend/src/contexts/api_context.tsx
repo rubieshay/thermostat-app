@@ -1,6 +1,6 @@
 import { createContext, useState, useMemo, useCallback} from "react";
 import { Preferences } from "@capacitor/preferences";
-import { defaultAPIURL, type ChildrenProviderProps } from "./utils";
+import { defaultAPIURL, type ChildrenProviderProps } from "../utils/constants";
 
 export interface APIContextType {
     apiURL: string | null,

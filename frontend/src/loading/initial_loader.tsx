@@ -1,8 +1,8 @@
 import { useEffect, useContext, useRef } from "react";
 import { useNavigate } from "react-router";
-import { TempDataContext } from "./temp_data_context";
-import { APIContext } from "./api_context";
-import { demoMode } from "./utils";
+import { TempDataContext } from "../contexts/temp_data_context";
+import { APIContext } from "../contexts/api_context";
+import { demoMode } from "../utils/constants";
 
 function InitialLoader() {
     const navigate = useNavigate();

@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
-import { fanTimerOptions, getIsoDatePlusDuration, getFanTimerString, fanTimerDisplayUpdateInterval, isFanOn } from "../utils";
-import { TempDataContext } from "../temp_data_context";
+import { fanTimerOptions, fanTimerDisplayUpdateInterval } from "../utils/constants";
+import { getIsoDatePlusDuration, getFanTimerString, isFanOn } from "../utils/functions";
+import { TempDataContext } from "../contexts/temp_data_context";
 import { FanTimerMode } from "../types";
 
 interface ModalDrawerProps {

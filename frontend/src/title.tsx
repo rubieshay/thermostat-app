@@ -1,6 +1,6 @@
 import { useContext} from "react";
 import { Connectivity } from "./types";
-import { TempDataContext } from "./temp_data_context";
+import { TempDataContext } from "./contexts/temp_data_context";
 
 function Title() {
     const {selectedTempData: tempData} = useContext(TempDataContext);

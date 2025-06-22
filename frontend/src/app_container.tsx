@@ -1,14 +1,15 @@
 import { useCallback, useContext, useRef, useState } from "react";
-import { TempDataContext } from "./temp_data_context";
-import AppLoading from "./app_loading";
+import { TempDataContext } from "./contexts/temp_data_context";
+import AppLoading from "./loading/app_loading";
 import Title from "./title";
 import Dial from "./dial";
 import Tiles from "./tiles";
 import Error from "./error";
 import ModalDrawer from "./modal_drawer";
-import { useSocketMessages } from "./websocket_messages";
+import { useSocketMessages } from "./utils/websocket_messages";
 import { ModalDrawerType } from "./types";
-import { dataRefreshTime, drawerTimeoutDuration, usePageVisibilityRefresh, demoMode } from "./utils";
+import { dataRefreshTime, drawerTimeoutDuration, demoMode } from "./utils/constants";
+import { usePageVisibilityRefresh } from "./utils/functions";
 
 export function AppContainer() {
     const { initialLoadComplete, okToStartRefreshTimer, stopRefreshTimer, startRefreshTimer, fetchTempData } = useContext(TempDataContext);

@@ -1,8 +1,8 @@
 import { useContext} from "react";
-import { TempMessageType, type TempUpdateMessage, type TempMessage } from "./types";
-import { TempDataContext } from "./temp_data_context";
+import { TempMessageType, type TempUpdateMessage, type TempMessage } from "../types";
+import { TempDataContext } from "../contexts/temp_data_context";
 import useWebSocket from "react-use-websocket";
-import { APIContext } from "./api_context";
+import { APIContext } from "../contexts/api_context";
 
 
 function removeProtocol(url: string | null) {

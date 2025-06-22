@@ -1,7 +1,6 @@
 import { useContext, type SetStateAction } from "react";
 import { Connectivity, ModalDrawerType } from "./types";
-import { TempDataContext } from "./temp_data_context";
-// import { getFanTimerString, isFanOn, tempModeOptions, ecoModeOptions, fanTimerDisplayUpdateInterval } from "./utils";
+import { TempDataContext } from "./contexts/temp_data_context";
 import IndoorAmbientTile from "./tiles/indoor_ambient_tile";
 import OutdoorAmbientTile from "./tiles/outdoor_ambient_tile";
 import TempModeTile from "./tiles/temp_mode_tile";

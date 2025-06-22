@@ -1,5 +1,5 @@
 import { useContext, useState, type FormEvent } from "react";
-import { APIContext } from "./api_context";
+import { APIContext } from "./contexts/api_context";
 import { useNavigate } from "react-router";
 
 function Settings() {

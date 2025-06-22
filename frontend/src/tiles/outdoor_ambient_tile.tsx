@@ -1,8 +1,9 @@
 import { useContext, useState, useEffect, useCallback, useRef } from "react";
-import { TempDataContext } from "../temp_data_context";
-import { APIContext } from "../api_context";
+import { TempDataContext } from "../contexts/temp_data_context";
+import { APIContext } from "../contexts/api_context";
 import { demoWeatherData, TempUnits } from "../types";
-import { convertTemp, demoMode, getHumidityIcon, getWeatherIcon, roundedTemp } from "../utils";
+import { demoMode } from "../utils/constants";
+import { convertTemp, getHumidityIcon, getWeatherIcon, roundedTemp } from "../utils/functions";
 
 function OutdoorAmbientTile() {
     const {selectedTempData: tempData} = useContext(TempDataContext);

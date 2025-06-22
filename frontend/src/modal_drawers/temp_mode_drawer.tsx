@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import { tempModeOptions } from "../utils";
-import { TempDataContext } from "../temp_data_context";
+import { tempModeOptions } from "../utils/constants";
+import { TempDataContext } from "../contexts/temp_data_context";
 import { TempMode } from "../types";
 
 interface ModalDrawerProps {
