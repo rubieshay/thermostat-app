@@ -31,7 +31,7 @@ function EnterURL() {
                 <div id="input-url-explain">An API URL was not automatically detected. Please enter it below.</div>
                 <div className="input-group">
                     <label htmlFor="input-url">API URL</label>
-                    <input type="text" value={inputURL} id="input-url" aria-describedby="input-url-explain"
+                    <input type="text" autoCapitalize="none" value={inputURL} id="input-url" aria-describedby="input-url-explain"
                     onChange={(event) => setInputURL(event.target.value)}/>
                 </div>
                 <input className="standard-button" type="submit" value="Validate"/>
