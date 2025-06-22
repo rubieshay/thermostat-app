@@ -73,6 +73,7 @@ jobs:
     - name: Create gradle.properties
       run: |
         cat > frontend/android/gradle.properties << EOF
+        org.gradle.jvmargs=-Xmx1536m
         android.useAndroidX=true
         android.enableJetifier=true
         UPLOAD_STORE_FILE=upload-keystore.jks
