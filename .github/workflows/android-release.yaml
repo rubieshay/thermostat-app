@@ -115,7 +115,7 @@ jobs:
         releaseFiles: frontend/android/app/build/outputs/bundle/release/app-release.aab
         mappingFile: frontend/android/app/build/outputs/mapping/release/mapping.txt
         track: alpha
-        status: released
+        status: completed
         inAppUpdatePriority: 2
 
     # - name: Create GitHub Release
