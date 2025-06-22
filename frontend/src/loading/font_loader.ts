@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import outfitFontURL from "./assets/fonts/outfit.ttf?url";
-import materialSymbolsRoundedFontURL from "./assets/fonts/material_symbols_rounded_minified.ttf?url";
+import outfitFontURL from "../assets/fonts/outfit.ttf?url";
+import materialSymbolsRoundedFontURL from "../assets/fonts/material_symbols_rounded_minified.ttf?url";
 
 export function useFontLoader() {
 

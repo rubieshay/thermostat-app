@@ -125,6 +125,8 @@ body {
     position: relative;
     background: var(--main-bg);
     color: var(--main-text);
+    margin: var(--safe-area-inset-top) var(--safe-area-inset-right)
+            var(--safe-area-inset-bottom) var(--safe-area-inset-left);
 }
 main {
     display: flex;
