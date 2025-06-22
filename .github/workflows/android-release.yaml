@@ -114,7 +114,7 @@ jobs:
         packageName: net.shaytech.gthermostat
         releaseFiles: frontend/android/app/build/outputs/bundle/release/app-release.aab
         mappingFile: frontend/android/app/build/outputs/mapping/release/mapping.txt
-        track: closed
+        track: alpha
         status: draft
         inAppUpdatePriority: 2
 
