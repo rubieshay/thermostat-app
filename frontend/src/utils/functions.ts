@@ -1,6 +1,5 @@
-import { useRef, useCallback, useEffect } from "react";
-import { TempUnits, HvacStatus, type FetchReturn } from "../types";
-import { decimalPrecision, minDialTemps, maxDialTemps, humidityRanges, weatherIcons, dataRefreshTime, dataRefreshEnabled } from "./constants";
+import { TempUnits, HvacStatus } from "../types";
+import { decimalPrecision, minDialTemps, maxDialTemps, humidityRanges, weatherIcons } from "./constants";
 
 export function convertTemp(tempVal: number | null, inputUnits: TempUnits, outputUnits: TempUnits): number | null {
     if (tempVal === null){
