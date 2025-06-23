@@ -22,6 +22,7 @@ export const environment = process.env.ENVIRONMENT || "prod";
 export const subscriptionId = "thermostat-sub-id-" + environment;
 export let weatherLatitude = Number(process.env.WEATHER_LATITUDE) || 39.833333; // Default to Lebanon, KS
 export let weatherLongitude = Number(process.env.WEATHER_LONGITUDE) || -98.583333; // Default to Lebanon, KS
+export const defaultCORSOrigin = process.env.DEFAULT_CORS_ORIGIN || null;
 
 const httpPort = Number(process.env.PORT) || 3000;
 
@@ -36,7 +37,21 @@ export const fastify = Fastify({
 fastify.register(fastifyWebSockets);
 
 fastify.register(cors, {
-    origin: false
+    origin: (origin, cb) => {
+        if (origin === undefined) {
+            cb(null,true);
+            return;
+        };
+        const hostname = new URL(origin).hostname
+        if(hostname === "localhost"){
+            //  Request from localhost will pass
+            cb(null, true)
+            return
+        }
+        if (defaultCORSOrigin !== null && origin.includes(defaultCORSOrigin))
+        // Generate an error on other origins, disabling access
+        cb(new Error("Not allowed"), false)
+    }
 })
 
 fastify.register( async function (fastify) {
