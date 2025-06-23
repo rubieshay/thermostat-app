@@ -15,7 +15,7 @@ export async function getDataAndSubscribe() {
             console.debug("Running in demo mode, using demo data, no event subscription needed");
         } else {
             console.debug("Retrieved device data... Starting subscription");
-            startSubscription();
+            await startSubscription();
         }
     }
 }
