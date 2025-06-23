@@ -114,34 +114,58 @@
     --main-bg: var(--color-gray-6);
     --main-text: var(--color-gray-1);
 
-    --dial-size: max(min(100vh - 29.5rem, 92vw, 32rem), min(20rem, 92vw));
+    /* This is entire vh and vw, not 1/100th */
+    --vh: calc(100vh - var(--safe-area-inset-top) - var(--safe-area-inset-bottom));
+    --vw: calc(100vw - var(--safe-area-inset-left) - var(--safe-area-inset-right));
+
+    --dial-size: max(min((var(--vh)) - 29.5rem, 0.92*var(--vw), 32rem), min(20rem, 0.92*var(--vw)));
 }
 
 
 
 /* GENERAL/PAGE STYLING  */
 
+html {
+    background: var(--main-bg);
+}
 body {
     position: relative;
     background: var(--main-bg);
     color: var(--main-text);
-    margin: var(--safe-area-inset-top) var(--safe-area-inset-right)
+    padding: var(--safe-area-inset-top) var(--safe-area-inset-right)
             var(--safe-area-inset-bottom) var(--safe-area-inset-left);
 }
+/* status and nav bar colors */
+body::before, body::after {
+    content: "";
+    display: block;
+    width: var(--vw);
+    position: fixed;
+    z-index: 999;
+}
+body::before {
+    top: 0;
+    height: var(--safe-area-inset-top);
+}
+body::after {
+    bottom: 0;
+    height: var(--safe-area-inset-bottom);
+}
 main {
+    background: var(--main-bg);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 2rem;
-    padding: 2rem 4vw;
+    padding: 2rem calc(0.04*var(--vw));
 }
 .centered-page {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    height: var(--vh);
 }
 h1, h2, h3, h4, h5, h6 {
     display: block;

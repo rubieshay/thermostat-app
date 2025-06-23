@@ -54,13 +54,14 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
     }, [themeSetting]);
 
     const enableSafeArea = useCallback(() => {
+        // both are transparent and created with css because the custom color bars doesn't appear to work
         if (usedTheme === ThemeSetting.dark) {
             SafeArea.enable({
                 config: {
                     customColorsForSystemBars: true,
-                    statusBarColor: "#000000",
+                    statusBarColor: "#00000000",
                     statusBarContent: "light",
-                    navigationBarColor: "#000000",
+                    navigationBarColor: "#00000000",
                     navigationBarContent: "light",
                 },
             });
@@ -68,9 +69,9 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
             SafeArea.enable({
                 config: {
                     customColorsForSystemBars: true,
-                    statusBarColor: "#ffffff",
+                    statusBarColor: "#ffffff00",
                     statusBarContent: "dark",
-                    navigationBarColor: "#ffffff",
+                    navigationBarColor: "#ffffff00",
                     navigationBarContent: "dark",
                 },
             });

@@ -49,7 +49,7 @@ dialog.modal-popup {
     padding: 2rem;
 }
 dialog.modal-popup[open] {
-    width: min(80vw, 32rem);
+    width: min(0.8*var(--vw), 32rem);
     border-radius: 1rem;
     top: 50%;
     left: 50%;
@@ -67,7 +67,7 @@ dialog.modal-popup button {
 /* DRAWERS */
 
 dialog.modal-drawer {
-    width: 100vw;
+    width: var(--vw);
     padding: 3rem 2rem 2rem 2rem;
     background: var(--color-gray-5);
     border-radius: 1rem 1rem 0 0;

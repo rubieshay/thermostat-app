@@ -7,11 +7,11 @@
     }
 }
 #loading-container {
-    height: calc(100vh - 4rem);
+    height: calc(var(--vh) - 4rem);
 }
 .loading-icon {
     display: block;
-    width: min(40vw, 40vh, 20rem);
+    width: min(0.4*var(--vw), 0.4*var(--vh), 20rem);
     aspect-ratio: 1;
     fill: var(--color-gray-1);
     animation: spin 4s linear infinite normal forwards;

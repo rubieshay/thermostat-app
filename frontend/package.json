@@ -1,7 +1,7 @@
 {
   "name": "thermostat-app",
   "private": true,
-  "version": "0.4.6",
+  "version": "0.4.7",
   "type": "module",
   "scripts": {
     "predev": "bin/updateenv.sh",
@@ -15,6 +15,8 @@
     "android:build": "npm run build && npx cap sync android && cd android && ./gradlew assembleRelease",
     "android:bundle": "npm run build && npx cap sync android && cd android && ./gradlew bundleRelease",
     "android:clean": "cd android && ./gradlew clean",
+    "android:open" : "npm run build && npx cap sync android && npx cap open android",
+    "android:sync" : "npm run build && npx cap sync android",
     "version:sync": "cap-set-version"
   },
   "dependencies": {
