@@ -9,7 +9,8 @@ export const dataRefreshEnabled =((window as any)._env_.DATA_REFRESH_ENABLED ===
                                   (window as any)._env_.DATA_REFRESH_ENABLED === "1" ||
                                   (window as any)._env_.DATA_REFRESH_ENABLED === "YES") ? true : false;
 /* eslint-enable @typescript-eslint/no-explicit-any */                                  
-console.debug("Environment driven settings:", {demoMode, defaultAPIURL, dataRefreshEnabled});
+export const appVersion = __APP_VERSION__;
+console.debug("Environment driven settings:", {demoMode, defaultAPIURL, dataRefreshEnabled, appVersion});
 
 export const debounceTime: number = 3000;
 export const dataRefreshTime: number = 60000;

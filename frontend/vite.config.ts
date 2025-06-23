@@ -3,6 +3,9 @@ import react from '@vitejs/plugin-react'
 import checker from 'vite-plugin-checker'
 import path from 'path'
 import { exec } from 'child_process'
+import { readFileSync } from "fs";
+
+const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'));
 
 // Custom plugin to watch .env file changes
 const envWatcherPlugin = () => {
@@ -44,6 +47,9 @@ const envWatcherPlugin = () => {
 
 // https://vite.dev/config/
 export default defineConfig({
+  define: {
+        __APP_VERSION__: JSON.stringify(packageJson.version),
+      },
   build: {
     rollupOptions: {
       output: {
