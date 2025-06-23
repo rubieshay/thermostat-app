@@ -15,8 +15,8 @@
     "android:build": "npm run build && npx cap sync android && cd android && ./gradlew assembleRelease",
     "android:bundle": "npm run build && npx cap sync android && cd android && ./gradlew bundleRelease",
     "android:clean": "cd android && ./gradlew clean",
-    "android:open" : "npm run build && npx cap sync android && npx cap open android",
-    "android:sync" : "npm run build && npx cap sync android",
+    "android:open": "npm run build && npx cap sync android && npx cap open android",
+    "android:sync": "npm run build && npx cap sync android",
     "version:sync": "cap-set-version"
   },
   "dependencies": {
@@ -36,7 +36,6 @@
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react": "^4.4.1",
-    "capacitor-set-version": "^2.2.0",
     "eslint": "^9.25.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",

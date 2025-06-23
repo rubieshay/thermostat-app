@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import cors from '@fastify/cors';
 import fastifyWebSockets from "@fastify/websocket";
 import { FetchReturn, TempMessageType, WeatherData, initWeatherData, TempMessage } from "./types";
 import { infoQuerySchema, InfoQueryString, latLongQuerySchema, latLongQueryString, setHeatSchema, SetHeatBody, 
@@ -33,6 +34,10 @@ export const fastify = Fastify({
 })
 
 fastify.register(fastifyWebSockets);
+
+fastify.register(cors, {
+    origin: false
+})
 
 fastify.register( async function (fastify) {
     fastify.get("/ws", { websocket: true,},
