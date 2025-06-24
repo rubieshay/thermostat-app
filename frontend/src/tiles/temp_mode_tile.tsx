@@ -3,11 +3,8 @@ import { ModalDrawerType } from "../types";
 import { TempDataContext } from "../contexts/temp_data_context";
 import { tempModeOptions } from "../utils/constants";
 
-interface TileProps {
-    setModalDrawerType: React.Dispatch<SetStateAction<ModalDrawerType | null>>
-}
-
-const TempModeTile: React.FC<TileProps> = ({ setModalDrawerType }) => {
+function TempModeTile({ setModalDrawerType }: {
+    setModalDrawerType: React.Dispatch<SetStateAction<ModalDrawerType | null>>}) {
     const {selectedTempData: tempData} = useContext(TempDataContext);
 
     return (
@@ -17,7 +14,7 @@ const TempModeTile: React.FC<TileProps> = ({ setModalDrawerType }) => {
                 <span className="material-symbols material-symbols-rounded" aria-hidden="true">
                     {tempModeOptions.find((option) => option.tempMode === tempData.tempMode)?.symbolText}
                 </span>
-                <span>{tempModeOptions.find((option) => option.tempMode === tempData.tempMode)?.dispText}</span>
+                <span>{tempModeOptions.find((option) => option.tempMode === tempData.tempMode)?.displayText}</span>
             </div>
         </button>
     );

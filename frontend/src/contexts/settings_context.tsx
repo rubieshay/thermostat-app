@@ -6,14 +6,14 @@ import { SafeArea } from "@capacitor-community/safe-area";
 
 export interface SettingsContextType {
     tempUnitsSetting: TempUnitsSetting,
-    setTempUnits: (units: TempUnitsSetting) => void,
+    setTempUnitsSetting: (units: TempUnitsSetting) => void,
     themeSetting: ThemeSetting,
     setThemeSetting: (mode: ThemeSetting) => void
 }
 
 export const initSettingsContext: SettingsContextType = {
     tempUnitsSetting: TempUnitsSetting.system,
-    setTempUnits: async() => {},
+    setTempUnitsSetting: async() => {},
     themeSetting: ThemeSetting.system,
     setThemeSetting: async() => {}
 }
@@ -26,7 +26,7 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
     const [tempUnitsSetting, setTempUnitsSettingState] = useState<TempUnitsSetting>(TempUnitsSetting.system);
     const [initialSettingsLoadComplete, setInitialSettingsLoadComplete] = useState(false);
 
-    const loadSettings = useCallback( async() => {
+    const loadSettings = useCallback(async() => {
         const {value: themeValue} = await Preferences.get({ key: "themeSetting"});
         if (themeValue === null) {
             setThemeSetting(initSettingsContext.themeSetting);
@@ -35,7 +35,7 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
         }
         const {value: tempValue} = await Preferences.get({ key: "tempUnits"});
         if (tempValue === null) {
-            setTempUnits(initSettingsContext.tempUnitsSetting);
+            setTempUnitsSetting(initSettingsContext.tempUnitsSetting);
         } else {
             setTempUnitsSettingState(tempValue as TempUnitsSetting);
         }
@@ -97,13 +97,13 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
         setThemeSettingState(mode);
     }
 
-    async function setTempUnits(units: TempUnitsSetting) {
+    async function setTempUnitsSetting(units: TempUnitsSetting) {
         await Preferences.set({ key: "tempUnits", value: units});
         setTempUnitsSettingState(units);
     }
 
     const memoedValue = useMemo(() => ({
-        tempUnitsSetting, setTempUnits, themeSetting, setThemeSetting
+        tempUnitsSetting, setTempUnitsSetting, themeSetting, setThemeSetting
     }), [tempUnitsSetting, themeSetting])
 
     return (

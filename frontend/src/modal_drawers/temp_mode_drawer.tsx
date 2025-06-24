@@ -3,20 +3,16 @@ import { tempModeOptions } from "../utils/constants";
 import { TempDataContext } from "../contexts/temp_data_context";
 import { TempMode } from "../types";
 
-interface ModalDrawerProps {
-    handleCloseModal: () => void
-}
-
-const TempModeDrawer: React.FC<ModalDrawerProps> = ({ handleCloseModal }) => {
+function TempModeDrawer({ handleCloseModal }: {handleCloseModal: () => void}) {
     const {selectedTempData: tempData, debounceTempData, setTempMode} = useContext(TempDataContext);
-    const [dispTempMode, setDispTempMode] = useState<TempMode>(TempMode.off);
+    const [currTempMode, setCurrTempMode] = useState<TempMode>(TempMode.off);
 
     useEffect (() => {
-        setDispTempMode(tempData.tempMode);
+        setCurrTempMode(tempData.tempMode);
     }, [tempData.tempMode]);
     
     function changeTempMode(newTempMode: TempMode) {
-        setDispTempMode(newTempMode);
+        setCurrTempMode(newTempMode);
         debounceTempData(() => setTempMode(newTempMode), false);
         handleCloseModal();
     }
@@ -25,14 +21,14 @@ const TempModeDrawer: React.FC<ModalDrawerProps> = ({ handleCloseModal }) => {
         <div className="drawer-content">
             <h2>HVAC Mode</h2>
             <hr/>
-            <ul className="radio-select">
+            <ul className="radio-select-list">
                 {tempModeOptions.map((option) => (
-                    <li key={option.tempMode} id={"temp-mode-select-" + option.idText} className={dispTempMode === option.tempMode ? "radio-selected" : ""}>
+                    <li key={option.tempMode} id={"temp-mode-select-" + option.idText} className={currTempMode === option.tempMode ? "radio-selected" : ""}>
                         <button className="standard-button icon-text-group" onClick={() => changeTempMode(option.tempMode)}>
                             <span className="material-symbols material-symbols-rounded" aria-hidden="true">
                                 {option.symbolText}
                             </span>
-                            <span>{option.dispText}</span>
+                            <span>{option.displayText}</span>
                         </button>
                     </li>
                 ))}

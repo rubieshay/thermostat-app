@@ -1,8 +1,8 @@
 /* BUTTONS */
 
 button, input[type="button"], input[type="submit"] {
+    display: block;
     cursor: pointer;
-    transition: scale 200ms ease-in-out;
 }
 .standard-button {
     width: fit-content;
@@ -11,17 +11,23 @@ button, input[type="button"], input[type="submit"] {
     border-radius: 1rem;
     background: var(--color-gray-3);
     color: var(--color-gray-0);
+    transition: scale 200ms ease-in-out;
 }
 .standard-button:hover, .standard-button:focus-visible {
     scale: 1.025;
 }
-
 .standard-button.button-disabled {
     background: var(--color-gray-4);
     color: var(--color-gray-5);
     cursor: default;
     pointer-events: none;
 }
+.icon-button {
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+}
+
 
 
 /* INPUT TEXT */
@@ -30,7 +36,6 @@ input[type="text"] {
     appearance: none;
     -webkit-appearance: none;
     display: block;
-    /* min-height: 0; */
     padding: calc(0.75rem - 2px);
     border-radius: 1rem;
     font-size: 1rem;
@@ -39,17 +44,19 @@ input[type="text"] {
     color: var(--color-gray-0);
     border: 2px solid var(--color-gray-3);
 }
-
-
+.input-invalid input[type="text"] {
+    border: 2px solid var(--color-heat-2);
+}
 
 /* FORM ELEMENTS */
 
 form {
     display: flex;
     flex-direction: column;
+    width: 100%;
     gap: 1.5rem;
 }
-label {
+label, .label {
     font-size: 0.875rem;
     color: var(--color-gray-3);
 }
@@ -58,46 +65,41 @@ label {
     flex-direction: column;
     gap: 0.5rem;
 }
+.input-error {
+    min-height: 1rem;
+    color: var(--color-heat-2);
+}
 
 
 
 /* SPECIFIC FORM ELEMENTS */
 
-#input-url-page form {
+#enter-url-page form, #enter-url-page #enter-url-explain {
     max-width: 20rem;
 }
-#input-url-page form > div {
+#enter-url-page #enter-url-explain {
     line-height: 1.25;
 }
 
 
 
-/* CONTROL TILE MODALS */
+/* RADIO SELECT BUTTONS/LIST (FOR CONTROL TILE MODALS AND SETTINGS) */
 
-ul.radio-select {
+ul.radio-select-list {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
-.radio-select li {
+.radio-select-list li, .radio-buttons li {
     display: block;
 }
-.radio-select button {
+.radio-select-list button {
     width: 100%;
-    /* padding: 1rem;
-    border-radius: 1rem; */
     background: var(--color-gray-4);
-    /* transition: scale 200ms ease-in-out; */
 }
-/* .radio-select button:hover, .radio-select button:focus-visible {
-    scale: 1.025;
-} */
-.radio-select li.radio-selected button {
+.radio-select-list li.radio-selected button {
     background: var(--color-gray-3);
     color: var(--color-gray-0);
-}
-.drawer-content hr {
-    height: 1rem;
 }
 ul.button-select {
     display: flex;
@@ -107,19 +109,24 @@ ul.button-select {
 ul.button-select li {
     display: block;
 }
-/* ul.button-select li button {
+.drawer-content hr {
+    height: 1rem;
+}
+
+ul.radio-buttons {
+    display: flex;
+    flex-direction: row;
+    border-radius: 1rem;
+    background: var(--color-gray-4);
+}
+.radio-buttons button {
+    width: fit-content;
+    display: block;
+    padding: 1rem;
+    border-radius: 1rem;
+    color: var(--color-gray-2);
+}
+.radio-buttons li.radio-selected button {
     background: var(--color-gray-3);
     color: var(--color-gray-0);
-    padding: 1rem 1.25rem;
-    border-radius: 0.5rem;
-    transition: scale 200ms ease-in-out;
-} */
-/* .button-select button:hover, .button-select button:focus-visible {
-    scale: 1.075;
-} */
-/* ul.button-select li.button-option-disabled button {
-    background: var(--color-gray-4);
-    color: var(--color-gray-5);
-    cursor: default;
-    pointer-events: none;
-} */
+}

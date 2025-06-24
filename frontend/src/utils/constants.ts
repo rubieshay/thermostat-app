@@ -1,4 +1,4 @@
-import { TempMode, EcoMode } from "../types";
+import { TempMode, EcoMode, TempUnitsSetting, ThemeSetting } from "../types";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const demoMode = ((window as any)._env_.DEMO_MODE === "TRUE" ||
@@ -68,30 +68,36 @@ export const usedDialRatio: number = 5/6;
 
 
 export const tempModeOptions = [{tempMode: TempMode.heat, idText: "heat",
-                                 dispText: "Heat", symbolText: "\uf537"},
+                                 displayText: "Heat", symbolText: "\uf537"},
                                 {tempMode: TempMode.heatcool, idText: "heatcool",
-                                 dispText: "Heat • Cool", symbolText: "\uf557"},
+                                 displayText: "Heat • Cool", symbolText: "\uf557"},
                                 {tempMode: TempMode.cool, idText: "cool",
-                                 dispText: "Cool", symbolText: "\uf166"},
+                                 displayText: "Cool", symbolText: "\uf166"},
                                 {tempMode: TempMode.off, idText: "off",
-                                 dispText: "Off", symbolText: "\uf16f"}]
+                                 displayText: "Off", symbolText: "\uf16f"}]
 export const ecoModeOptions = [{"ecoMode": EcoMode.on, idText: "on",
-                                dispText: "On", symbolText: "\uf8be"},
+                                displayText: "On", symbolText: "\uf8be"},
                                {"ecoMode": EcoMode.off, idText: "off",
-                                dispText: "Off", symbolText: "\uf16f"}]
-export const fanTimerOptions = [{duration: 900, dispText: "15 min"},
-                                {duration: 1800, dispText: "30 min"},
-                                {duration: 2700, dispText: "45 min"},
-                                {duration: 3600, dispText: "1 hr"},
-                                {duration: 7200, dispText: "2 hr"},
-                                {duration: 14400, dispText: "4 hr"},
-                                {duration: 28800, dispText: "8 hr"},
-                                {duration: 43200, dispText: "12 hr"}]
+                                displayText: "Off", symbolText: "\uf16f"}]
+export const fanTimerOptions = [{duration: 900, displayText: "15 min"},
+                                {duration: 1800, displayText: "30 min"},
+                                {duration: 2700, displayText: "45 min"},
+                                {duration: 3600, displayText: "1 hr"},
+                                {duration: 7200, displayText: "2 hr"},
+                                {duration: 14400, displayText: "4 hr"},
+                                {duration: 28800, displayText: "8 hr"},
+                                {duration: 43200, displayText: "12 hr"}]
+
+export const tempUnitsOptions = [{displayText: "Celsius", tempUnitsSetting: TempUnitsSetting.celsius},
+                                {displayText: "System", tempUnitsSetting: TempUnitsSetting.system},
+                                {displayText: "Fahrenheit", tempUnitsSetting: TempUnitsSetting.fahrenheit}]
+export const themeOptions = [{displayText: "Light", themeSetting: ThemeSetting.light},
+                                {displayText: "System", themeSetting: ThemeSetting.system},
+                                {displayText: "Dark", themeSetting: ThemeSetting.dark}]
 
 export const humidityRanges = [{rangeEnd: 0, symbolText: "\uf164"},
                                 {rangeEnd: 40, symbolText: "\uf165"},
                                 {rangeEnd: 60, symbolText: "\uf163"}]
-
 export const weatherIcons = {
     day: {
         skc: {symbolText: "\ue81a", ariaText: "Sunny"},

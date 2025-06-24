@@ -26,9 +26,7 @@ export const WeatherContextProvider: React.FC<ChildrenProviderProps> = (props: C
 
 
     const getWeather = useCallback(async () => {
-        console.log("Getting weather...");
         if (demoMode) {
-            console.log("demo")
             setWeatherData(demoWeatherData);
             setWeatherDataLoaded(true);
             return;
@@ -41,7 +39,6 @@ export const WeatherContextProvider: React.FC<ChildrenProviderProps> = (props: C
         }
         weatherDataLoading.current = true;
         const url = apiURL + "/weather";
-        console.log("Weather URL:", url);
         try {
             const response = await fetch(url, {
                 method: "GET",
@@ -53,7 +50,6 @@ export const WeatherContextProvider: React.FC<ChildrenProviderProps> = (props: C
                 console.error("Failed to get weather : " + response.statusText);
                 return;
             }
-            console.log("fetched weather");
             const weatherData = await response.json();
             setWeatherData(weatherData);
             setWeatherDataLoaded(true);

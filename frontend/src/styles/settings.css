@@ -1,0 +1,11 @@
+#settings-page {
+    align-items: start;
+}
+#settings-page hr {
+    height: 1px;
+    width: 100%;
+    background: var(--color-gray-3);
+}
+#settings-page > form, #settings-page > div {
+    max-width: 20rem;
+}

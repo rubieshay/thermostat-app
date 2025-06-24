@@ -2,11 +2,13 @@ import { useContext } from "react";
 import { TempDataContext } from "../contexts/temp_data_context";
 import { TempUnits } from "../types";
 import { getHumidityIcon, convertTemp, roundedTemp } from "../utils/functions";
+import { useActualTempUnits } from "../utils/hooks";
 
 function IndoorAmbientTile() {
     const {selectedTempData: tempData} = useContext(TempDataContext);
+    const tempUnits = useActualTempUnits();
 
-    const ambientIndoorTempString = roundedTemp(convertTemp(tempData.ambientTempCelsius, TempUnits.celsius, tempData.tempUnits), tempData.tempUnits) ? roundedTemp(convertTemp(tempData.ambientTempCelsius, TempUnits.celsius, tempData.tempUnits), tempData.tempUnits)!.toString() + "\u00B0" : "Not Found";
+    const ambientIndoorTempString = roundedTemp(convertTemp(tempData.ambientTempCelsius, TempUnits.celsius, tempUnits), tempUnits) ? roundedTemp(convertTemp(tempData.ambientTempCelsius, TempUnits.celsius, tempUnits), tempUnits)!.toString() + "\u00B0" : "Not Found";
     const ambientIndoorHumidityString = tempData.ambientHumidity ? Math.round(tempData.ambientHumidity).toString() + "%" : "Not Found";
 
     return (

@@ -4,11 +4,7 @@ import { TempDataContext } from "../contexts/temp_data_context";
 import { fanTimerDisplayUpdateInterval } from "../utils/constants";
 import { getFanTimerString, isFanOn } from "../utils/functions";
 
-interface TileProps {
-    setModalDrawerType: React.Dispatch<SetStateAction<ModalDrawerType | null>>
-}
-
-const FanTimerTile: React.FC<TileProps> = ({ setModalDrawerType }) => {
+function FanTimerTile({ setModalDrawerType }: {setModalDrawerType: React.Dispatch<SetStateAction<ModalDrawerType | null>>}) {
     const {selectedTempData: tempData} = useContext(TempDataContext);
     const [fanTimerString, setFanTimerString] = useState<string>("");
     const fanIsActive: boolean = isFanOn(tempData.fanTimer, tempData.hvacStatus);

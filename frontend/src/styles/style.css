@@ -61,7 +61,7 @@
 /* FONTS */
 
 :root {
-    font-family: "Outfit", system-ui, sans-serif;
+    font-family: "Outfit", sans-serif;
     font-variation-settings: "wght" 400;
 }
 .material-symbols {
@@ -83,7 +83,7 @@
     user-select: none;
 }
 .material-symbols-rounded {
-    font-family: "Material Symbols Rounded";
+    font-family: "Material Symbols Rounded", "Outfit", sans-serif;
 }
 
 
@@ -132,8 +132,8 @@ body {
     position: relative;
     background: var(--main-bg);
     color: var(--main-text);
-    padding: var(--safe-area-inset-top) var(--safe-area-inset-right)
-            var(--safe-area-inset-bottom) var(--safe-area-inset-left);
+    padding: calc(var(--safe-area-inset-top)) calc(var(--safe-area-inset-right))
+             calc(var(--safe-area-inset-bottom)) calc(var(--safe-area-inset-left));
 }
 /* status and nav bar colors */
 body::before, body::after {
@@ -157,23 +157,18 @@ main {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2rem;
-    padding: 2rem calc(0.04*var(--vw));
+    gap: 1.5rem;
+    padding: 1.5rem min(1.5rem, 0.04*var(--vw));
 }
 .centered-page {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: var(--vh);
+    height: calc(var(--vh) - 6rem);
 }
 h1, h2, h3, h4, h5, h6 {
     display: block;
-}
-h1 {
-    font-size: 1.5rem;
-    text-align: center;
-    line-height: 1.25;
 }
 .icon-title {
     display: flex;

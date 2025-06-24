@@ -2,30 +2,32 @@ import { useEffect, useState, useContext, useRef, useCallback } from "react";
 import { TempUnits, TempMode, EcoMode, HvacStatus, Connectivity, SetPointType } from "./types";
 import { maxDialTemps, minDialTemps, usedDialRatio, decimalPrecision, minRangeGap, setPointFadeDuration } from "./utils/constants";
 import { roundedTemp, convertTemp, makeTempInRange, isFanOn } from "./utils/functions"
+import { useActualTempUnits } from "./utils/hooks";
 import { TempDataContext } from "./contexts/temp_data_context";
 
 function Dial() {
     const {selectedTempData: tempData, debounceTempData, setHeatCelsius, setCoolCelsius, setRangeCelsius} = useContext(TempDataContext);
-    // we need to possibly schange dispTemps to not be rounded for better dragging, but only display numbers as rounded at set numbers as rounded and maybe create roundedDispTemps (also could split into decimal component for superscript-like decimals)
-    const [dispCoolPoint, setDispCoolPoint] = useState<number | null>(null);
-    const [dispHeatPoint, setDispHeatPoint] = useState<number | null>(null);
+    const tempUnits = useActualTempUnits();
+    // we need to possibly change displayTemps to not be rounded for better dragging, but only display numbers as rounded at set numbers as rounded and maybe create roundedDisplayTemps (also could split into decimal component for superscript-like decimals)
+    const [displayCoolPoint, setDisplayCoolPoint] = useState<number | null>(null);
+    const [displayHeatPoint, setDisplayHeatPoint] = useState<number | null>(null);
     const [activeSetPoint, setActiveSetPoint] = useState<SetPointType | null>(null);
     const [lastSetPoint, setLastSetPoint] = useState<SetPointType | null>(null);
     const [isDraggingTemp, setIsDraggingTemp] = useState<boolean>(false);
     const setPointFadeTimer = useRef<number | null>(null);
     const dialRef = useRef<HTMLElement | null>(null);
 
-    const dispAmbientTemp: number | null = roundedTemp(convertTemp(tempData.ambientTempCelsius, TempUnits.celsius, tempData.tempUnits), tempData.tempUnits);
+    const displayAmbientTemp: number | null = roundedTemp(convertTemp(tempData.ambientTempCelsius, TempUnits.celsius, tempUnits), tempUnits);
     const fanIsActive: boolean = isFanOn(tempData.fanTimer, tempData.hvacStatus);
 
-    const maxDialTemp: number = maxDialTemps[tempData.tempUnits];
-    const minDialTemp: number = minDialTemps[tempData.tempUnits];
+    const maxDialTemp: number = maxDialTemps[tempUnits];
+    const minDialTemp: number = minDialTemps[tempUnits];
     const midDialTemp: number = (maxDialTemp + minDialTemp) / 2;
     const dialRange: number = maxDialTemp - minDialTemp;
 
-    const ambientThumbAngle: number | null = getThumbAngle(dispAmbientTemp);
-    const coolPointThumbAngle: number | null = getThumbAngle(dispCoolPoint);
-    const heatPointThumbAngle: number | null = getThumbAngle(dispHeatPoint);
+    const ambientThumbAngle: number | null = getThumbAngle(displayAmbientTemp);
+    const coolPointThumbAngle: number | null = getThumbAngle(displayCoolPoint);
+    const heatPointThumbAngle: number | null = getThumbAngle(displayHeatPoint);
     const activeTrackRange: number[] = getTrackRange();
 
     useEffect(() => {
@@ -46,9 +48,9 @@ function Dial() {
                 baseTemp = tempData.coolCelsius;
             }
         }
-        const unitTemp = convertTemp(baseTemp, TempUnits.celsius, tempData.tempUnits);
-        setDispCoolPoint(roundedTemp(unitTemp, tempData.tempUnits));
-    }, [tempData.ecoCoolCelsius, tempData.coolCelsius, tempData.tempUnits, tempData.tempMode, tempData.ecoMode]);
+        const unitTemp = convertTemp(baseTemp, TempUnits.celsius, tempUnits);
+        setDisplayCoolPoint(roundedTemp(unitTemp, tempUnits));
+    }, [tempData.ecoCoolCelsius, tempData.coolCelsius, tempUnits, tempData.tempMode, tempData.ecoMode]);
 
     useEffect(() => {
         let baseTemp = null;
@@ -59,9 +61,9 @@ function Dial() {
                 baseTemp = tempData.heatCelsius;
             }
         }
-        const unitTemp = convertTemp(baseTemp, TempUnits.celsius, tempData.tempUnits);
-        setDispHeatPoint(roundedTemp(unitTemp, tempData.tempUnits));
-    }, [tempData.ecoHeatCelsius, tempData.heatCelsius, tempData.tempUnits, tempData.tempMode, tempData.ecoMode]);
+        const unitTemp = convertTemp(baseTemp, TempUnits.celsius, tempUnits);
+        setDisplayHeatPoint(roundedTemp(unitTemp, tempUnits));
+    }, [tempData.ecoHeatCelsius, tempData.heatCelsius, tempUnits, tempData.tempMode, tempData.ecoMode]);
 
     // SWAPPING AND FADING SETPOINTS
 
@@ -87,14 +89,14 @@ function Dial() {
     // SETTING/CHANGING TEMP SETPOINTS
 
     const changeSingleTemp = useCallback((newTemp: number, setPointType: SetPointType) => {
-        const fixedTemp = makeTempInRange(newTemp, tempData.tempUnits);
+        const fixedTemp = makeTempInRange(newTemp, tempUnits);
         if (setPointType === SetPointType.heat && tempData.tempMode === TempMode.heat) {
-            setDispHeatPoint(roundedTemp(fixedTemp, tempData.tempUnits));
+            setDisplayHeatPoint(roundedTemp(fixedTemp, tempUnits));
         } else if (setPointType === SetPointType.cool && tempData.tempMode === TempMode.cool) {
-            setDispCoolPoint(roundedTemp(fixedTemp, tempData.tempUnits));
+            setDisplayCoolPoint(roundedTemp(fixedTemp, tempUnits));
         }
         // fix then round then convert
-        const celsiusFixedTemp: number | null = convertTemp(roundedTemp(fixedTemp, tempData.tempUnits), tempData.tempUnits, TempUnits.celsius);
+        const celsiusFixedTemp: number | null = convertTemp(roundedTemp(fixedTemp, tempUnits), tempUnits, TempUnits.celsius);
 
         if (celsiusFixedTemp === null) {
             return;
@@ -104,10 +106,10 @@ function Dial() {
         } else if (tempData.tempMode === TempMode.cool) {
             debounceTempData(() => setCoolCelsius(celsiusFixedTemp), true);
         }
-    }, [debounceTempData, setCoolCelsius, setHeatCelsius, tempData.tempMode, tempData.tempUnits]);
+    }, [debounceTempData, setCoolCelsius, setHeatCelsius, tempData.tempMode, tempUnits]);
 
     const changeRangeTemps = useCallback((newTemp: number, setPointType: SetPointType) => {
-        if (dispHeatPoint === null || dispCoolPoint === null) {
+        if (displayHeatPoint === null || displayCoolPoint === null) {
             return;
         }
         // get both temps fixed(range) and rounded but not converted
@@ -115,42 +117,42 @@ function Dial() {
         let coolPoint;
         if (setPointType === SetPointType.heat) {
             heatPoint = newTemp;
-            coolPoint = dispCoolPoint
+            coolPoint = displayCoolPoint
         } else {
-            heatPoint = dispHeatPoint;
+            heatPoint = displayHeatPoint;
             coolPoint = newTemp;
         }
-        heatPoint = roundedTemp(makeTempInRange(heatPoint, tempData.tempUnits), tempData.tempUnits);
-        coolPoint = roundedTemp(makeTempInRange(coolPoint, tempData.tempUnits), tempData.tempUnits);
+        heatPoint = roundedTemp(makeTempInRange(heatPoint, tempUnits), tempUnits);
+        coolPoint = roundedTemp(makeTempInRange(coolPoint, tempUnits), tempUnits);
         let newHeatPoint = heatPoint;
         let newCoolPoint = coolPoint;
         // ensure a large enough gap
-        if (coolPoint! - heatPoint! < minRangeGap[tempData.tempUnits]) {
+        if (coolPoint! - heatPoint! < minRangeGap[tempUnits]) {
             if (setPointType === SetPointType.heat) {
-                newCoolPoint = (heatPoint! + minRangeGap[tempData.tempUnits]);
+                newCoolPoint = (heatPoint! + minRangeGap[tempUnits]);
                 if (newCoolPoint > maxDialTemp) {
                     newCoolPoint = maxDialTemp;
-                    newHeatPoint = maxDialTemp - minRangeGap[tempData.tempUnits];
+                    newHeatPoint = maxDialTemp - minRangeGap[tempUnits];
                 }
             } else {
-                newHeatPoint = (coolPoint! - minRangeGap[tempData.tempUnits]);
+                newHeatPoint = (coolPoint! - minRangeGap[tempUnits]);
                 if (newHeatPoint < minDialTemp) {
                     newHeatPoint = minDialTemp;
-                    newCoolPoint = minDialTemp + minRangeGap[tempData.tempUnits];
+                    newCoolPoint = minDialTemp + minRangeGap[tempUnits];
                 }
             }
         }
-        // set disp points
-        setDispHeatPoint(newHeatPoint);
-        setDispCoolPoint(newCoolPoint);
+        // set display points
+        setDisplayHeatPoint(newHeatPoint);
+        setDisplayCoolPoint(newCoolPoint);
         // convert to C and send calls
-        const heatCelsiusFixedTemp = convertTemp(newHeatPoint, tempData.tempUnits, TempUnits.celsius);
-        const coolCelsiusFixedTemp = convertTemp(newCoolPoint, tempData.tempUnits, TempUnits.celsius);
+        const heatCelsiusFixedTemp = convertTemp(newHeatPoint, tempUnits, TempUnits.celsius);
+        const coolCelsiusFixedTemp = convertTemp(newCoolPoint, tempUnits, TempUnits.celsius);
         if (heatCelsiusFixedTemp === null || coolCelsiusFixedTemp === null) {
             return;
         }
         debounceTempData(() => setRangeCelsius(heatCelsiusFixedTemp, coolCelsiusFixedTemp), true);
-    }, [debounceTempData, dispCoolPoint, dispHeatPoint, maxDialTemp, minDialTemp, setRangeCelsius, tempData.tempUnits]);
+    }, [debounceTempData, displayCoolPoint, displayHeatPoint, maxDialTemp, minDialTemp, setRangeCelsius, tempUnits]);
 
     const changeTemp = useCallback((newTemp: number, setPointType: SetPointType) => {
         if (tempData.tempMode === TempMode.off || tempData.ecoMode === EcoMode.on) {
@@ -182,16 +184,16 @@ function Dial() {
         // change corresponding setpoint
         let newTemp: number;
         if (thisSetPoint === SetPointType.cool) {
-            if (dispCoolPoint === null) {
+            if (displayCoolPoint === null) {
                 return;
             } else {
-                newTemp = dispCoolPoint + diff;
+                newTemp = displayCoolPoint + diff;
             }
         } else if (thisSetPoint === SetPointType.heat) {
-            if (dispHeatPoint === null) {
+            if (displayHeatPoint === null) {
                 return;
             } else {
-                newTemp = dispHeatPoint + diff;
+                newTemp = displayHeatPoint + diff;
             }
         } else {
             return;
@@ -249,7 +251,7 @@ function Dial() {
             window.removeEventListener("pointerup", finishDragTemp);
         });
 
-    }, [isDraggingTemp, dispCoolPoint, dispHeatPoint, dragTemp, finishDragTemp]);
+    }, [isDraggingTemp, displayCoolPoint, displayHeatPoint, dragTemp, finishDragTemp]);
 
     // DIALS AND THUMBS
 
@@ -338,7 +340,7 @@ function Dial() {
                     <div id="main-numbers">
                         <div id="main-numbers-ambient" className="main-number-group">
                             <h2>Indoor</h2>
-                            <h3>{(typeof dispAmbientTemp === "number") && !isNaN(dispAmbientTemp) ? dispAmbientTemp : ""}</h3>
+                            <h3>{(typeof displayAmbientTemp === "number") && !isNaN(displayAmbientTemp) ? displayAmbientTemp : ""}</h3>
                         </div>
                         {tempData.tempMode === TempMode.off ?
                             <></>
@@ -347,7 +349,7 @@ function Dial() {
                                 {tempData.tempMode === TempMode.heat || tempData.tempMode === TempMode.heatcool ?
                                     <button id="main-numbers-heatpoint" className={"main-number-group" + (activeSetPoint === SetPointType.heat ? " setpoint-number-active" : "")} onClick={() => changeActiveSetpoint(SetPointType.heat, true)}>
                                         <h2>Heat</h2>
-                                        <h3>{(typeof dispHeatPoint === "number") && !isNaN(dispHeatPoint) ? dispHeatPoint : ""}</h3>
+                                        <h3>{(typeof displayHeatPoint === "number") && !isNaN(displayHeatPoint) ? displayHeatPoint : ""}</h3>
                                     </button>
                                     :
                                     <></>
@@ -355,7 +357,7 @@ function Dial() {
                                 {tempData.tempMode === TempMode.cool || tempData.tempMode === TempMode.heatcool ?
                                     <button id="main-numbers-coolpoint" className={"main-number-group" + (activeSetPoint === SetPointType.cool ? " setpoint-number-active" : "")} onClick={() => changeActiveSetpoint(SetPointType.cool, true)}>
                                         <h2>Cool</h2>
-                                        <h3>{(typeof dispCoolPoint === "number") && !isNaN(dispCoolPoint) ? dispCoolPoint : ""}</h3>
+                                        <h3>{(typeof displayCoolPoint === "number") && !isNaN(displayCoolPoint) ? displayCoolPoint : ""}</h3>
                                     </button>
                                     :
                                     <></>
@@ -379,11 +381,11 @@ function Dial() {
                             : 
                             <div className="dial-buttons">
                                 <button className="material-symbols material-symbols-rounded" aria-label="Temperature Down"
-                                    onClick={() => bumpTemp(-decimalPrecision[tempData.tempUnits])}>
+                                    onClick={() => bumpTemp(-decimalPrecision[tempUnits])}>
                                     {"\ue15b"}
                                 </button>
                                 <button className="material-symbols material-symbols-rounded" aria-label="Temperature Up"
-                                    onClick={() => bumpTemp(decimalPrecision[tempData.tempUnits])}>
+                                    onClick={() => bumpTemp(decimalPrecision[tempUnits])}>
                                     {"\ue145"}
                                 </button>
                             </div>

@@ -11,7 +11,7 @@ interface TileProps {
     setModalDrawerType: React.Dispatch<SetStateAction<ModalDrawerType | null>>
 }
 
-const Tiles: React.FC<TileProps> = ({ setModalDrawerType }) => {
+function Tiles({ setModalDrawerType }: TileProps) {
     const {selectedTempData: tempData} = useContext(TempDataContext);
 
     return (
@@ -21,8 +21,8 @@ const Tiles: React.FC<TileProps> = ({ setModalDrawerType }) => {
                     <section id="tiles">
                         <section id="control-tiles" className="tiles-group">
                             <TempModeTile setModalDrawerType={setModalDrawerType}/>
-                            <EcoModeTile setModalDrawerType={setModalDrawerType}/>
                             <FanTimerTile setModalDrawerType={setModalDrawerType}/>
+                            <EcoModeTile setModalDrawerType={setModalDrawerType}/>
                         </section>
                         <hr/>
                         <section id="info-tiles" className="tiles-group">

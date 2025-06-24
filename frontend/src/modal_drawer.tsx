@@ -10,7 +10,7 @@ interface ModalDrawerProps {
     handleResetModal: (startTimer: boolean) => void
 }
 
-const ModalDrawer: React.FC<ModalDrawerProps> = ({ modalDrawerType, handleResetModal }) => {
+function ModalDrawer ({ modalDrawerType, handleResetModal } : ModalDrawerProps) {
     const controlDrawerRef = useRef<HTMLDialogElement | null>(null);
 
     useEffect(() => {

@@ -4,19 +4,15 @@ import { getIsoDatePlusDuration, getFanTimerString, isFanOn } from "../utils/fun
 import { TempDataContext } from "../contexts/temp_data_context";
 import { FanTimerMode } from "../types";
 
-interface ModalDrawerProps {
-    handleCloseModal: () => void
-}
-
-const FanTimerDrawer: React.FC<ModalDrawerProps> = ({ handleCloseModal }) => {
+function FanTimerDrawer({ handleCloseModal }: {handleCloseModal: () => void}) {
     const {selectedTempData: tempData, debounceTempData, setFanTimer} = useContext(TempDataContext);
 
-    const [dispFanTimer, setDispFanTimer] = useState<string | null>(null);
+    const [currFanTimer, setCurrFanTimer] = useState<string | null>(null);
     const [fanTimerString, setFanTimerString] = useState<string>("");
     const fanIsActive: boolean = isFanOn(tempData.fanTimer, tempData.hvacStatus);
 
     useEffect (() => {
-        setDispFanTimer(tempData.fanTimer);
+        setCurrFanTimer(tempData.fanTimer);
         // Calculate immediately
         setFanTimerString(getFanTimerString(tempData.fanTimer, tempData.hvacStatus));
 
@@ -31,10 +27,10 @@ const FanTimerDrawer: React.FC<ModalDrawerProps> = ({ handleCloseModal }) => {
 
     function changeFanTimer(newFanMode: FanTimerMode, duration?: number) {
         if (newFanMode === FanTimerMode.off) {
-            setDispFanTimer(null);
+            setCurrFanTimer(null);
             debounceTempData(() => setFanTimer(newFanMode), false);
         } else if (duration) {
-            setDispFanTimer(getIsoDatePlusDuration(duration));
+            setCurrFanTimer(getIsoDatePlusDuration(duration));
             debounceTempData(() => setFanTimer(newFanMode, duration), false);
         }
         handleCloseModal();
@@ -58,13 +54,13 @@ const FanTimerDrawer: React.FC<ModalDrawerProps> = ({ handleCloseModal }) => {
             <hr/>
             <ul className="button-select">
                 <li>
-                    <button className={"standard-button" + (dispFanTimer === null ? " button-disabled" : "")}
+                    <button className={"standard-button" + (currFanTimer === null ? " button-disabled" : "")}
                     onClick={() => changeFanTimer(FanTimerMode.off)}>Off</button>
                 </li>
                 {fanTimerOptions.map((option) => (
                     <li key={option.duration}>
                         <button className="standard-button icon-text-group" onClick={() => changeFanTimer(FanTimerMode.on, option.duration)}>
-                            {option.dispText}
+                            {option.displayText}
                         </button>
                     </li>
                 ))}
