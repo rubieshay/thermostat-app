@@ -39,7 +39,8 @@ jobs:
         MAJOR_V=$(echo "$VERSION" | awk -F'.' '{print $1}')
         MINOR_V=$(echo "$VERSION" | awk -F'.' '{print $2}')
         PATCH_V=$(echo "$VERSION" | awk -F'.' '{print $3}')
-        VERSION_CODE=$(printf "%d%03d%03d\n" "$MAJOR_V" "$MINOR_V" "$PATCH_V")
+
+        VERSION_CODE=$((($MAJOR_V * 1000000) + ($MINOR_V * 1000) + $PATCH_V))
         
         echo "VERSION=$VERSION" >> $GITHUB_ENV
         echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
