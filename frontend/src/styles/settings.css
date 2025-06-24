@@ -9,3 +9,6 @@
 #settings-page > form, #settings-page > div {
     max-width: 20rem;
 }
+#settings-page h2 {
+    font-style: italic;
+}

@@ -47,13 +47,6 @@ function EnterURLComponent({ navLink, label } : {navLink: string | null, label: 
                     :
                     <div className="input-error">{apiResponse}</div>
                 }
-                {/* <div className="input-error">
-                    {apiResponse === null ?
-                        ""
-                        :
-                        apiResponse
-                    }
-                </div> */}
             </form>
         </>
     )
