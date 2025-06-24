@@ -43,13 +43,12 @@ fastify.register(cors, {
             return;
         };
         const hostname = new URL(origin).hostname
-        console.log("Registering CORS -- origin: ",origin," hostname: ",hostname);
-        if(hostname === "localhost"){
-            //  Request from localhost will pass
-            cb(null, true)
-            return
+        console.log("Registering CORS -- origin: ",origin," hostname: ",hostname, " defaultCORS: ",defaultCORSOrigin);
+        if(hostname === "localhost" || (defaultCORSOrigin !== null && origin.includes(defaultCORSOrigin))){
+            //  Request from localhost or defaultCORSOrigin will pass
+            cb(null, true);
+            return;
         }
-        if (defaultCORSOrigin !== null && origin.includes(defaultCORSOrigin))
         // Generate an error on other origins, disabling access
         cb(new Error("Not allowed"), false)
     }
