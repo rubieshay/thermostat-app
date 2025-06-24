@@ -1,10 +1,11 @@
 import { TempMode, EcoMode } from "../types";
+import { stripSlashFromURLIfThere } from "./functions";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const demoMode = ((window as any)._env_.DEMO_MODE === "TRUE" ||
                          (window as any)._env_.DEMO_MODE === "1" ||
                          (window as any)._env_.DEMO_MODE === "YES") ? true : false;
-export const defaultAPIURL = (window as any)._env_.DEFAULT_API_URL ? (window as any)._env_.DEFAULT_API_URL : null;
+export const defaultAPIURL = (window as any)._env_.DEFAULT_API_URL ? stripSlashFromURLIfThere((window as any)._env_.DEFAULT_API_URL) : null;
 export const dataRefreshEnabled =((window as any)._env_.DATA_REFRESH_ENABLED === "TRUE" || 
                                   (window as any)._env_.DATA_REFRESH_ENABLED === "1" ||
                                   (window as any)._env_.DATA_REFRESH_ENABLED === "YES") ? true : false;
