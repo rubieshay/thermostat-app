@@ -1,0 +1,36 @@
+services:
+  frontend-thermostat-client:
+    container_name: frontend-thermostat-client
+    environment:
+#     CHANGEME: Change the DEFAULT_API_URL to be the fqdn/port externally accessible URL to your API server
+      DEFAULT_API_URL: http://localhost:3333
+    image: ghcr.io/rubieshay/thermostat-app-frontend:latest
+    ports:
+      - "8080:8080"
+    networks:
+      - thermostat    
+  backend-thermostat-server:
+    restart: unless-stopped  
+    container_name: backend-thermostat-server
+    environment:
+      PROJECT_ID: "GOOGLE-DEVICE-ACCESS-PROJECT-ID"
+      CLIENT_ID: "OUATH2-CLIENT-ID-LINKED-TO-DEVICE-ACCESS-API"
+      CLIENT_SECRET: "OAUTH2-CLIENT-SECRET"
+      REFRESH_TOKEN: "DEVICE-ACCESS-PROJECT-REFRESH-TOKEN"
+      PORT: 3333
+      DEMO_MODE: "0"
+      ENVIRONMENT: "docker-dev"
+      PUBSUB_PROJECT_ID: "GOOGLE-CLOUD-PROJECT-ID"
+      GOOGLE_APPLICATION_CREDENTIALS: "/var/gsecrets/service-account-key.json"
+      WEATHER_LATITUDE: "39.833333"
+      WEATHER_LONGITUDE: "-98.583333"
+      DEFAULT_CORS_ORIGIN: "https://thermo.mytld.com" 
+    volumes:
+      - ./data/sak:/var/gsecrets
+    image: ghcr.io/rubieshay/thermostat-app-backend:latest
+    ports:
+      - "3333:3333"
+    networks:
+      - thermostat
+networks:
+  thermostat:

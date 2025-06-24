@@ -1,11 +1,12 @@
 import { useEffect, useContext, useRef } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { TempDataContext } from "../contexts/temp_data_context";
 import { APIContext } from "../contexts/api_context";
 import { demoMode } from "../utils/constants";
 
 function InitialLoader() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { loadInitialTempData } = useContext(TempDataContext);
     const { retrieveAndValidateAPIURL, apiIsHealthy, setAPIIsHealthy, initialAPICheckComplete, setInitialAPICheckComplete } = useContext(APIContext);
     const initialAPICheckAttempted = useRef(false);
@@ -49,19 +50,22 @@ function InitialLoader() {
             initialLoadAttempted.current = true;
             console.log("loading initial temp data");
             await loadInitialTempData();
-            console.log("data loaded, about to navigate to /app");
-            navigate("/app", { replace: true });
+            if (location.pathname === "/") {
+                console.log("data loaded, on /, about to navigate to /app");
+                navigate("/app", { replace: true});
+            } else {
+                console.log("data is loaded, but not on root, stay where you are.");
+            }
         }
-        console.log({apiIsHealthy, initialAPICheckComplete});
         if (apiIsHealthy && initialAPICheckComplete) {
             loadAndNav();
         }
-    }, [navigate, loadInitialTempData, apiIsHealthy,initialAPICheckComplete]);
+    }, [navigate, location, loadInitialTempData, apiIsHealthy,initialAPICheckComplete]);
 
 
     return (
         <></>
-    )
+    );
 }
 
 export default InitialLoader;

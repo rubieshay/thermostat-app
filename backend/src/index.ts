@@ -10,6 +10,7 @@ import { getCurrentObservation, initializeWeatherAndRefresh } from "./weather";
 import {tempDataInfo} from "./googlesdm";
 import { getDataAndSubscribe, removeSubscription } from "./googlepubsub";
 import { Mutex } from "./mutex";
+import { stripSlashFromURLIfThere } from "./utils";
 
 export const googleClientId  = process.env.CLIENT_ID || "";
 export const googleClientSecret = process.env.CLIENT_SECRET || "";
@@ -22,7 +23,7 @@ export const environment = process.env.ENVIRONMENT || "prod";
 export const subscriptionId = "thermostat-sub-id-" + environment;
 export let weatherLatitude = Number(process.env.WEATHER_LATITUDE) || 39.833333; // Default to Lebanon, KS
 export let weatherLongitude = Number(process.env.WEATHER_LONGITUDE) || -98.583333; // Default to Lebanon, KS
-export const defaultCORSOrigin = process.env.DEFAULT_CORS_ORIGIN || null;
+export const defaultCORSOrigin = (process.env.DEFAULT_CORS_ORIGIN === null || process.env.DEFAULT_CORS_ORIGIN === undefined) ? null : stripSlashFromURLIfThere(process.env.DEFAULT_CORS_ORIGIN)
 
 const httpPort = Number(process.env.PORT) || 3000;
 
@@ -43,12 +44,11 @@ fastify.register(cors, {
             return;
         };
         const hostname = new URL(origin).hostname
-        if(hostname === "localhost"){
-            //  Request from localhost will pass
-            cb(null, true)
-            return
+        if(hostname === "localhost" || (defaultCORSOrigin !== null && origin.includes(defaultCORSOrigin))){
+            //  Request from localhost or defaultCORSOrigin will pass
+            cb(null, true);
+            return;
         }
-        if (defaultCORSOrigin !== null && origin.includes(defaultCORSOrigin))
         // Generate an error on other origins, disabling access
         cb(new Error("Not allowed"), false)
     }

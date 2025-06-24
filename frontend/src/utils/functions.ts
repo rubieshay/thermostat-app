@@ -200,6 +200,14 @@ export function arraysEqualIgnoreOrder<T extends Record<string, any>>(arr1: T[],
     return true;
 }
 
+export function stripSlashFromURLIfThere(url: string) {
+    if (url.endsWith("/")) {
+        return (url.slice(0,-1))
+    } else {
+        return url;
+    }
+}
+
 export function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
