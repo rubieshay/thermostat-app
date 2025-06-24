@@ -1,3 +1,5 @@
+/* COMBINED PAGE LAYOUT */
+
 #settings-page {
     align-items: start;
 }
@@ -6,9 +8,38 @@
     width: 100%;
     background: var(--color-gray-3);
 }
-#settings-page > form, #settings-page > div {
-    max-width: 20rem;
+#settings-page > form {
+    max-width: 30rem;
+}
+#settings-page ul, #settings-page > .input-group {
+    /* width: 100%;
+    min-width: max-content;
+    max-width: 20rem; */
+    width: fit-content;
 }
 #settings-page h2 {
     font-style: italic;
+}
+
+
+
+/* ENTER URL */
+
+#enter-url-page form, #enter-url-page #enter-url-explain {
+    max-width: 20rem;
+}
+#enter-url-page #enter-url-explain {
+    line-height: 1.25;
+}
+#enter-url-form #current-url-value {
+    line-height: 1.25;
+}
+#enter-url-form #current-url-value span:last-child {
+    font-style: italic;
+}
+#settings-page .input-controls-container {
+    flex-direction: row;
+}
+#settings-page .input-controls-container .standard-button {
+    margin-top: 1.375rem;
 }

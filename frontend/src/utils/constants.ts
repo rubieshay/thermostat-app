@@ -89,9 +89,9 @@ export const fanTimerOptions = [{duration: 900, displayText: "15 min"},
                                 {duration: 28800, displayText: "8 hr"},
                                 {duration: 43200, displayText: "12 hr"}]
 
-export const tempUnitsOptions = [{displayText: "Celsius", tempUnitsSetting: TempUnitsSetting.celsius},
+export const tempUnitsOptions = [{displayText: "\u00B0C", tempUnitsSetting: TempUnitsSetting.celsius},
                                 {displayText: "System", tempUnitsSetting: TempUnitsSetting.system},
-                                {displayText: "Fahrenheit", tempUnitsSetting: TempUnitsSetting.fahrenheit}]
+                                {displayText: "\u00B0F", tempUnitsSetting: TempUnitsSetting.fahrenheit}]
 export const themeOptions = [{displayText: "Light", themeSetting: ThemeSetting.light},
                                 {displayText: "System", themeSetting: ThemeSetting.system},
                                 {displayText: "Dark", themeSetting: ThemeSetting.dark}]

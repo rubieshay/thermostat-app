@@ -47,20 +47,29 @@ input[type="text"] {
 .input-invalid input[type="text"] {
     border: 2px solid var(--color-heat-2);
 }
+input::placeholder {
+    color: var(--color-gray-3);
+}
 
 /* FORM ELEMENTS */
 
-form {
+form, .input-controls-container {
     display: flex;
     flex-direction: column;
     width: 100%;
+}
+form {
     gap: 1.5rem;
+}
+.input-controls-container {
+    gap: 0.75rem;
 }
 label, .label {
     font-size: 0.875rem;
     color: var(--color-gray-3);
 }
 .input-group {
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -68,17 +77,6 @@ label, .label {
 .input-error {
     min-height: 1rem;
     color: var(--color-heat-2);
-}
-
-
-
-/* SPECIFIC FORM ELEMENTS */
-
-#enter-url-page form, #enter-url-page #enter-url-explain {
-    max-width: 20rem;
-}
-#enter-url-page #enter-url-explain {
-    line-height: 1.25;
 }
 
 
@@ -114,19 +112,38 @@ ul.button-select li {
 }
 
 ul.radio-buttons {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
     border-radius: 1rem;
     background: var(--color-gray-4);
+    position: relative;
+}
+.radio-buttons li {
+    display: block;
+    z-index: 5;
 }
 .radio-buttons button {
-    width: fit-content;
     display: block;
+    width: 100%;
+    text-align: center;
     padding: 1rem;
     border-radius: 1rem;
     color: var(--color-gray-2);
+    transition: color 200ms ease-in-out;
+}
+ul.radio-buttons::before {
+    content: "";
+    display: block;
+    width: calc(100%/var(--radio-options-count));
+    position: absolute;
+    left: calc(var(--radio-selected-index)*(100%/var(--radio-options-count)));
+    z-index: 1;
+    height: 3rem;
+    border-radius: 1rem;
+    background: var(--color-gray-3);
+    transition: left 200ms ease-in-out;
 }
 .radio-buttons li.radio-selected button {
-    background: var(--color-gray-3);
     color: var(--color-gray-0);
 }

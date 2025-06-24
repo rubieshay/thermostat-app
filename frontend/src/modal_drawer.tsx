@@ -24,23 +24,30 @@ function ModalDrawer ({ modalDrawerType, handleResetModal } : ModalDrawerProps) 
         (controlDrawerRef.current as HTMLDialogElement).close();
     }
 
+    function handleModalClick(event: React.MouseEvent<HTMLDialogElement, MouseEvent>) {
+        if (event.target === controlDrawerRef.current) {
+            handleCloseModal();
+        }
+    }
+
     return (
-        // closedBy="any" not fully supported but does work in chrome if added
-        <dialog id="control-drawer" ref={controlDrawerRef} className="modal-drawer" style={{"--drawer-timeout-duration": drawerTimeoutDuration + "ms"} as React.CSSProperties} onClose={() => handleResetModal(true)}>
-            <button className="drawer-handle" onClick={handleCloseModal}></button>
-            {modalDrawerType === ModalDrawerType.tempModeModal ?
-                <TempModeDrawer handleCloseModal={handleCloseModal}/>
-                :
-                (modalDrawerType === ModalDrawerType.ecoModeModal ?
-                    <EcoModeDrawer handleCloseModal={handleCloseModal}/>
+        <dialog id="control-drawer" ref={controlDrawerRef} className="modal-drawer" style={{"--drawer-timeout-duration": drawerTimeoutDuration + "ms"} as React.CSSProperties} onClose={() => handleResetModal(true)} onClick={(event) => handleModalClick(event)}>
+            <div className="drawer-container">
+                <button className="drawer-handle" onClick={handleCloseModal}></button>
+                {modalDrawerType === ModalDrawerType.tempModeModal ?
+                    <TempModeDrawer handleCloseModal={handleCloseModal}/>
                     :
-                    (modalDrawerType === ModalDrawerType.fanTimerModal ?
-                        <FanTimerDrawer handleCloseModal={handleCloseModal}/>
+                    (modalDrawerType === ModalDrawerType.ecoModeModal ?
+                        <EcoModeDrawer handleCloseModal={handleCloseModal}/>
                         :
-                        <></>
+                        (modalDrawerType === ModalDrawerType.fanTimerModal ?
+                            <FanTimerDrawer handleCloseModal={handleCloseModal}/>
+                            :
+                            <></>
+                        )
                     )
-                )
-            }
+                }
+            </div>
         </dialog>
     );
 }

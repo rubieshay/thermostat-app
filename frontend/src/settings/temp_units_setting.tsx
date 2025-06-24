@@ -4,11 +4,13 @@ import { SettingsContext } from "../contexts/settings_context";
 
 function TempUnitsSetting() {
     const {tempUnitsSetting, setTempUnitsSetting} = useContext(SettingsContext);
+    const radioSelectedIndex = Math.max(0, tempUnitsOptions.findIndex((option) => tempUnitsSetting === option.tempUnitsSetting))
 
     return (
         <div className="input-group">
             <div className="label">Temperature Units</div>
-            <ul className="radio-buttons">
+            <ul className="radio-buttons"
+            style={{"--radio-options-count": tempUnitsOptions.length, "--radio-selected-index": radioSelectedIndex} as React.CSSProperties}>
                 {tempUnitsOptions.map((option) => (
                     <li key={option.tempUnitsSetting}
                     className={tempUnitsSetting === option.tempUnitsSetting ? "radio-selected" : ""}> 
