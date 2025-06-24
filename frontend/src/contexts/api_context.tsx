@@ -42,7 +42,7 @@ export const APIContextProvider: React.FC<ChildrenProviderProps> = (props: Child
         const fetchReturn: FetchReturn = {success: false};
         // got a URL, see if it is healthy
         if (!(url.startsWith("https://") || url.startsWith("http://"))) {
-            fetchReturn.error = "Invalid URL: please include http:// or https://";
+            fetchReturn.error = "Invalid URL: Please include http:// or https://";
         } else {
             // console.log("URL:", url);
             const healthURL = url + "/healthz";

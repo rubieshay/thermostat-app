@@ -3,7 +3,7 @@ import { APIContext } from "./contexts/api_context";
 import { useNavigate } from "react-router";
 
 function EnterURLComponent({ navLink, label } : {navLink: string | null, label: string}) {
-    const {setAPIURL, validateURL, setAPIValidated} = useContext(APIContext);
+    const {apiURL, setAPIURL, validateURL, setAPIValidated} = useContext(APIContext);
     const [inputURL, setInputURL] = useState<string>("");
     const [apiResponse, setAPIResponse] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -34,21 +34,29 @@ function EnterURLComponent({ navLink, label } : {navLink: string | null, label: 
     }
 
     return (
-        <>
-            <form id="enter-url-form" onSubmit={(event) => handleSubmit(event)}>
+        <form id="enter-url-form" onSubmit={(event) => handleSubmit(event)}>
+            {apiURL === null ?
+                <></>
+                :
+                <div id="current-url-value">
+                    <span>Current API URL: </span>
+                    <span>{apiURL}</span>
+                </div>
+            }
+            <div className="input-controls-container">
                 <div className={"input-group" + ((apiResponse === null) ? "" : " input-invalid")}>
                     <label htmlFor="enter-url">{label}</label>
-                    <input type="text" autoCapitalize="none" value={inputURL} id="enter-url" aria-describedby="enter-url-explain" required aria-required="true"
+                    <input type="text" id="enter-url" autoCapitalize="none" placeholder="https://example.com/api" value={inputURL} aria-describedby="enter-url-explain" required aria-required="true"
                     onChange={(event) => handleInputChange(event)}/>
                 </div>
                 <input className="standard-button" type="submit" value="Validate"/>
-                {(apiResponse === null) ?
-                    <></>
-                    :
-                    <div className="input-error">{apiResponse}</div>
-                }
-            </form>
-        </>
+            </div>
+            {(apiResponse === null) ?
+                <></>
+                :
+                <div className="input-error">{apiResponse}</div>
+            }
+        </form>
     )
 }
 

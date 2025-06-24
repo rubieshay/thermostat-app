@@ -17,6 +17,9 @@
     gap: 1rem;
 }
 .tile {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
     min-width: 0;
     background: var(--color-gray-5);
     padding: 1rem;
@@ -27,9 +30,12 @@
     font-variation-settings: "wght" 100;
 }
 .tile legend, .tile > h2, .drawer-content h2 {
-    padding-bottom: 0.5rem;
+    padding-bottom: 0.25rem;
 }
 /* clickable tiles only */
 #control-tiles button.tile:hover, #control-tiles button.tile:focus-visible {
     scale: 1.05;
+}
+#control-tiles :first-child {
+    grid-column: span 2;
 }
