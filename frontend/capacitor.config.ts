@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'net.shaytech.gthermostat',
-  appName: 'GoogleThermostat',
+  appName: 'ThermoPal',
   webDir: 'dist',
   server: {
     androidScheme: 'https'
