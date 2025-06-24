@@ -44,9 +44,15 @@ jobs:
         echo "VERSION=$VERSION" >> $GITHUB_ENV
         echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
         
+        echo "Version is $VERSION .  Version Code is $VERSION_CODE ..."
+
         # Update Android build.gradle
         sed -i "s/versionCode [0-9]*/versionCode $VERSION_CODE/" frontend/android/app/build.gradle
         sed -i "s/versionName \".*\"/versionName \"$VERSION\"/" frontend/android/app/build.gradle
+
+        echo "build.gradle updated... First 15 lines:"
+
+        head -n 15 frontend/android/app/build.gradle
 
     - name: Create env file
       run: |
