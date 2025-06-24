@@ -43,6 +43,7 @@ fastify.register(cors, {
             return;
         };
         const hostname = new URL(origin).hostname
+        console.log("Registering CORS -- origin: ",origin," hostname: ",hostname);
         if(hostname === "localhost"){
             //  Request from localhost will pass
             cb(null, true)
