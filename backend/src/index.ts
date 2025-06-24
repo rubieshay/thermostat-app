@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-// import cors from '@fastify/cors';
+import cors from '@fastify/cors';
 import fastifyWebSockets from "@fastify/websocket";
 import { FetchReturn, TempMessageType, WeatherData, initWeatherData, TempMessage } from "./types";
 import { infoQuerySchema, InfoQueryString, latLongQuerySchema, latLongQueryString, setHeatSchema, SetHeatBody, 
@@ -36,23 +36,23 @@ export const fastify = Fastify({
 
 fastify.register(fastifyWebSockets);
 
-// fastify.register(cors, {
-//     origin: (origin, cb) => {
-//         if (origin === undefined) {
-//             cb(null,true);
-//             return;
-//         };
-//         const hostname = new URL(origin).hostname
-//         if(hostname === "localhost"){
-//             //  Request from localhost will pass
-//             cb(null, true)
-//             return
-//         }
-//         if (defaultCORSOrigin !== null && origin.includes(defaultCORSOrigin))
-//         // Generate an error on other origins, disabling access
-//         cb(new Error("Not allowed"), false)
-//     }
-// })
+fastify.register(cors, {
+    origin: (origin, cb) => {
+        if (origin === undefined) {
+            cb(null,true);
+            return;
+        };
+        const hostname = new URL(origin).hostname
+        if(hostname === "localhost"){
+            //  Request from localhost will pass
+            cb(null, true)
+            return
+        }
+        if (defaultCORSOrigin !== null && origin.includes(defaultCORSOrigin))
+        // Generate an error on other origins, disabling access
+        cb(new Error("Not allowed"), false)
+    }
+})
 
 fastify.register( async function (fastify) {
     fastify.get("/ws", { websocket: true,},
