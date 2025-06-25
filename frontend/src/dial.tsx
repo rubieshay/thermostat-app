@@ -321,6 +321,7 @@ function Dial() {
                                 (activeSetPoint === SetPointType.heat && isDraggingTemp ? " setpoint-thumb-active": "")}
                                 onPointerDown={() => startDragTemp(SetPointType.heat)}>
                             </div>
+                            <div className="thumb-icon material-symbols material-symbols-rounded">{"\uf537"}</div>
                         </div>
                         :
                         <></>
@@ -332,6 +333,7 @@ function Dial() {
                                 (activeSetPoint === SetPointType.cool && isDraggingTemp ? " setpoint-thumb-active": "")}
                                 onPointerDown={() => startDragTemp(SetPointType.cool)}>
                             </div>
+                            <div className="thumb-icon material-symbols material-symbols-rounded">{"\uf166"}</div>
                         </div>
                         :
                         <></>

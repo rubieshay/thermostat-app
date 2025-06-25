@@ -95,7 +95,7 @@
     --vh: calc(100vh - var(--safe-area-inset-top) - var(--safe-area-inset-bottom));
     --vw: calc(100vw - var(--safe-area-inset-left) - var(--safe-area-inset-right));
 
-    --dial-size: max(min((var(--vh)) - 29.5rem, 0.92*var(--vw), 32rem), min(20rem, 0.92*var(--vw)));
+    --dial-size: min(0.92*var(--vw), clamp(20rem, var(--vh) - 27.75rem - 2px, 32rem));
 
 
     --color-gray-000: #f0e9e6;
