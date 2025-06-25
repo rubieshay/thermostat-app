@@ -12,7 +12,8 @@ export type ThreadRequestDataMessage = {
 }
 
 export type ThreadStartupMessage = {
-    type: MessageTypes.startup
+    type: MessageTypes.startup,
+    data: ThreadData
 }
 
 export type ThreadShutdownMessage = {

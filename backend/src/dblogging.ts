@@ -1,9 +1,17 @@
 import { parentPort, workerData } from "worker_threads";
 import { MessageTypes, ThreadData, ThreadDataResponseMessage, ThreadRequestDataMessage } from "./backendtypes";
+
+import './network_debug';
+
 import { Sender } from "@questdb/nodejs-client";
 import { TempData } from "./types";
 
 const logIntervalSeconds = 60;
+
+///
+
+
+
 
 
 if (!workerData) {
@@ -12,12 +20,13 @@ if (!workerData) {
 
 let {dbClientConf} = workerData;
 
-let sender: Sender|null = null;
+let sender: Sender|null|any = null;
 
 async function initializeDB() {
     console.log("initializing DB, opening");
     console.log("passed DB conf is: ",dbClientConf);
     sender = Sender.fromConfig(dbClientConf);
+//    console.log("QuestDB config is:",sender);
 }
 
 // export type TempData = {
@@ -106,6 +115,9 @@ if (parentPort) {
         } else if (message.type === MessageTypes.shutdown) {
             clearInterval(logInterval);
             process.exit(0);
+        } else if (message.type === MessageTypes.startup) {
+            const logData: ThreadData = message.data;
+            await logEntryToDB(logData);
         }
 
     })

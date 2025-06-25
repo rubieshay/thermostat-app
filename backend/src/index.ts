@@ -194,7 +194,7 @@ async function initializeDBLogging() {
             console.error("Worker thread exited with code:", code);
         })
         console.log("Worker Thread for DB Logging created. Sending startup message...");
-        const startupMessage: ThreadStartupMessage = {type: MessageTypes.startup};
+        const startupMessage: ThreadStartupMessage = {type: MessageTypes.startup, data: { tempDataInfo, weatherData}};
         worker.postMessage(startupMessage);
 
     } else {
