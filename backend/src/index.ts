@@ -11,6 +11,9 @@ import {tempDataInfo} from "./googlesdm";
 import { getDataAndSubscribe, removeSubscription } from "./googlepubsub";
 import { Mutex } from "./mutex";
 import { stripSlashFromURLIfThere } from "./utils";
+import { Worker } from "worker_threads";
+import * as path from "path";
+import { MessageTypes, ThreadDataResponseMessage, ThreadRequestDataMessage, ThreadShutdownMessage, ThreadStartupMessage } from "./backendtypes";
 
 export const googleClientId  = process.env.CLIENT_ID || "";
 export const googleClientSecret = process.env.CLIENT_SECRET || "";
@@ -18,14 +21,18 @@ export const googleProjectId = process.env.PROJECT_ID || "";
 export const googleRefreshToken = process.env.REFRESH_TOKEN || "";
 export const googleTopicId = process.env.TOPIC_ID || "thermostat-topic-id";
 export const googlePubSubProjectId = process.env.PUBSUB_PROJECT_ID || "";
-export const demoMode = ( process.env.DEMO_MODE?.toUpperCase() === "1" || process.env.DEMO_MODE?.toUpperCase() === "YES" || process.env.DEMO_MODE?.toUpperCase() === "TRUE" ? true : false );
+export const demoMode = ( process.env.DEMO_MODE?.toUpperCase() === "1" || process.env.DEMO_MODE?.toUpperCase() === "YES" || process.env.DEMO_MODE?.toUpperCase() === "TRUE") ? true : false;
 export const environment = process.env.ENVIRONMENT || "prod";
 export const subscriptionId = "thermostat-sub-id-" + environment;
 export let weatherLatitude = Number(process.env.WEATHER_LATITUDE) || 39.833333; // Default to Lebanon, KS
 export let weatherLongitude = Number(process.env.WEATHER_LONGITUDE) || -98.583333; // Default to Lebanon, KS
 export const defaultCORSOrigin = (process.env.DEFAULT_CORS_ORIGIN === null || process.env.DEFAULT_CORS_ORIGIN === undefined) ? null : stripSlashFromURLIfThere(process.env.DEFAULT_CORS_ORIGIN)
+const dbLogging = (process.env.DB_LOGGING?.toUpperCase() === "1" || process.env.DB_LOGGING?.toUpperCase() === "YES" || process.env.DB_LOGGING?.toUpperCase() === "TRUE") ? true: false;
+const dbClientConf = (process.env.DB_CLIENT_CONF === null || process.env.DB_CLIENT_CONF === undefined) ? "http::addr=localhost:9000" : process.env.DB_CLIENT_CONF;
 
 const httpPort = Number(process.env.PORT) || 3000;
+
+console.log("Environmental Info:",JSON.stringify({demoMode, environment,dbLogging,dbClientConf}));
 
 export let weatherData: WeatherData = structuredClone(initWeatherData);
 
@@ -166,11 +173,45 @@ fastify.post<{ Body: SetFanTimerBody }>("/set_fan_timer", {schema: { body: setFa
     }
 });
 
+const workerPath = path.join(__dirname, 'dblogging.js'); // Use .js for compiled TypeScript
+const worker = dbLogging ? new Worker(workerPath,{workerData: {dbClientConf}}) : null;
+
+async function initializeDBLogging() {
+    if (dbLogging && worker !== null) {
+        worker.on("message", (message: ThreadRequestDataMessage) => {
+            if (message.type === MessageTypes.requestData) {
+                const messageResponse: ThreadDataResponseMessage = {
+                    type: MessageTypes.dataResponse,
+                    data: { tempDataInfo, weatherData}
+                };
+                worker.postMessage(messageResponse);
+            }
+        });
+        worker.on("error", (error: Error) => {
+            console.log("worker thread error:",error);
+        });
+        worker.on("exit", (code) => {
+            console.error("Worker thread exited with code:", code);
+        })
+        console.log("Worker Thread for DB Logging created. Sending startup message...");
+        const startupMessage: ThreadStartupMessage = {type: MessageTypes.startup};
+        worker.postMessage(startupMessage);
+
+    } else {
+        console.log("Not logging data, deactivated.");
+    }
+}
+
 const start = async () => {
     try {
         await getDataAndSubscribe();
         await fastify.listen({ port: httpPort, host: "0.0.0.0" });
-        await initializeWeatherAndRefresh();
+        if (demoMode) {
+            weatherData = structuredClone(initWeatherData);
+        } else {
+            await initializeWeatherAndRefresh();
+        }
+        await initializeDBLogging();
     } catch (err) {
         fastify.log.error(err);
         process.exit(1);
@@ -181,12 +222,22 @@ start();
 
 async function cleanUp() {
     await removeSubscription();
+    if (worker) {
+        const shutdownMessage: ThreadShutdownMessage = {type: MessageTypes.shutdown};
+        worker.postMessage(shutdownMessage);
+    }
     // something something websockets...
     process.exit(0)
 }
 
 process.on('SIGINT', async () => {
      console.log('Ctrl+C pressed. Cleaning up...');
+     await cleanUp();
+     process.exit(0); // Exit with success code 0
+   });
+
+process.on('SIGUSR2', async () => {
+     console.log('USR2 signal - possibly restarting with nodemon. Cleaning up...');
      await cleanUp();
      process.exit(0); // Exit with success code 0
    });

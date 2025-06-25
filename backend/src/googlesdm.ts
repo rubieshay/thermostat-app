@@ -2,10 +2,11 @@ import { googleClientSecret, googleRefreshToken, googleClientId, googleProjectId
 import { APIParams, CoolParams, EcoModeParams, HeatParams, TempModeParams, RangeParams, FanTimerParams } from "./schemas";
 import { Connectivity, FetchReturn, TempMode, HvacStatus, EcoMode,
         TempUnitsName, TempUnits, TempData, initTempData, FanTimerMode, 
-        demoTempDataArray} from "./types"; 
+        demoTempDataArray,
+        TempDataArray} from "./types"; 
 import { TempCommands, deviceTypeThermostat, sleep } from "./utils"
 
-export let tempDataInfo: TempData[] = [];
+export let tempDataInfo: TempDataArray = [];
 
 import { URL } from "url";
 
