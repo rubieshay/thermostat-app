@@ -1,4 +1,4 @@
-import { useContext, useState, type ChangeEvent, type FormEvent } from "react";
+import { useContext, useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { APIContext } from "./contexts/api_context";
 import { useNavigate } from "react-router";
 
@@ -7,6 +7,12 @@ function EnterURLComponent({ navLink, label } : {navLink: string | null, label: 
     const [inputURL, setInputURL] = useState<string>("");
     const [apiResponse, setAPIResponse] = useState<string | null>(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (apiURL !== null) {
+            setInputURL(apiURL);
+        }
+    }, [apiURL]);
 
     function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
         setInputURL(event.target.value);

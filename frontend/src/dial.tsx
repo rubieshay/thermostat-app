@@ -347,7 +347,7 @@ function Dial() {
                         {tempData.tempMode === TempMode.off ?
                             <></>
                             :
-                            <div id="main-numbers-setpoints">
+                            <div id="main-numbers-setpoints" className={tempData.tempMode === TempMode.heatcool ? "numbers-dual" : ""}>
                                 {tempData.tempMode === TempMode.heat || tempData.tempMode === TempMode.heatcool ?
                                     <button id="main-numbers-heatpoint" className={"main-number-group" + (activeSetPoint === SetPointType.heat ? " setpoint-number-active" : "")} onClick={() => changeActiveSetpoint(SetPointType.heat, true)}>
                                         <h2>Heat</h2>

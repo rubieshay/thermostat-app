@@ -150,7 +150,7 @@
 /* GENERAL/PAGE STYLING  */
 
 body {
-    background: var(--color-gray-900);
+    background-color: var(--color-gray-900);
     position: relative;
     color: var(--color-gray-200);
     padding: calc(var(--safe-area-inset-top)) calc(var(--safe-area-inset-right))
@@ -243,10 +243,34 @@ h1, h2, h3, h4, h5, h6 {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-/* Rotating fan icons */
+/* Rotating fan icons and loading */
+@keyframes spin {
+    0% {
+        rotate: 0deg;
+    }
+    100% {
+        rotate: 360deg;
+    }
+}
 .fan-icon {
     position: relative;
 }
 .fan-icon.fan-on {
     animation: spin 4s linear infinite normal forwards;
+}
+#loading-container {
+    height: calc(var(--vh) - 4rem);
+}
+.loading-icon {
+    display: block;
+    width: min(0.4*var(--vw), 0.4*var(--vh), 20rem);
+    aspect-ratio: 1;
+    fill: var(--color-gray-200);
+    animation: spin 4s linear infinite normal forwards;
+    --dial-transition-time: 400ms;
+    transition: fill var(--dial-transition-time) ease-in-out;
+}
+body:has(#loading-container) {
+    --dial-transition-time: 400ms;
+    transition: background-color var(--dial-transition-time) ease-in-out;
 }
