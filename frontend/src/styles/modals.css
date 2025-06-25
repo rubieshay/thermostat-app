@@ -23,18 +23,15 @@ dialog[open] {
 dialog::backdrop {
     display: none;
     opacity: 0;
-    background: var(--color-gray-6);
+    background: var(--overlay-shade);
     transition-property: display, opacity;
     transition-duration: var(--drawer-timeout-duration);
     transition-timing-function: ease-in-out;
     transition-behavior: allow-discrete;
 }
-dialog#error-dialog::backdrop {
-    background: var(--color-heat-5);
-}
 dialog[open]::backdrop {
     display: block;
-    opacity: 0.5;
+    opacity: 1;
 }
 @starting-style {
     dialog[open]::backdrop {
@@ -45,7 +42,7 @@ dialog[open]::backdrop {
 /* POPUPS */
 
 dialog.modal-popup {
-    background: var(--color-gray-3);
+    background: var(--color-gray-800);
     padding: 2rem;
 }
 dialog.modal-popup[open] {
@@ -57,9 +54,13 @@ dialog.modal-popup[open] {
 }
 dialog.modal-popup button {
     padding: 0.75rem 1rem;
-    background: var(--color-gray-5);
+    margin-top: 1rem;
+    background: var(--color-gray-600);
     width: fit-content;
     border-radius: 0.5rem;
+}
+dialog#error-dialog::backdrop {
+    background: var(--overlay-error-shade);
 }
 
 
@@ -68,7 +69,7 @@ dialog.modal-popup button {
 
 dialog.modal-drawer {
     width: var(--vw);
-    background: var(--color-gray-5);
+    background: var(--color-gray-800);
     border-radius: 1rem 1rem 0 0;
     bottom: 0;
     transform: translateY(100%);
@@ -96,13 +97,13 @@ dialog.modal-drawer button.drawer-handle::after {
     height: 0.375rem;
     border-radius: 0.1875rem;
     margin-inline: auto;
-    background: var(--color-gray-2);
+    background: var(--color-gray-400);
 }
 dialog.modal-drawer button.drawer-handle:focus-visible {
     outline: none;
 }
 dialog.modal-drawer button.drawer-handle:focus-visible::after {
-    outline: 2px solid var(--color-gray-0);
+    outline: 2px solid var(--color-gray-000);
     outline-offset: 3px;
     border-radius: 8px;
 }

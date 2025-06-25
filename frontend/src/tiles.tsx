@@ -21,8 +21,8 @@ function Tiles({ setModalDrawerType }: TileProps) {
                     <section id="tiles">
                         <section id="control-tiles" className="tiles-group">
                             <TempModeTile setModalDrawerType={setModalDrawerType}/>
-                            <FanTimerTile setModalDrawerType={setModalDrawerType}/>
                             <EcoModeTile setModalDrawerType={setModalDrawerType}/>
+                            <FanTimerTile setModalDrawerType={setModalDrawerType}/>
                         </section>
                         <hr/>
                         <section id="info-tiles" className="tiles-group">

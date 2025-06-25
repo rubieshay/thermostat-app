@@ -38,32 +38,33 @@ function FanTimerDrawer({ handleCloseModal }: {handleCloseModal: () => void}) {
 
     return (
         <div className="drawer-content">
-            <h2>Fan</h2>
-            <div className="icon-text-group">
-                {fanIsActive ?
-                    <span className="material-symbols material-symbols-rounded fan-icon fan-on" aria-hidden="true">
-                        {"\uf168"}
-                    </span>
-                    :
-                    <span className="material-symbols material-symbols-rounded fan-icon fan-off" aria-hidden="true">
-                        {"\uec17"}
-                    </span>
-                }
-                <span>{fanTimerString}</span>
+            <div>
+                <h2>Fan</h2>
+                <div className="icon-text-group">
+                    {fanIsActive ?
+                        <span className="material-symbols material-symbols-rounded fan-icon fan-on" aria-hidden="true">
+                            {"\uf168"}
+                        </span>
+                        :
+                        <span className="material-symbols material-symbols-rounded fan-icon fan-off" aria-hidden="true">
+                            {"\uec17"}
+                        </span>
+                    }
+                    <span>{fanTimerString}</span>
+                </div>
             </div>
-            <hr/>
             <ul className="button-select">
-                <li>
-                    <button className={"standard-button" + (currFanTimer === null ? " button-disabled" : "")}
-                    onClick={() => changeFanTimer(FanTimerMode.off)}>Off</button>
-                </li>
                 {fanTimerOptions.map((option) => (
                     <li key={option.duration}>
-                        <button className="standard-button icon-text-group" onClick={() => changeFanTimer(FanTimerMode.on, option.duration)}>
+                        <button className="standard-button" onClick={() => changeFanTimer(FanTimerMode.on, option.duration)}>
                             {option.displayText}
                         </button>
                     </li>
                 ))}
+                <li className="extra-select-option">
+                    <button className={"standard-button" + (currFanTimer === null ? " button-disabled" : "")}
+                    onClick={() => changeFanTimer(FanTimerMode.off)}>End Timer</button>
+                </li>
             </ul>
         </div>
     );

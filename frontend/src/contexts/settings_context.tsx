@@ -43,13 +43,13 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
     },[]);
 
     const changeTheme = useCallback(() => {
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
         if ((themeSetting === ThemeSetting.system && prefersDark) || themeSetting === ThemeSetting.dark) {
             setUsedTheme(ThemeSetting.dark);
-            document.body.classList.remove("color-scheme-light");
+            document.body.classList.remove("color-theme-light");
         } else {
             setUsedTheme(ThemeSetting.light);
-            document.body.classList.add("color-scheme-light");
+            document.body.classList.add("color-theme-light");
         }
     }, [themeSetting]);
 

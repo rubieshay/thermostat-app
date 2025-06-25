@@ -91,47 +91,68 @@
 /* GLOBAL COLOR AND SIZE VARIABLES */
 
 :root {
-    --color-gray-0: #f4f3f3;
-    --color-gray-1: #c4b8b4;
-    --color-gray-2: #a69c98;
-    --color-gray-3: #736c6a;
-    --color-gray-4: #4c4846;
-    --color-gray-5: #3e3a39;
-    --color-gray-6: #1b1919;
-    --color-heat-0: #eecbb2;
-    --color-heat-1: #e5ab81;
-    --color-heat-2: #bd7957;
-    --color-heat-3: #a15a40;
-    --color-heat-4: #69342b;
-    --color-heat-5: #542822;
-    --color-cool-0: #b4d8e5;
-    --color-cool-1: #71a6c7;
-    --color-cool-2: #537296;
-    --color-cool-3: #3e5978;
-    --color-cool-4: #283557;
-    --color-cool-5: #1c263f;
-
-    --main-bg: var(--color-gray-6);
-    --main-text: var(--color-gray-1);
-
     /* This is entire vh and vw, not 1/100th */
     --vh: calc(100vh - var(--safe-area-inset-top) - var(--safe-area-inset-bottom));
     --vw: calc(100vw - var(--safe-area-inset-left) - var(--safe-area-inset-right));
 
-    --dial-size: max(min((var(--vh)) - 29.5rem, 0.92*var(--vw), 32rem), min(20rem, 0.92*var(--vw)));
+    --dial-size: min(0.92*var(--vw), clamp(20rem, var(--vh) - 27.75rem - 2px, 32rem));
+
+
+    --color-gray-000: #f0e9e6;
+    --color-gray-200: #c4b8b4;
+    --color-gray-400: #827a78;
+    --color-gray-500: #615b59;
+    --color-gray-600: #4c4846;
+    --color-gray-700: #3e3a39;
+    --color-gray-800: #292626;
+    --color-gray-900: #1b1919;
+
+    --color-heat-200: #eda979;
+    --color-heat-400: #b86040;
+    --color-heat-600: #693325;
+    --color-heat-700: #542417;
+
+    --color-cool-200: #72abe0;
+    --color-cool-400: #346099;
+    --color-cool-600: #213861;
+    --color-cool-700: #1d2a4a;
+
+    --overlay-shade: #00000099;
+    --overlay-error-shade: #b8604099;
+}
+
+.color-theme-light {
+    --color-gray-000: #363231;
+    --color-gray-200: #696260;
+    --color-gray-400: #a19794;
+    --color-gray-500: #bdb2ae;
+    --color-gray-600: #d4c7c3;
+    --color-gray-700: #ebe0dd;
+    --color-gray-800: #f7eeeb;
+    --color-gray-900: #fff8f5;
+
+    --color-heat-200: #ad5031;
+    --color-heat-400: #de8552;
+    --color-heat-600: #ebb18a;
+    --color-heat-700: #f7ceb0;
+
+    --color-cool-200: #144c96;
+    --color-cool-400: #4e8ac7;
+    --color-cool-600: #8fb6d9;
+    --color-cool-700: #c0daf0;
+    
+    --overlay-shade: #00000055;
+    --overlay-error-shade: #de855299;
 }
 
 
 
 /* GENERAL/PAGE STYLING  */
 
-html {
-    background: var(--main-bg);
-}
 body {
+    background: var(--color-gray-900);
     position: relative;
-    background: var(--main-bg);
-    color: var(--main-text);
+    color: var(--color-gray-200);
     padding: calc(var(--safe-area-inset-top)) calc(var(--safe-area-inset-right))
              calc(var(--safe-area-inset-bottom)) calc(var(--safe-area-inset-left));
 }
@@ -152,7 +173,6 @@ body::after {
     height: var(--safe-area-inset-bottom);
 }
 main {
-    background: var(--main-bg);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -183,7 +203,7 @@ h1, h2, h3, h4, h5, h6 {
 .icon-title img {
     height: 3.5rem;
     width: 3.5rem;
-    background: var(--color-gray-0);
+    background: var(--color-gray-000);
     border-radius: 25%;
 }
 ::selection {
@@ -191,7 +211,7 @@ h1, h2, h3, h4, h5, h6 {
     opacity: 0.5;
 }
 *:focus-visible {
-    outline: 2px solid var(--color-gray-0);
+    outline: 2px solid var(--color-gray-000);
     outline-offset: 3px;
     border-radius: 8px;
 }
@@ -223,27 +243,10 @@ h1, h2, h3, h4, h5, h6 {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-/* Custom and rotating fan icons */
+/* Rotating fan icons */
 .fan-icon {
     position: relative;
 }
 .fan-icon.fan-on {
     animation: spin 4s linear infinite normal forwards;
 }
-/* #dial .fan-off {
-    rotate: 15deg;
-}
-#dial .fan-off::after {
-    display: block;
-    content: "horizontal_rule";
-    position: absolute;
-    color: inherit;
-    width: 100%;
-    aspect-ratio: 1;
-    font-size: 1em;
-    rotate: 30deg;
-    scale: 1.75;
-    font-variation-settings: "wght" 300;
-    top: 0;
-    left: 0;
-} */

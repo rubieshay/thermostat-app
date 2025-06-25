@@ -19,8 +19,9 @@ function EcoModeDrawer({ handleCloseModal }: {handleCloseModal: () => void}) {
 
     return (
         <div className="drawer-content">
-            <h2>Eco Mode</h2>
-            <hr/>
+            <div>
+                <h2>Eco Mode</h2>
+            </div>
             <ul className="radio-select-list">
                 {ecoModeOptions.map((option) => (
                     <li key={option.ecoMode} id={"eco-mode-select-" + option.idText} className={currEcoMode === option.ecoMode ? "radio-selected" : ""}>

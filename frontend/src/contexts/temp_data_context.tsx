@@ -329,7 +329,6 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         };
 
         makeBackendAPICall("set_eco_mode", reqBody, "setting ecoMode");
-        
 
     }, [selectedDeviceID, makeBackendAPICall, getSelectedTempData]);
 
