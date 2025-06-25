@@ -82,6 +82,26 @@ export function stripSlashFromURLIfThere(url: string) {
     }
 }
 
+export function splitURLsByCommaToArray(urls: string | null) {
+    if (urls === null) {return []};
+    let initArray : string[] = [];
+    initArray = urls.split(",");
+    let fixedArray: string[] = [];
+    for (const url of initArray) {
+        fixedArray.push(stripSlashFromURLIfThere(url.trim()));
+    }
+    return fixedArray;
+}
+
+export function originInCorsList(origin: string, CORSArray: string[] | null): boolean {
+    if (CORSArray === null) return true; // CORS checking off if no array passed;
+    let inList = false;
+    for (const corsEntry of CORSArray) {
+        if (origin.includes(corsEntry)) {inList = true;}
+    }
+    return inList;
+}
+
 export function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }

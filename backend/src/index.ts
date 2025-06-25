@@ -10,7 +10,7 @@ import { getCurrentObservation, initializeWeatherAndRefresh } from "./weather";
 import {tempDataInfo} from "./googlesdm";
 import { getDataAndSubscribe, removeSubscription } from "./googlepubsub";
 import { Mutex } from "./mutex";
-import { stripSlashFromURLIfThere } from "./utils";
+import { originInCorsList, splitURLsByCommaToArray } from "./utils";
 import { Worker } from "worker_threads";
 import * as path from "path";
 import { MessageTypes, ThreadDataResponseMessage, ThreadRequestDataMessage, ThreadShutdownMessage, ThreadStartupMessage } from "./backendtypes";
@@ -26,7 +26,8 @@ export const environment = process.env.ENVIRONMENT || "prod";
 export const subscriptionId = "thermostat-sub-id-" + environment;
 export let weatherLatitude = Number(process.env.WEATHER_LATITUDE) || 39.833333; // Default to Lebanon, KS
 export let weatherLongitude = Number(process.env.WEATHER_LONGITUDE) || -98.583333; // Default to Lebanon, KS
-export const defaultCORSOrigin = (process.env.DEFAULT_CORS_ORIGIN === null || process.env.DEFAULT_CORS_ORIGIN === undefined) ? null : stripSlashFromURLIfThere(process.env.DEFAULT_CORS_ORIGIN)
+const defaultCORSOrigin = (process.env.DEFAULT_CORS_ORIGIN === null || process.env.DEFAULT_CORS_ORIGIN === undefined) ? null : process.env.DEFAULT_CORS_ORIGIN
+const defaultCORSOriginArray = splitURLsByCommaToArray(defaultCORSOrigin);
 const dbLogging = (process.env.DB_LOGGING?.toUpperCase() === "1" || process.env.DB_LOGGING?.toUpperCase() === "YES" || process.env.DB_LOGGING?.toUpperCase() === "TRUE") ? true: false;
 const dbClientConf = (process.env.DB_CLIENT_CONF === null || process.env.DB_CLIENT_CONF === undefined) ? "http::addr=localhost:9000" : process.env.DB_CLIENT_CONF;
 
@@ -51,7 +52,7 @@ fastify.register(cors, {
             return;
         };
         const hostname = new URL(origin).hostname
-        if(hostname === "localhost" || (defaultCORSOrigin !== null && origin.includes(defaultCORSOrigin))){
+        if (hostname === "localhost" || originInCorsList(origin,defaultCORSOriginArray)){
             //  Request from localhost or defaultCORSOrigin will pass
             cb(null, true);
             return;
