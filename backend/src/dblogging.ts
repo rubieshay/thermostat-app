@@ -27,22 +27,6 @@ async function initializeDB() {
 //    console.log("QuestDB config is:",sender);
 }
 
-// export type TempData = {
-//     deviceID: string | null,
-//     tempUnits: TempUnits,
-//     ambientTempCelsius: number | null,
-//     heatCelsius: number | null,
-//     coolCelsius: number | null,
-//     tempMode: TempMode,
-//     hvacStatus: HvacStatus,
-//     ecoMode: EcoMode,
-//     ecoHeatCelsius: number | null,
-//     ecoCoolCelsius: number | null,
-//     fanTimer: string | null
-//     connectivity: Connectivity,
-//     deviceName: string | null
-//     ambientHumidity: number | null
-// }
 function getSimplifiedTempData(tempData: TempData) {
     const returnTempData: TempData = tempData;
     if (returnTempData.deviceID === null) {returnTempData.deviceID = ""};
