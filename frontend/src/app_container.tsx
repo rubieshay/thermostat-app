@@ -11,10 +11,12 @@ import { Connectivity, ModalDrawerType } from "./types";
 import { dataRefreshTime, drawerTimeoutDuration, demoMode } from "./utils/constants";
 import { usePageVisibilityRefresh } from "./utils/hooks";
 import { WeatherContext } from "./contexts/weather_context";
+import { SettingsContext } from "./contexts/settings_context";
 
 export function AppContainer() {
     const { initialLoadComplete, okToStartRefreshTimer, stopRefreshTimer, startRefreshTimer, fetchTempData, selectedTempData: tempData } = useContext(TempDataContext);
     const { weatherDataLoaded } = useContext(WeatherContext);
+    const { changeInitialThemeComplete } = useContext(SettingsContext);
     const [modalDrawerType, setModalDrawerType] = useState<ModalDrawerType | null>(null);
     const fadeDrawerTimer = useRef<number | null>(null);
     useSocketMessages(demoMode || !initialLoadComplete);
@@ -40,7 +42,7 @@ export function AppContainer() {
 
     return (
         <>
-            {initialLoadComplete && weatherDataLoaded ?
+            {initialLoadComplete && weatherDataLoaded && changeInitialThemeComplete ?
                 <>
                     <HeaderBar navLink="/settings" navSymbol={"\ue8b8"} pageTitle={(tempData && tempData.connectivity === Connectivity.online && tempData.deviceName !== null) ? tempData.deviceName : "Thermostat Not Found"}/>
                     <main>

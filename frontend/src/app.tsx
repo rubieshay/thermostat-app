@@ -8,9 +8,14 @@ import { SettingsContextProvider } from "./contexts/settings_context";
 import Settings from "./settings/settings";
 import { useFontLoader } from "./loading/font_loader";
 import { WeatherContextProvider } from "./contexts/weather_context";
+import { useEffect } from "react";
 
 function App() {
     const [fontsLoaded] = useFontLoader();
+
+    useEffect(() => {
+        document.body.style.setProperty("--dial-transition-time", "400ms");
+    }, []);
     
     if (!fontsLoaded) {
         return <></>

@@ -60,7 +60,7 @@ export const WeatherContextProvider: React.FC<ChildrenProviderProps> = (props: C
 
     useEffect(() => {
         getWeather()
-    },[getWeather]);
+    }, [getWeather]);
     
     const memoedValue = useMemo(() => ({
         weatherData, setWeatherData, weatherDataLoaded
@@ -69,5 +69,4 @@ export const WeatherContextProvider: React.FC<ChildrenProviderProps> = (props: C
     return (
         <WeatherContext.Provider value={memoedValue}>{props.children}</WeatherContext.Provider>
     );
-
 }

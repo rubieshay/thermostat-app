@@ -34,7 +34,7 @@
 }
 /* clickable tiles only */
 #control-tiles button.tile:hover, #control-tiles button.tile:focus-visible {
-    scale: 1.05;
+    scale: 1.03;
 }
 #control-tiles :last-child {
     grid-column: span 2;
