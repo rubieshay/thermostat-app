@@ -89,6 +89,9 @@ export const APIContextProvider: React.FC<ChildrenProviderProps> = (props: Child
             // console.log("URL validated, healthy");
             setAPIIsHealthy(true);
             setAPIURLState(tempURL);
+            if (value === null) {
+                setAPIURL(defaultAPIURL!)
+            }
         } else {
             // console.log("URL not healthy");
             setAPIIsHealthy(false);
