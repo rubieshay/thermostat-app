@@ -24,7 +24,7 @@ async function getStationsFromLatLong(): Promise<FetchReturn> {
         weatherData.observationStationsURL = data.properties.observationStations;
         weatherData.forecastURL = data.properties.forecast;
         weatherData.gridId = data.properties.gridId;
-        console.log("Retrieved stations URL, forecast URL, and gridID:" + JSON.stringify(weatherData));
+        // console.log("Retrieved stations URL, forecast URL, and gridID:" + JSON.stringify(weatherData));
     } catch (error) {
         // Handle network errors or errors thrown by the if statement above
         if (error instanceof Error) {
@@ -67,12 +67,12 @@ async function getObservationStations(): Promise<FetchReturn> {
         }
         const data = await response.json(); // Or response.text() for text responses
         fetchReturn.success = true;
-        console.log("Got observations station data:",JSON.stringify(data.features[0]));
+        // console.log("Got observations station data:",JSON.stringify(data.features[0]));
         weatherData.observationStation = data.features[0].properties.stationIdentifier;
         const cityAirportName = data.features[0].properties.name;
         weatherData.observationCity = cityAirportName.split(",")[0]; 
         weatherData.observationURL = encodeURI(weatherBaseURL + "stations/" + weatherData.observationStation + "/observations/latest");
-        console.log("New observation station data retrieved:" + JSON.stringify(weatherData));
+        // console.log("New observation station data retrieved:" + JSON.stringify(weatherData));
     } catch (error) {
         // Handle network errors or errors thrown by the if statement above
         if (error instanceof Error) {
@@ -124,7 +124,7 @@ export async function getCurrentObservation(): Promise<FetchReturn> {
         weatherData.currentTemperature = data.properties.temperature.value;
         weatherData.currentRelativeHumidity = data.properties.relativeHumidity.value;
         weatherData.currentWeatherIconURL = data.properties.icon;
-        console.log("New weather data retrieved:" + JSON.stringify(weatherData));
+        // console.log("New weather data retrieved:" + JSON.stringify(weatherData));
     } catch (error) {
         // Handle network errors or errors thrown by the if statement above
         if (error instanceof Error) {

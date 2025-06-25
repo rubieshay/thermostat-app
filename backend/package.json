@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "predev": "tsc -p tsconfig.json",
     "dev": "nodemon",
     "build": "tsc -p tsconfig.json"
   },

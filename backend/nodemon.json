@@ -1,12 +1,6 @@
 {
   "watch": ["src",".env"],
-  "ext": "ts,js,json,env",
-  "ignore": ["src/**/*.spec.ts","src/*.js"],
-  "events": {
-    "start": "tsc src/dblogging.ts --outDir src --target es2024 --module commonjs",
-    "restart": "tsc src/dblogging.ts --outDir src --target es2024 --module commonjs",
-    "crash": "rm src/backendtypes.js && rm src/dblogging.js && rm src/types.js",
-    "exit": "rm src/backendtypes.js && rm src/dblogging.js && rm src/types.js"
-  },
-  "exec": "tsx --env-file=.env src/index.ts"
+  "ext": "ts,json,env",
+  "ignore": ["src/**/*.spec.ts","build/*.js"],
+  "exec": "tsc -p tsconfig.json && node --env-file=.env build/index.js"
 }

@@ -1,10 +1,9 @@
 import { parentPort, workerData } from "worker_threads";
 import { MessageTypes, ThreadData, ThreadDataResponseMessage, ThreadRequestDataMessage } from "./backendtypes";
 import { Sender } from "@questdb/nodejs-client";
-import { tempDataInfo } from "./googlesdm";
 import { TempData } from "./types";
 
-const logIntervalSeconds = 30;
+const logIntervalSeconds = 60;
 
 
 if (!workerData) {
@@ -43,18 +42,52 @@ function getSimplifiedTempData(tempData: TempData) {
     if (returnTempData.ambientTempCelsius === null) {returnTempData.ambientTempCelsius = 0};
     if (returnTempData.heatCelsius === null) {returnTempData.heatCelsius = 0};
     if (returnTempData.coolCelsius === null) {returnTempData.coolCelsius = 0};
+    if (returnTempData.ecoHeatCelsius === null) {returnTempData.ecoHeatCelsius = 0};
+    if (returnTempData.ecoCoolCelsius === null) {returnTempData.ecoCoolCelsius = 0};
+    if (returnTempData.fanTimer === null) {
+        const now = new Date();
+        returnTempData.fanTimer = now.toUTCString();
+    };
+    if (returnTempData.deviceName === null) {returnTempData.deviceName = "Thermostat"};
+    if (returnTempData.ambientHumidity == null) {returnTempData.ambientHumidity = 0};
     return returnTempData;
+}
+
+function getSecondsFromDateTime(UTCTimeString: string) : number {
+    let UTCDate = new Date(UTCTimeString);
+    let now = new Date();
+    let millisApart = UTCDate.getTime() - now.getTime();
+    let secondsApart = Math.trunc(millisApart / 1000);
+    return secondsApart;
 }
 
 async function logEntryToDB(data: ThreadData) {
     console.log("Logging entry to database...");
     if (!sender) {return};
-    for (const logTempData of tempDataInfo) {
+    for (const logTempData of data.tempDataInfo) {
         const logData = getSimplifiedTempData(logTempData);
-        sender.table("temp")
-            .symbol("deviceID",logData.deviceID!)
-            .symbol("tempUnits",logData.tempUnits)
-            .floatColumn("ambientTempCelsius", logTempData.ambientTempCelsius!);
+        let fanSecondsLeft = getSecondsFromDateTime(logData.fanTimer!);
+        let outdoorTempCelsius = data.weatherData.currentTemperature === null ? 0 : data.weatherData.currentTemperature;
+        let outdoorHumidity = data.weatherData.currentRelativeHumidity === null ? 0 : data.weatherData.currentRelativeHumidity;
+        try {
+            await sender.table("temp")
+                .symbol("deviceID",logData.deviceID!)
+                .symbol("tempUnits",logData.tempUnits)
+                .floatColumn("indoorTempCelsius", logData.ambientTempCelsius!)
+                .floatColumn("heatCelsius", logData.heatCelsius!)
+                .floatColumn("coolCelsius", logData.coolCelsius!)
+                .floatColumn("ecoHeatCelsius", logData.ecoHeatCelsius!)
+                .floatColumn("ecoCoolCelsius", logData.ecoCoolCelsius!)
+                .intColumn("fanSecondsLeft", fanSecondsLeft)
+                .floatColumn("indoorHumdity", logData.ambientHumidity!)
+                .floatColumn("outdoorTempCelsius", outdoorTempCelsius)
+                .floatColumn("outdoorHumidty", outdoorHumidity)
+                .atNow();
+            await sender.flush();
+        }
+        catch (error) {
+            console.error("Unable to log to database...",error);
+        }
     }
 }
 
@@ -78,15 +111,24 @@ if (parentPort) {
     })
 }
 
-process.on('SIGTERM', () => {
-    console.log("Received terminate message on worker thread. Ending.");
+async function cleanup() {
+    console.log("Cleaning up dblogging worker thread...");
     clearInterval(logInterval);
+    if (sender) {
+        console.log("Closing out database...");
+        await sender.close();
+    }
+}
+
+process.on('SIGTERM', async () => {
+    console.log("Received terminate message on worker thread. Ending.");
+    await cleanup();
     process.exit(0);
 });
 
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
     console.log("Received interrupt Ctrl-C on worker thread. Stopping.");
-    clearInterval(logInterval);
+    cleanup();
     process.exit(0);
 });
 

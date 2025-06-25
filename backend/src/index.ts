@@ -203,14 +203,20 @@ async function initializeDBLogging() {
 }
 
 const start = async () => {
+    console.log("Executing main startup process...");
     try {
+        console.log("Getting thermostat data and subscribing...");
         await getDataAndSubscribe();
+        console.log("Starting fastify listen service on port: ",httpPort);
         await fastify.listen({ port: httpPort, host: "0.0.0.0" });
         if (demoMode) {
+            console.log("Getting demo weather data...");
             weatherData = structuredClone(initWeatherData);
         } else {
+            console.log("Initializing weather service data retrieval...");
             await initializeWeatherAndRefresh();
         }
+        console.log("Setting up worker for database logging...");
         await initializeDBLogging();
     } catch (err) {
         fastify.log.error(err);
