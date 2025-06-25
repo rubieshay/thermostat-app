@@ -4,20 +4,17 @@
     align-items: start;
 }
 #settings-page hr {
-    height: 1px;
+    height: 2px;
     width: 100%;
-    background: var(--color-gray-3);
+    background: var(--color-gray-500);
 }
 #settings-page > form {
     max-width: 30rem;
 }
 #settings-page ul, #settings-page > .input-group {
-    /* width: 100%;
-    min-width: max-content;
-    max-width: 20rem; */
     width: fit-content;
 }
-#settings-page h2 {
+#settings-page h2 span:last-child {
     font-style: italic;
 }
 

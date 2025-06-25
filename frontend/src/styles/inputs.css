@@ -9,16 +9,16 @@ button, input[type="button"], input[type="submit"] {
     display: block;
     padding: 1rem;
     border-radius: 1rem;
-    background: var(--color-gray-3);
-    color: var(--color-gray-0);
+    background: var(--color-gray-600);
+    color: var(--color-gray-200);
     transition: scale 200ms ease-in-out;
 }
 .standard-button:hover, .standard-button:focus-visible {
     scale: 1.025;
 }
 .standard-button.button-disabled {
-    background: var(--color-gray-4);
-    color: var(--color-gray-5);
+    background: var(--color-gray-700);
+    color: var(--color-gray-500);
     cursor: default;
     pointer-events: none;
 }
@@ -40,15 +40,15 @@ input[type="text"] {
     border-radius: 1rem;
     font-size: 1rem;
     line-height: 1.5;
-    background: var(--color-gray-5);
-    color: var(--color-gray-0);
-    border: 2px solid var(--color-gray-3);
+    background: var(--color-gray-700);
+    color: var(--color-gray-000);
+    border: 2px solid var(--color-gray-200);
 }
 .input-invalid input[type="text"] {
-    border: 2px solid var(--color-heat-2);
+    border: 2px solid var(--color-heat-200);
 }
 input::placeholder {
-    color: var(--color-gray-3);
+    color: var(--color-gray-500);
 }
 
 /* FORM ELEMENTS */
@@ -66,7 +66,7 @@ form {
 }
 label, .label {
     font-size: 0.875rem;
-    color: var(--color-gray-3);
+    color: var(--color-gray-400);
 }
 .input-group {
     width: 100%;
@@ -76,12 +76,12 @@ label, .label {
 }
 .input-error {
     min-height: 1rem;
-    color: var(--color-heat-2);
+    color: var(--color-heat-200);
 }
 
 
 
-/* RADIO SELECT BUTTONS/LIST (FOR CONTROL TILE MODALS AND SETTINGS) */
+/* RADIO SELECT/BUTTONS LIST/RADIO BUTTONS (FOR CONTROL TILE MODALS AND SETTINGS) */
 
 ul.radio-select-list {
     display: flex;
@@ -93,22 +93,23 @@ ul.radio-select-list {
 }
 .radio-select-list button {
     width: 100%;
-    background: var(--color-gray-4);
 }
 .radio-select-list li.radio-selected button {
-    background: var(--color-gray-3);
-    color: var(--color-gray-0);
+    background: var(--color-gray-400);
+    color: var(--color-gray-000);
 }
+
 ul.button-select {
     display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
     gap: 1rem;
 }
 ul.button-select li {
     display: block;
 }
-.drawer-content hr {
-    height: 1rem;
+ul.button-select li button {
+    width: 100%;
 }
 
 ul.radio-buttons {
@@ -116,7 +117,7 @@ ul.radio-buttons {
     grid-auto-flow: column;
     grid-auto-columns: minmax(0, 1fr);
     border-radius: 1rem;
-    background: var(--color-gray-4);
+    background: var(--color-gray-600);
     position: relative;
 }
 .radio-buttons li {
@@ -129,7 +130,7 @@ ul.radio-buttons {
     text-align: center;
     padding: 1rem;
     border-radius: 1rem;
-    color: var(--color-gray-2);
+    color: var(--color-gray-200);
     transition: color 200ms ease-in-out;
 }
 ul.radio-buttons::before {
@@ -141,9 +142,9 @@ ul.radio-buttons::before {
     z-index: 1;
     height: 3rem;
     border-radius: 1rem;
-    background: var(--color-gray-3);
+    background: var(--color-gray-400);
     transition: left 200ms ease-in-out;
 }
 .radio-buttons li.radio-selected button {
-    color: var(--color-gray-0);
+    color: var(--color-gray-000);
 }

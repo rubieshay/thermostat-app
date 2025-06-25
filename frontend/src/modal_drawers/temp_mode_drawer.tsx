@@ -19,8 +19,9 @@ function TempModeDrawer({ handleCloseModal }: {handleCloseModal: () => void}) {
 
     return (
         <div className="drawer-content">
-            <h2>HVAC Mode</h2>
-            <hr/>
+            <div>
+                <h2>HVAC Mode</h2>
+            </div>
             <ul className="radio-select-list">
                 {tempModeOptions.map((option) => (
                     <li key={option.tempMode} id={"temp-mode-select-" + option.idText} className={currTempMode === option.tempMode ? "radio-selected" : ""}>

@@ -8,7 +8,7 @@
     height: 2px;
     border-radius: 1px;
     width: 100%;
-    background: var(--color-gray-3);
+    background: var(--color-gray-500);
 }
 .tiles-group {
     display: grid;
@@ -21,21 +21,61 @@
     flex-direction: column;
     gap: 0.25rem;
     min-width: 0;
-    background: var(--color-gray-5);
+    background: var(--color-gray-700);
     padding: 1rem;
     border-radius: 1rem;
     transition: scale 200ms ease-in-out;
 }
 .tile h2, .drawer-content h2 {
-    font-variation-settings: "wght" 100;
+    font-variation-settings: "wght" 150;
 }
-.tile legend, .tile > h2, .drawer-content h2 {
+.tile legend, .tile > h2 {
     padding-bottom: 0.25rem;
 }
 /* clickable tiles only */
 #control-tiles button.tile:hover, #control-tiles button.tile:focus-visible {
     scale: 1.05;
 }
-#control-tiles :first-child {
+#control-tiles :last-child {
+    grid-column: span 2;
+}
+
+
+
+/* DRAWER CONTENTS (FROM TILES) */
+
+.drawer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    container-type: inline-size;
+}
+.drawer-content div:has(.icon-text-group) h2{
+    padding-bottom: 0.5rem;
+}
+.drawer-content ul.button-select {
+    display: grid;
+    grid-template-columns: repeat(8, 5.125rem);
+    gap: 1rem;
+}
+.drawer-content ul.button-select button {
+    text-align: center;
+}
+@container (width < 48rem) {
+    .drawer-content ul.button-select {
+        grid-template-columns: repeat(4, minmax(5.125rem, 1fr));
+    }
+}
+@container (width < 23.5rem) {
+    .drawer-content ul.button-select {
+        grid-template-columns: repeat(3, minmax(5.125rem, 1fr));
+    }
+}
+@container (width < 17.375rem) {
+    .drawer-content ul.button-select {
+        grid-template-columns: repeat(2, minmax(5.125rem, 1fr));
+    }
+}
+.button-select .extra-select-option {
     grid-column: span 2;
 }

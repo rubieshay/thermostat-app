@@ -10,7 +10,10 @@ function Settings() {
         <>
             <HeaderBar navLink={"/app"} navSymbol={"\ue88a"} pageTitle={"Settings"}/>
             <main id="settings-page">
-                <h2>App Version: {appVersion}</h2>
+                <h2>
+                    <span>App Version: </span>
+                    <span>{appVersion}</span>
+                </h2>
                 <hr/>
                 {demoMode ?
                     <></>
