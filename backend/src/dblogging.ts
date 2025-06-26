@@ -123,7 +123,7 @@ process.on('SIGTERM', async () => {
 
 process.on('SIGINT', async () => {
     console.log("Received interrupt Ctrl-C on worker thread. Stopping.");
-    cleanup();
+    await cleanup();
     process.exit(0);
 });
 
