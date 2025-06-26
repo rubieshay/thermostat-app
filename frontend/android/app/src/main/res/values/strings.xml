@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">GoogleThermostat</string>
-    <string name="title_activity_main">GoogleThermostat</string>
+    <string name="app_name">ThermoPal</string>
+    <string name="title_activity_main">ThermoPal</string>
     <string name="package_name">net.shaytech.gthermostat</string>
     <string name="custom_url_scheme">net.shaytech.gthermostat</string>
 </resources>
