@@ -1,7 +1,7 @@
 import { parentPort, workerData } from "worker_threads";
 import { MessageTypes, ThreadData, ThreadDataResponseMessage, ThreadRequestDataMessage } from "./backendtypes";
 import { Sender } from "@questdb/nodejs-client";
-import { TempData } from "./types";
+import { FanMode, HvacStatus, TempData } from "./types";
 
 const logIntervalSeconds = 60;
 
@@ -51,7 +51,7 @@ function getSecondsFromDateTime(UTCTimeString: string) : number {
     let secondsApart = Math.trunc(millisApart / 1000);
     return secondsApart;
 }
-
+ 
 async function logEntryToDB(data: ThreadData) {
     if (!dbOK) {return};
     console.log("Logging entry to database...");
@@ -59,6 +59,10 @@ async function logEntryToDB(data: ThreadData) {
     for (const logTempData of data.tempDataInfo) {
         const logData = getSimplifiedTempData(logTempData);
         let fanSecondsLeft = getSecondsFromDateTime(logData.fanTimer!);
+        let fanMode: FanMode = logData.fanTimer === null ? FanMode.off : FanMode.on;
+        if (logData.hvacStatus !== HvacStatus.off && logData.fanTimer === null){
+            fanMode = FanMode.auto;
+        }
         let outdoorTempCelsius = data.weatherData.currentTemperature === null ? 0 : data.weatherData.currentTemperature;
         let outdoorHumidity = data.weatherData.currentRelativeHumidity === null ? 0 : data.weatherData.currentRelativeHumidity;
         try {
@@ -68,6 +72,10 @@ async function logEntryToDB(data: ThreadData) {
                 .floatColumn("indoorTempCelsius", logData.ambientTempCelsius!)
                 .floatColumn("heatCelsius", logData.heatCelsius!)
                 .floatColumn("coolCelsius", logData.coolCelsius!)
+                .symbol("tempMode",logData.tempMode)
+                .symbol("hvacStatus", logData.hvacStatus)
+                .symbol("fanMode", fanMode)
+                .symbol("ecoMode", logData.ecoMode)
                 .floatColumn("ecoHeatCelsius", logData.ecoHeatCelsius!)
                 .floatColumn("ecoCoolCelsius", logData.ecoCoolCelsius!)
                 .intColumn("fanSecondsLeft", fanSecondsLeft)
