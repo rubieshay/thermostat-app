@@ -59,8 +59,8 @@ async function logEntryToDB(data: ThreadData) {
     for (const logTempData of data.tempDataInfo) {
         const logData = getSimplifiedTempData(logTempData);
         let fanSecondsLeft = getSecondsFromDateTime(logData.fanTimer!);
-        let fanMode: FanMode = logData.fanTimer === null ? FanMode.off : FanMode.on;
-        if (logData.hvacStatus !== HvacStatus.off && logData.fanTimer === null){
+        let fanMode: FanMode = logTempData.fanTimer === null ? FanMode.off : FanMode.on;
+        if (logData.hvacStatus !== HvacStatus.off && logTempData.fanTimer === null){
             fanMode = FanMode.auto;
         }
         let outdoorTempCelsius = data.weatherData.currentTemperature === null ? 0 : data.weatherData.currentTemperature;
