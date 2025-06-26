@@ -103,7 +103,7 @@ jobs:
       run: |
         mkdir -p /tmp/upload
         cp frontend/android/app/build/outputs/bundle/release/app-release.aab /tmp/upload/app-release.aab
-        cp frontend/android/app/build/outputs/apk/release/gthermostat.apk /tmp/upload/gthermostat.apk
+        cp frontend/android/app/build/outputs/apk/release/app-release.apk /tmp/upload/thermopal.apk
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
@@ -111,7 +111,7 @@ jobs:
         name: android-artifacts
         path: |
           /tmp/upload/app-release.aab
-          /tmp/upload/gthermostat.apk
+          /tmp/upload/thermopal.apk
 
     - name: Upload to Play Console (Closed Testing)
       if: github.ref == 'refs/heads/main'

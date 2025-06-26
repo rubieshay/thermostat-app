@@ -9,14 +9,16 @@ import Settings from "./settings/settings";
 import { useFontLoader } from "./loading/font_loader";
 import { WeatherContextProvider } from "./contexts/weather_context";
 import { useEffect } from "react";
+import { useBackButtonHandler } from "./utils/hooks";
 
 function App() {
     const [fontsLoaded] = useFontLoader();
+    useBackButtonHandler();
 
     useEffect(() => {
         document.body.style.setProperty("--dial-transition-time", "400ms");
     }, []);
-    
+
     if (!fontsLoaded) {
         return <></>
     }

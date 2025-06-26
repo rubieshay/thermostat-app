@@ -85,7 +85,8 @@ export const APIContextProvider: React.FC<ChildrenProviderProps> = (props: Child
         // got a URL, see if it is healthy
         // console.log("checking healthz URL on found endpoint: " + tempURL);
         const healthURL = tempURL;
-        if (await validateURL(healthURL)) {
+        let fetchReturn = await validateURL(healthURL);
+        if (fetchReturn.success) {
             // console.log("URL validated, healthy");
             setAPIIsHealthy(true);
             setAPIURLState(tempURL);

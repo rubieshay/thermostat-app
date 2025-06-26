@@ -32,16 +32,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
-        applicationVariants.all{
-            // this method is use to rename your all apk weather
-            // it may be signed or unsigned(debug apk)
-            variant ->
-                variant.outputs.each{
-                    output->
-                        def name = "gthermostat.apk"
-                        output.outputFileName = name
-                }
-        }       
+        // applicationVariants.all{
+        //     // this method is use to rename your all apk weather
+        //     // it may be signed or unsigned(debug apk)
+        //     variant ->
+        //         variant.outputs.each{
+        //             output->
+        //                 def name = "gthermostat.apk"
+        //                 output.outputFileName = name
+        //         }
+        // }       
 
     }
 }

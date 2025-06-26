@@ -1,4 +1,7 @@
 import { useCallback, useContext, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from 'react-router';
+import { App } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 import { TempUnits, TempUnitsSetting, type FetchReturn } from "../types";
 import { dataRefreshTime, dataRefreshEnabled } from "./constants";
 import { TempDataContext } from "../contexts/temp_data_context";
@@ -82,3 +85,47 @@ export const useActualTempUnits = (() => {
         return (tempUnitsSetting === TempUnitsSetting.celsius ? TempUnits.celsius : TempUnits.fahrenheit);
     }
 });
+
+export const useBackButtonHandler = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Only handle back button on native platforms
+    if (!Capacitor.isNativePlatform()) {
+      return;
+    }
+
+    const handleBackButton = () => {
+      const currentPath = location.pathname;
+      
+      // Define your root routes where back button should exit the app
+      const rootRoutes = ['/', '/app','/enterurl'];
+      
+      console.log({currentPath, rootRoutes});
+      if (rootRoutes.includes(currentPath)) {
+        // Exit app if on root route
+        App.exitApp();
+      } else {
+        // Navigate back in history
+        navigate(-1);
+      }
+    };
+
+    // Add the back button listener
+    let backButtonListener: any;
+    
+    const setupListener = async () => {
+      backButtonListener = await App.addListener('backButton', handleBackButton);
+    };
+    
+    setupListener();
+
+    // Cleanup on unmount
+    return () => {
+      if (backButtonListener) {
+        backButtonListener.remove();
+      }
+    };
+  }, [navigate, location.pathname]);
+};
