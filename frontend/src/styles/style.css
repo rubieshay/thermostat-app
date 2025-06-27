@@ -118,6 +118,7 @@
     --color-cool-700: #1d2a4a;
 
     --overlay-shade: #00000099;
+    --background-shadow: #1b191955;
     --overlay-error-shade: #b8604099;
 }
 
@@ -142,6 +143,7 @@
     --color-cool-700: #c0daf0;
     
     --overlay-shade: #00000055;
+    --background-shadow: #fff8f555;
     --overlay-error-shade: #de855299;
 }
 
@@ -153,8 +155,8 @@ body {
     background-color: var(--color-gray-900);
     position: relative;
     color: var(--color-gray-200);
-    padding: calc(var(--safe-area-inset-top)) calc(var(--safe-area-inset-right))
-             calc(var(--safe-area-inset-bottom)) calc(var(--safe-area-inset-left));
+    padding: var(--safe-area-inset-top) var(--safe-area-inset-right)
+             var(--safe-area-inset-bottom) var(--safe-area-inset-left);
 }
 /* status and nav bar colors */
 body::before, body::after {
