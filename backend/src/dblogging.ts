@@ -28,7 +28,7 @@ async function initializeDB() {
 }
 
 function getSimplifiedTempData(tempData: TempData) {
-    const returnTempData: TempData = tempData;
+    const returnTempData: TempData = structuredClone(tempData);
     if (returnTempData.deviceID === null) {returnTempData.deviceID = ""};
     if (returnTempData.ambientTempCelsius === null) {returnTempData.ambientTempCelsius = 0};
     if (returnTempData.heatCelsius === null) {returnTempData.heatCelsius = 0};
