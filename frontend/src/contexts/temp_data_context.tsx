@@ -57,7 +57,7 @@ export const TempDataContext = createContext(initTempContext);
 
 export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: ChildrenProviderProps) => {
     const {apiURL} = useContext(APIContext); 
-    const {setLastDeviceID} = useContext(SettingsContext);
+    const {lastDeviceID, setLastDeviceID} = useContext(SettingsContext);
     const [tempDataArray, setTempDataArray] = useState<TempDataArray>([structuredClone(initTempData)]);
     const [selectedDeviceID, setSelectedDeviceID] = useState<string | null>(null);
     const [tempDataLoaded, setTempDataLoaded] = useState<boolean>(false);
@@ -84,10 +84,8 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         // DEMO DATA
         if (demoMode) {
             setTempDataArray(structuredClone(demoTempDataArray));
-            if (selectedDeviceID === null) {
-                setSelectedDeviceID(demoTempDataArray[0].deviceID);
-            }
             fetchError.fetchReturn.success = true;
+            fetchError.fetchReturn.data = structuredClone(demoTempDataArray);
             isFetching.current = false;
             initialFetchSuccess.current = true;
             return(fetchError.fetchReturn);
@@ -115,9 +113,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             if (data) {
                 if (!arraysEqualIgnoreOrder(tempDataArray,data)) {
                     setTempDataArray(data);
-                    if (selectedDeviceID === null) {
-                        setSelectedDeviceID(data[0].deviceID);
-                    }
+                    fetchError.fetchReturn.data = structuredClone(data);
                 }
                 fetchError.fetchReturn.success = true;
             } else {
@@ -134,7 +130,34 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         }
         isFetching.current = false;
         return fetchError.fetchReturn;
-    }, [lastAPIError.errorSeq, selectedDeviceID, tempDataArray, apiURL]);
+    }, [lastAPIError.errorSeq, tempDataArray, apiURL]);
+
+    const changeDeviceID = useCallback( async (selectedDeviceID: string) => {
+        setSelectedDeviceID(selectedDeviceID);
+        await setLastDeviceID(selectedDeviceID);
+    },[setLastDeviceID])
+
+    const checkAndSetDeviceID = useCallback( async (tda: TempDataArray) => {
+        if (lastDeviceID === null) {
+            // not yet set, set to first one in array
+            if (tda.length > 0 && tda[0].deviceID !== null) {
+                console.log("")
+                changeDeviceID(tda[0].deviceID);
+            }
+        } else {
+            // already loaded a last deviceID from settings. Check if in new TempData and change to it
+            let foundAnID = false;
+            for (const tempData of tda) {
+                if (tempData.deviceID === lastDeviceID) {
+                    foundAnID = true;
+                    changeDeviceID(lastDeviceID);
+                }
+            }
+            if (!foundAnID && tda.length > 0 && tda[0].deviceID !== null) {
+                changeDeviceID(tda[0].deviceID);
+            }
+        }
+    },[changeDeviceID,lastDeviceID]);
 
     const fetchInitialData = useCallback(async () => {
         let retryCount = 0;
@@ -156,7 +179,8 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         }
         if (initialFetchSuccess.current) {
             // after taking cached data, force a cache refresh in case anything is out of sync
-//            fetchTempData(true);
+            await checkAndSetDeviceID(fetchReturn.data);
+            fetchTempData(true);
             setOkToStartRefreshTimer(true);
         } else {
             const apiError: LastAPIError = initLastAPIError;
@@ -167,7 +191,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             setLastAPIError(apiError);
             console.error("Initial fetch not successful after 10 retries");
         }
-    },[fetchTempData]);
+    },[fetchTempData,checkAndSetDeviceID]);
 
     const loadInitialTempData = useCallback( async() => {
         if (hasFetchedInitial.current) {
@@ -175,11 +199,6 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         }
         await fetchInitialData();
     },[fetchInitialData])
-
-    const changeDeviceID = useCallback( async (selectedDeviceID: string) => {
-        setSelectedDeviceID(selectedDeviceID);
-        setLastDeviceID(selectedDeviceID);
-    },[setLastDeviceID])
 
     const getSelectedTempData = useCallback(() => {
         if (selectedDeviceID === null) {

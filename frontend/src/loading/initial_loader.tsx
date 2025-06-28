@@ -8,7 +8,6 @@ import AppLoading from "./app_loading";
 import { WeatherContext } from "../contexts/weather_context";
 import { SettingsContext } from "../contexts/settings_context";
 import { useFontLoader } from "./font_loader";
-import { initAppLoad } from "../main";
 import Thermostat from "../thermostat";
 import EnterURLPage from "../enter_url_page";
 import Settings from "../settings/settings";
@@ -25,7 +24,7 @@ function InitialLoader() {
     const fontsLoaded = useFontLoader();
     const showLoadingIcon = useRef(false);
 
-    const readyToNav = tempDataLoaded && weatherDataLoaded && changeInitialThemeComplete && fontsLoaded;
+    const readyToNav = (tempDataLoaded && weatherDataLoaded && changeInitialThemeComplete && fontsLoaded);
 
     // when initially loaded, get URL from preferences/environment 
     useEffect(() => {
@@ -47,7 +46,6 @@ function InitialLoader() {
 
     // if isAPIHealthy is still false and initialAPICheck is complete, navigate to url entry page
     useEffect(() => {
-        console.log("somethin changed",{initialAPICheckComplete,apiIsHealthy});
         if (initialAPICheckComplete && !apiIsHealthy) {
             // setInitialAPICheckComplete(false);
             initialAPICheckAttempted.current = false;
@@ -60,7 +58,6 @@ function InitialLoader() {
     useEffect(() => {
         const loadAndNav = async() => {
             if (initialLoadAttempted.current) {
-                console.log("Already attempted initial load... staying on page");
                 return;
             }
             initialLoadAttempted.current = true;
@@ -91,13 +88,6 @@ function InitialLoader() {
             clearTimeout(timer);
         })
     },[])
-
-
-    if (fontsLoaded) {
-        console.log("Fonts finally loaded at:", new Date().getTime() - initAppLoad);
-    }
-
-    console.log({readyToNav, apiIsHealthy, initialAPICheckComplete, initialAPICheckAttempted});
 
     if (readyToNav || (!apiIsHealthy && initialAPICheckComplete && fontsLoaded)) {
         return(

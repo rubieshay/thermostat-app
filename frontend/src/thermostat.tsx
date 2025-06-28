@@ -9,14 +9,9 @@ import { useSocketMessages } from "./utils/websocket_messages";
 import { Connectivity, ModalDrawerType } from "./types";
 import { dataRefreshTime, drawerTimeoutDuration, demoMode } from "./utils/constants";
 import { usePageVisibilityRefresh } from "./utils/hooks";
-import { WeatherContext } from "./contexts/weather_context";
-import { SettingsContext } from "./contexts/settings_context";
-import { initAppLoad } from "./main";
 
 function Thermostat() {
     const { tempDataLoaded, okToStartRefreshTimer, stopRefreshTimer, startRefreshTimer, fetchTempData, selectedTempData: tempData } = useContext(TempDataContext);
-    const { weatherDataLoaded } = useContext(WeatherContext);
-    const { changeInitialThemeComplete } = useContext(SettingsContext);
     const [modalDrawerType, setModalDrawerType] = useState<ModalDrawerType | null>(null);
     const fadeDrawerTimer = useRef<number | null>(null);
     useSocketMessages(demoMode || !tempDataLoaded);
@@ -39,17 +34,6 @@ function Thermostat() {
         refreshInterval: dataRefreshTime,
         okToStartRefresh: okToStartRefreshTimer
     });
-
-    if (tempDataLoaded) {
-        console.log("initial load complete in:",(new Date().getTime())-initAppLoad);
-    }
-    if (weatherDataLoaded) {
-        console.log("weather data load complete in:",(new Date().getTime())-initAppLoad);
-    }
-    if (changeInitialThemeComplete) {
-        console.log("theme change complete in:",(new Date().getTime())-initAppLoad);
-    }
-
 
     return (
         <>
