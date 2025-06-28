@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from 'react-router';
 import { App } from '@capacitor/app';
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, type PluginListenerHandle } from '@capacitor/core';
 import { TempUnits, TempUnitsSetting, type FetchReturn } from "../types";
 import { dataRefreshTime, dataRefreshEnabled } from "./constants";
 import { TempDataContext } from "../contexts/temp_data_context";
@@ -100,7 +100,7 @@ export const useBackButtonHandler = () => {
       const currentPath = location.pathname;
       
       // Define your root routes where back button should exit the app
-      const rootRoutes = ['/', '/app','/enterurl'];
+      const rootRoutes = ['/','/enterurl'];
       
       console.log({currentPath, rootRoutes});
       if (rootRoutes.includes(currentPath)) {
@@ -113,7 +113,7 @@ export const useBackButtonHandler = () => {
     };
 
     // Add the back button listener
-    let backButtonListener: any;
+    let backButtonListener: PluginListenerHandle;
     
     const setupListener = async () => {
       backButtonListener = await App.addListener('backButton', handleBackButton);

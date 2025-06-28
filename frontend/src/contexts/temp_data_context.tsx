@@ -5,6 +5,7 @@ import { demoMode, debounceTime, type ChildrenProviderProps, dataRefreshTime } f
 import { arraysEqualIgnoreOrder, sleep } from "../utils/functions";
 import { setDemoCoolCelsius, setDemoEcoMode, setDemoFanTime, setDemoHeatCelsius, setDemoRangeCelsius, setDemoTempMode } from "../utils/temp_data_utils";
 import { APIContext } from "./api_context";
+import { SettingsContext } from "./settings_context";
 
 export interface TempContextType {
     tempDataArray: TempDataArray;
@@ -14,7 +15,7 @@ export interface TempContextType {
     debounceTempData: (cbFunction: Function, letWait: boolean) => void,
     selectedDeviceID: string | null,
     changeDeviceID: (newDeviceID: string) => void,
-    initialLoadComplete: boolean,
+    tempDataLoaded: boolean,
     okToStartRefreshTimer: boolean,
     startRefreshTimer: () => void,
     stopRefreshTimer: () => void,
@@ -37,7 +38,7 @@ export const initTempContext: TempContextType = {
     debounceTempData: () => {},
     selectedDeviceID: null,
     changeDeviceID: () => {},
-    initialLoadComplete: false,
+    tempDataLoaded: false,
     okToStartRefreshTimer: false,
     startRefreshTimer: () => {},
     stopRefreshTimer: () => {},
@@ -56,9 +57,10 @@ export const TempDataContext = createContext(initTempContext);
 
 export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: ChildrenProviderProps) => {
     const {apiURL} = useContext(APIContext); 
+    const {setLastDeviceID} = useContext(SettingsContext);
     const [tempDataArray, setTempDataArray] = useState<TempDataArray>([structuredClone(initTempData)]);
     const [selectedDeviceID, setSelectedDeviceID] = useState<string | null>(null);
-    const [initialLoadComplete, setInitialLoadComplete] = useState<boolean>(false);
+    const [tempDataLoaded, setTempDataLoaded] = useState<boolean>(false);
     const [okToStartRefreshTimer, setOkToStartRefreshTimer] = useState<boolean>(false); 
     const [lastAPIError, setLastAPIError] = useState<LastAPIError>(noLastAPIError);
     const hasFetchedInitial = useRef<boolean>(false);
@@ -143,7 +145,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             fetchReturn = await fetchTempData(false);
             if (fetchReturn.success) {
                 initialFetchSuccess.current = true;
-                setInitialLoadComplete(true);
+                setTempDataLoaded(true);
                 console.debug("Initial load completed successfully");
             } else {
                 console.error("Initial fetch failed on retry count:", retryCount, "pausing 15s");
@@ -154,7 +156,7 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         }
         if (initialFetchSuccess.current) {
             // after taking cached data, force a cache refresh in case anything is out of sync
-            fetchTempData(true);
+//            fetchTempData(true);
             setOkToStartRefreshTimer(true);
         } else {
             const apiError: LastAPIError = initLastAPIError;
@@ -174,10 +176,10 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         await fetchInitialData();
     },[fetchInitialData])
 
-    async function changeDeviceID(selectedDeviceID: string) {
+    const changeDeviceID = useCallback( async (selectedDeviceID: string) => {
         setSelectedDeviceID(selectedDeviceID);
-        // shouldn't this also change selectedTempData?
-    }
+        setLastDeviceID(selectedDeviceID);
+    },[setLastDeviceID])
 
     const getSelectedTempData = useCallback(() => {
         if (selectedDeviceID === null) {
@@ -359,17 +361,17 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
     // SETTING CONTEXT
 
     const cbDebounceTempData = useCallback((cbFunction: Function, letWait: boolean) => debounceTempData(cbFunction, letWait), []);
-    const cbChangeDeviceID = useCallback((selectedDeviceID: string) => changeDeviceID(selectedDeviceID), []);
+    const cbChangeDeviceID = useCallback((selectedDeviceID: string) => changeDeviceID(selectedDeviceID), [changeDeviceID]);
     
     const selectedTempData = getSelectedTempData();
 
     const memoedValue: TempContextType = useMemo(() => ({
         tempDataArray, fetchTempData, loadInitialTempData, selectedTempData, getSelectedTempData, 
         debounceTempData : cbDebounceTempData, selectedDeviceID, changeDeviceID : cbChangeDeviceID,
-        initialLoadComplete, okToStartRefreshTimer,
+        tempDataLoaded, okToStartRefreshTimer,
         startRefreshTimer, stopRefreshTimer, lastAPIError, clearAPIError,
         setHeatCelsius, setCoolCelsius, setRangeCelsius, setTempMode, setEcoMode, setFanTimer, updateAllTempData
-    }), [tempDataArray, fetchTempData, loadInitialTempData, selectedTempData, getSelectedTempData, cbDebounceTempData, selectedDeviceID, cbChangeDeviceID, initialLoadComplete, okToStartRefreshTimer, startRefreshTimer, stopRefreshTimer, lastAPIError, clearAPIError, setHeatCelsius, setCoolCelsius, setRangeCelsius, setTempMode, setEcoMode, setFanTimer]);
+    }), [tempDataArray, fetchTempData, loadInitialTempData, selectedTempData, getSelectedTempData, cbDebounceTempData, selectedDeviceID, cbChangeDeviceID, tempDataLoaded, okToStartRefreshTimer, startRefreshTimer, stopRefreshTimer, lastAPIError, clearAPIError, setHeatCelsius, setCoolCelsius, setRangeCelsius, setTempMode, setEcoMode, setFanTimer]);
 
     return (
         <TempDataContext.Provider value={memoedValue}>{props.children}</TempDataContext.Provider>

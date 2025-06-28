@@ -92,8 +92,8 @@
 
 :root {
     /* This is entire vh and vw, not 1/100th */
-    --vh: calc(100vh - var(--safe-area-inset-top) - var(--safe-area-inset-bottom));
-    --vw: calc(100vw - var(--safe-area-inset-left) - var(--safe-area-inset-right));
+    --vh: calc(100svh - var(--safe-area-inset-top) - var(--safe-area-inset-bottom));
+    --vw: calc(100svw - var(--safe-area-inset-left) - var(--safe-area-inset-right));
 
     --dial-size: min(0.92*var(--vw), clamp(20rem, var(--vh) - 27.75rem - 2px, 32rem));
 
@@ -118,8 +118,9 @@
     --color-cool-700: #1d2a4a;
 
     --overlay-shade: #00000099;
+    --highlight-shade: #f0e9e655;
     --background-shadow: #1b191955;
-    --overlay-error-shade: #b8604099;
+    --overlay-error-shade: #b8604055;
 }
 
 .color-theme-light {
@@ -143,8 +144,9 @@
     --color-cool-700: #c0daf0;
     
     --overlay-shade: #00000055;
+    --highlight-shade: #36323155;
     --background-shadow: #fff8f555;
-    --overlay-error-shade: #de855299;
+    --overlay-error-shade: #de855255;
 }
 
 
@@ -187,7 +189,7 @@ main {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: calc(var(--vh) - 6rem);
+    height: var(--vh);
 }
 h1, h2, h3, h4, h5, h6 {
     display: block;
@@ -203,14 +205,17 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 2rem;
 }
 .icon-title img {
+    display: block;
     height: 3.5rem;
     width: 3.5rem;
     background: var(--color-gray-000);
     border-radius: 25%;
 }
 ::selection {
-    background: #f4f3f344;
-    opacity: 0.5;
+    background: var(--highlight-shade);
+}
+* {
+    -webkit-tap-highlight-color: var(--highlight-shade);
 }
 *:focus-visible {
     outline: 2px solid var(--color-gray-000);
@@ -261,7 +266,7 @@ h1, h2, h3, h4, h5, h6 {
     animation: spin 4s linear infinite normal forwards;
 }
 #loading-container {
-    height: calc(var(--vh) - 4rem);
+    height: var(--vh);
 }
 .loading-icon {
     display: block;

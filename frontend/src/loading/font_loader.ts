@@ -23,5 +23,5 @@ export function useFontLoader() {
         loadFonts();
     }, []);
 
-    return [fontsLoaded];
+    return fontsLoaded;
 }

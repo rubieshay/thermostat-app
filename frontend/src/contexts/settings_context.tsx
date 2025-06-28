@@ -10,6 +10,8 @@ export interface SettingsContextType {
     setTempUnitsSetting: (units: TempUnitsSetting) => void,
     themeSetting: ThemeSetting,
     setThemeSetting: (mode: ThemeSetting) => void,
+    lastDeviceID: string | null,
+    setLastDeviceID: (deviceID: string) => void,
     changeInitialThemeComplete: boolean
 }
 
@@ -18,6 +20,8 @@ export const initSettingsContext: SettingsContextType = {
     setTempUnitsSetting: async() => {},
     themeSetting: ThemeSetting.system,
     setThemeSetting: async() => {},
+    lastDeviceID: null,
+    setLastDeviceID: async() => {},
     changeInitialThemeComplete: false
 }
 
@@ -29,9 +33,11 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
     const [tempUnitsSetting, setTempUnitsSettingState] = useState<TempUnitsSetting>(TempUnitsSetting.system);
     const [initialSettingsLoadComplete, setInitialSettingsLoadComplete] = useState(false);
     const [changeInitialThemeComplete, setChangeInitialThemeComplete] = useState(false);
+    const [lastDeviceID, setLastDeviceIDState] = useState<string|null>(null);
     const changeThemeTimer = useRef<number | null>(null);
 
     const loadSettings = useCallback(async() => {
+        console.log("start of loading settings:", new Date().getTime() - initAppLoad);
         const {value: themeValue} = await Preferences.get({ key: "themeSetting"});
         if (themeValue === null) {
             setThemeSetting(initSettingsContext.themeSetting);
@@ -43,6 +49,12 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
             setTempUnitsSetting(initSettingsContext.tempUnitsSetting);
         } else {
             setTempUnitsSettingState(tempUnitsValue as TempUnitsSetting);
+        }
+        const {value: lastDevID} = await Preferences.get({ key: "lastDeviceID"});
+        if (lastDevID === null) {
+            setLastDeviceIDState(null);
+        } else {
+            setLastDeviceIDState(lastDevID);
         }
         setInitialSettingsLoadComplete(true);
         console.log("Time to load settings from app start:",new Date().getTime() - initAppLoad);
@@ -61,11 +73,6 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
             clearTimeout(changeThemeTimer.current);
         }
         setChangeInitialThemeComplete(true);
-        // if (!changeInitialThemeComplete) {
-        //     changeThemeTimer.current = window.setTimeout(() => {
-        //         setChangeInitialThemeComplete(true);
-            // }, dialTransitionDuration);
-        // }
     }, [themeSetting]);
 
     const enableSafeArea = useCallback(() => {
@@ -104,7 +111,7 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
             changeTheme();
             console.log("changed theme");
         }
-    }, [changeTheme, themeSetting,initialSettingsLoadComplete]);
+    }, [changeTheme, themeSetting, initialSettingsLoadComplete]);
 
     useEffect(() => {
         enableSafeArea();
@@ -120,9 +127,14 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
         setTempUnitsSettingState(units);
     }
 
+    async function setLastDeviceID(lastDevID: string) {
+        await Preferences.set({key: "lastDeviceID", value: lastDevID});
+        setLastDeviceIDState(lastDevID);
+    }
+
     const memoedValue = useMemo(() => ({
-        tempUnitsSetting, setTempUnitsSetting, themeSetting, setThemeSetting, changeInitialThemeComplete
-    }), [tempUnitsSetting, themeSetting, changeInitialThemeComplete])
+        tempUnitsSetting, setTempUnitsSetting, themeSetting, setThemeSetting, changeInitialThemeComplete, lastDeviceID, setLastDeviceID
+    }), [tempUnitsSetting, themeSetting, changeInitialThemeComplete, lastDeviceID])
 
     return (
         <SettingsContext.Provider value={memoedValue}>{props.children}</SettingsContext.Provider>

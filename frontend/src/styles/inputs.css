@@ -13,7 +13,12 @@ button, input[type="button"], input[type="submit"] {
     color: var(--color-gray-200);
     transition: scale 200ms ease-in-out;
 }
-.standard-button:hover, .standard-button:focus-visible {
+@media (hover) {
+    .standard-button:hover {
+        scale: 1.08;
+    }
+}
+.standard-button:focus-visible {
     scale: 1.08;
 }
 .standard-button.button-disabled {
@@ -100,7 +105,12 @@ ul.radio-select-list {
     background: var(--color-gray-400);
     color: var(--color-gray-000);
 }
-.radio-select-list button:hover, .radio-select-list button:focus-visible {
+@media (hover) {
+    .radio-select-list button:hover {
+        scale: 1.01;
+    }
+}
+.radio-select-list button:focus-visible {
     scale: 1.01;
 }
 

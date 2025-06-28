@@ -354,14 +354,26 @@ button, #main-numbers * {
                              "GRAD" 0,
                              "opsz" 24;
 }
-.dial-buttons button:focus-visible, .dial-buttons button:hover {
+@media (hover) {
+    .dial-buttons button:hover {
+        background-color: var(--color-gray-400);
+        color: var(--color-gray-000);
+    }
+    #dial.hvac-status-cooling .dial-buttons button:hover {
+        background-color: var(--color-cool-400);
+    }
+    #dial.hvac-status-heating .dial-buttons button:hover {
+        background-color: var(--color-heat-400);
+    }
+}
+.dial-buttons button:focus-visible {
     background-color: var(--color-gray-400);
     color: var(--color-gray-000);
 }
-#dial.hvac-status-cooling .dial-buttons button:focus-visible, #dial.hvac-status-cooling .dial-buttons button:hover {
+#dial.hvac-status-cooling .dial-buttons button:focus-visible {
     background-color: var(--color-cool-400);
 }
-#dial.hvac-status-heating .dial-buttons button:focus-visible, #dial.hvac-status-heating .dial-buttons button:hover {
+#dial.hvac-status-heating .dial-buttons button:focus-visible {
     background-color: var(--color-heat-400);
 }
 #dial .mode-icon {

@@ -1,6 +1,5 @@
 import { useCallback, useContext, useRef, useState } from "react";
 import { TempDataContext } from "./contexts/temp_data_context";
-import AppLoading from "./loading/app_loading";
 import HeaderBar from "./header_bar";
 import Dial from "./dial";
 import Tiles from "./tiles";
@@ -14,13 +13,13 @@ import { WeatherContext } from "./contexts/weather_context";
 import { SettingsContext } from "./contexts/settings_context";
 import { initAppLoad } from "./main";
 
-export function AppContainer() {
-    const { initialLoadComplete, okToStartRefreshTimer, stopRefreshTimer, startRefreshTimer, fetchTempData, selectedTempData: tempData } = useContext(TempDataContext);
+function Thermostat() {
+    const { tempDataLoaded, okToStartRefreshTimer, stopRefreshTimer, startRefreshTimer, fetchTempData, selectedTempData: tempData } = useContext(TempDataContext);
     const { weatherDataLoaded } = useContext(WeatherContext);
     const { changeInitialThemeComplete } = useContext(SettingsContext);
     const [modalDrawerType, setModalDrawerType] = useState<ModalDrawerType | null>(null);
     const fadeDrawerTimer = useRef<number | null>(null);
-    useSocketMessages(demoMode || !initialLoadComplete);
+    useSocketMessages(demoMode || !tempDataLoaded);
 
     const handleResetModal = useCallback((startTimer: boolean) => {
         if (fadeDrawerTimer.current) {
@@ -41,7 +40,7 @@ export function AppContainer() {
         okToStartRefresh: okToStartRefreshTimer
     });
 
-    if (initialLoadComplete) {
+    if (tempDataLoaded) {
         console.log("initial load complete in:",(new Date().getTime())-initAppLoad);
     }
     if (weatherDataLoaded) {
@@ -54,21 +53,15 @@ export function AppContainer() {
 
     return (
         <>
-            {initialLoadComplete && weatherDataLoaded && changeInitialThemeComplete ?
-                <>
-                    <HeaderBar navLink="/settings" navSymbol={"\ue8b8"} pageTitle={(tempData && tempData.connectivity === Connectivity.online && tempData.deviceName !== null) ? tempData.deviceName : "Thermostat Not Found"}/>
-                    <main>
-                        <Dial/>
-                        <Tiles setModalDrawerType={setModalDrawerType}/>
-                    </main>
-                    <ModalDrawer modalDrawerType={modalDrawerType} handleResetModal={handleResetModal}/>
-                    <Error/>
-                </>
-                :
-                <AppLoading/>
-            }
+            <HeaderBar navLink="/settings" navSymbol={"\ue8b8"} pageTitle={(tempData && tempData.connectivity === Connectivity.online && tempData.deviceName !== null) ? tempData.deviceName : "Thermostat Not Found"}/>
+            <main>
+                <Dial/>
+                <Tiles setModalDrawerType={setModalDrawerType}/>
+            </main>
+            <ModalDrawer modalDrawerType={modalDrawerType} handleResetModal={handleResetModal}/>
+            <Error/>
         </>
     );
 }
 
-export default AppContainer;
+export default Thermostat;
