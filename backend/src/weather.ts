@@ -9,6 +9,8 @@ const weatherDataExpireDurationSecs = 180;
 
 const weatherDataAutoRefreshSecs = 300;
 
+let weatherInterval: NodeJS.Timeout;
+
 async function getStationsFromLatLong(): Promise<FetchReturn> {
     let pointsURL = encodeURI(weatherBaseURL + "/points/"+ weatherLatitude + "," + weatherLongitude);
     let fetchReturn: FetchReturn = {success: false};
@@ -155,7 +157,6 @@ async function broadcastNewWeatherData() {
     })
 }
 
-
 async function getWeatherCheckAndSend() {
     let oldWeatherData = weatherData;
     await getCurrentObservation();
@@ -166,8 +167,10 @@ async function getWeatherCheckAndSend() {
 
 export async function initializeWeatherAndRefresh() {
     await getCurrentObservation();
-    setInterval( () => {getWeatherCheckAndSend()},weatherDataAutoRefreshSecs*1000)
-
+    weatherInterval = setInterval( async () => {await getWeatherCheckAndSend()},weatherDataAutoRefreshSecs*1000)
 }
 
+export async function cleanupWeather() {
+    clearInterval(weatherInterval);
+}
 

@@ -139,7 +139,8 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
         hasFetchedInitial.current = true;
         let fetchReturn: FetchReturn = {success: false}
         while (retryCount < 10 && !initialFetchSuccess.current) {
-            fetchReturn = await fetchTempData(true);
+            // for initial load, accept cached data to avoid delaying startup
+            fetchReturn = await fetchTempData(false);
             if (fetchReturn.success) {
                 initialFetchSuccess.current = true;
                 setInitialLoadComplete(true);
@@ -152,6 +153,8 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
             }
         }
         if (initialFetchSuccess.current) {
+            // after taking cached data, force a cache refresh in case anything is out of sync
+            fetchTempData(true);
             setOkToStartRefreshTimer(true);
         } else {
             const apiError: LastAPIError = initLastAPIError;

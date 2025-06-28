@@ -1,8 +1,9 @@
 import { createContext, useState, useMemo, useCallback, useEffect, useRef} from "react";
 import { Preferences } from "@capacitor/preferences";
-import { dialTransitionDuration, type ChildrenProviderProps } from "../utils/constants";
+import { type ChildrenProviderProps } from "../utils/constants";
 import { TempUnitsSetting, ThemeSetting } from "../types";
 import { SafeArea } from "@capacitor-community/safe-area";
+import { initAppLoad } from "../main";
 
 export interface SettingsContextType {
     tempUnitsSetting: TempUnitsSetting,
@@ -44,6 +45,7 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
             setTempUnitsSettingState(tempUnitsValue as TempUnitsSetting);
         }
         setInitialSettingsLoadComplete(true);
+        console.log("Time to load settings from app start:",new Date().getTime() - initAppLoad);
     }, []);
 
     const changeTheme = useCallback(() => {
@@ -58,12 +60,13 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
         if (changeThemeTimer.current) {
             clearTimeout(changeThemeTimer.current);
         }
-        if (!changeInitialThemeComplete) {
-            changeThemeTimer.current = window.setTimeout(() => {
-                setChangeInitialThemeComplete(true);
-            }, dialTransitionDuration);
-        }
-    }, [themeSetting, changeInitialThemeComplete]);
+        setChangeInitialThemeComplete(true);
+        // if (!changeInitialThemeComplete) {
+        //     changeThemeTimer.current = window.setTimeout(() => {
+        //         setChangeInitialThemeComplete(true);
+            // }, dialTransitionDuration);
+        // }
+    }, [themeSetting]);
 
     const enableSafeArea = useCallback(() => {
         // both are transparent and created with css because the custom color bars doesn't appear to work
@@ -94,12 +97,14 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
         if (!initialSettingsLoadComplete) {
             loadSettings();
         };
-    }, [initialSettingsLoadComplete, loadSettings, changeTheme, enableSafeArea])
+    }, [initialSettingsLoadComplete, loadSettings, changeTheme, enableSafeArea]);
 
     useEffect(() => {
-        changeTheme();
-        console.log("changed theme");
-    }, [changeTheme, themeSetting])
+        if (initialSettingsLoadComplete) {
+            changeTheme();
+            console.log("changed theme");
+        }
+    }, [changeTheme, themeSetting,initialSettingsLoadComplete]);
 
     useEffect(() => {
         enableSafeArea();

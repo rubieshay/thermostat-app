@@ -16,7 +16,7 @@ let accessTokenExpirationTime: Date | null = null;
 
 const TokenExpireBufferSeconds = 300;
 
-const dataCacheExpireSeconds = 120;
+const dataCacheExpireSeconds = 600;
 let dataCacheExpirationTime: Date | null = null;
 
 function isAccessTokenExpired(): boolean {

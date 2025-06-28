@@ -10,6 +10,8 @@ import "./styles/modals.css";
 import "./styles/settings.css";
 import App from "./app";
 
+export const initAppLoad = new Date().getTime();
+
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <BrowserRouter>

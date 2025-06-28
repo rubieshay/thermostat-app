@@ -61,7 +61,7 @@
 
 /* MAIN DIAL AND COVER */
 #dial {
-    /* --dial-transition-duration: 400ms; */
+    --dial-transition-duration: 400ms;
     --dial-bg: var(--color-gray-700);
     display: grid;
     place-items: center;

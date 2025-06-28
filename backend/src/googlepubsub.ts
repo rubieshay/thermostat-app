@@ -3,21 +3,41 @@ import { Message, PubSub, StatusError, Subscription } from "@google-cloud/pubsub
 import { checkAndGetDeviceInfo, getDeviceInfo, tempDataInfo, updateTempDataInfoFull } from "./googlesdm";
 import { TempMessageType, TempMode, TempMessage } from "./types";
 import { fastify } from "./index";
+import { getDefaultAutoSelectFamily } from "net";
 
 let pubSub : PubSub 
 let thermoSub : Subscription
 
+const tempIntervalSeconds = 300; // should not need to refresh that often
+let tempInterval: NodeJS.Timeout;
+
+
 export async function getDataAndSubscribe() {
     console.debug("Executing initial fetch of data in to backend...");
-    let fetchReturn = await getDeviceInfo();
+    let fetchReturn = await checkAndGetDeviceInfo(true);
     if (fetchReturn.success) {
         if (demoMode) {
             console.debug("Running in demo mode, using demo data, no event subscription needed");
         } else {
             console.debug("Retrieved device data... Starting subscription");
             await startSubscription();
+            await startTempDataRefreshTimer();
         }
     }
+}
+
+async function startTempDataRefreshTimer() {
+    tempInterval = setInterval( async () => {
+        await checkAndGetDeviceInfo(true);
+    },tempIntervalSeconds*1000)
+}
+
+export async function cleanupTempData() {
+    clearInterval(tempInterval);
+    await removeSubscription();
+    fastify.websocketServer.clients.forEach((client) => {
+        client.close(1001);
+    });
 }
 
 async function startSubscription() {
@@ -44,7 +64,7 @@ async function startSubscription() {
     thermoSub.on('message', thermostatEventHandler);
 }
 
-export async function removeSubscription() {
+async function removeSubscription() {
     if (demoMode) {
         console.debug("Running in demo mode, not removing subscription");
         return;

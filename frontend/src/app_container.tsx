@@ -12,6 +12,7 @@ import { dataRefreshTime, drawerTimeoutDuration, demoMode } from "./utils/consta
 import { usePageVisibilityRefresh } from "./utils/hooks";
 import { WeatherContext } from "./contexts/weather_context";
 import { SettingsContext } from "./contexts/settings_context";
+import { initAppLoad } from "./main";
 
 export function AppContainer() {
     const { initialLoadComplete, okToStartRefreshTimer, stopRefreshTimer, startRefreshTimer, fetchTempData, selectedTempData: tempData } = useContext(TempDataContext);
@@ -39,6 +40,17 @@ export function AppContainer() {
         refreshInterval: dataRefreshTime,
         okToStartRefresh: okToStartRefreshTimer
     });
+
+    if (initialLoadComplete) {
+        console.log("initial load complete in:",(new Date().getTime())-initAppLoad);
+    }
+    if (weatherDataLoaded) {
+        console.log("weather data load complete in:",(new Date().getTime())-initAppLoad);
+    }
+    if (changeInitialThemeComplete) {
+        console.log("theme change complete in:",(new Date().getTime())-initAppLoad);
+    }
+
 
     return (
         <>

@@ -6,9 +6,9 @@ import { infoQuerySchema, InfoQueryString, latLongQuerySchema, latLongQueryStrin
         setCoolSchema, SetCoolBody, setRangeSchema, SetRangeBody, setTempModeSchema,
         SetTempModeBody, setEcoModeSchema, SetEcoModeBody, setFanTimerSchema, SetFanTimerBody} from "./schemas";
 import { checkAndGetDeviceInfo, setHeat, setCool, setRange, setTempMode, setEcoMode, setFanTimer} from "./googlesdm";
-import { getCurrentObservation, initializeWeatherAndRefresh } from "./weather";
+import { cleanupWeather, getCurrentObservation, initializeWeatherAndRefresh } from "./weather";
 import {tempDataInfo} from "./googlesdm";
-import { getDataAndSubscribe, removeSubscription } from "./googlepubsub";
+import { cleanupTempData, getDataAndSubscribe } from "./googlepubsub";
 import { Mutex } from "./mutex";
 import { originInCorsList, splitURLsByCommaToArray } from "./utils";
 import { Worker } from "worker_threads";
@@ -228,12 +228,12 @@ const start = async () => {
 start();
 
 async function cleanUp() {
-    await removeSubscription();
+    await cleanupTempData();
+    await cleanupWeather();
     if (worker) {
         const shutdownMessage: ThreadShutdownMessage = {type: MessageTypes.shutdown};
         worker.postMessage(shutdownMessage);
     }
-    // something something websockets...
     process.exit(0)
 }
 
