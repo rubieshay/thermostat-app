@@ -25,7 +25,7 @@ button, input[type="button"], input[type="submit"] {
 .icon-button {
     font-size: 1.5rem;
     padding: 0.5rem;
-    border-radius: 0.5rem;
+    border-radius: 1rem;
 }
 
 
@@ -152,4 +152,117 @@ ul.radio-buttons::before {
 }
 .radio-buttons li.radio-selected button {
     color: var(--color-gray-000);
+}
+
+
+
+/* DROPDOWN SELECT */
+
+.dropdown {
+    width: 2.5rem;
+    display: block;
+    pointer-events: none;
+    position: relative;
+    z-index: 10;
+    transition: margin-bottom 200ms, z-index 400ms;
+}
+.dropdown.active {
+    z-index: 11;
+    margin-bottom: calc(-1 * var(--dropdown-size) * 2.5rem);
+    transition: margin-bottom 200ms, z-index 0ms;
+}
+.dropdown button {
+    display: block;
+    pointer-events: all;
+    cursor: pointer;
+    padding-inline: 1rem 2.5rem;
+    height: 2.5rem;
+}
+.dropdown ul {
+    width: min(20rem, var(--vw) - 2*min(1.5rem, 0.04*var(--vw)));
+    pointer-events: all;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    right: calc(min(20rem, var(--vw) - 2*min(1.5rem, 0.04*var(--vw))) - 2rem);
+    top: 0.75rem;
+    border-radius: 1rem;
+    background: var(--color-gray-600);
+    box-shadow: 0 0 10px 10px var(--background-shadow);
+    transition: all 200ms;
+}
+.dropdown ul.hidden {
+    visibility: hidden;
+    pointer-events: none;
+}
+.dropdown ul::before {
+    content: "";
+    display: block;
+    pointer-events: none;
+    z-index: 10;
+    position: absolute;
+    width: 100%;
+    height: calc(var(--dropdown-size) * 2.5rem);
+    border-radius: 1rem;
+    transition: height 200ms;
+}
+.dropdown ul.hidden::before {
+    height: 0;
+}
+.dropdown ul::after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: calc(var(--safe-area-inset-bottom) + 1.5rem);
+    bottom: calc(-1 * (var(--safe-area-inset-bottom) + 1.5rem));
+}
+.dropdown ul.hidden::after {
+    margin-top: calc(-1 * (var(--safe-area-inset-bottom) + 1.5rem));
+}
+.dropdown ul li {
+    display: block;
+    position: relative;
+    transition: all 200ms;
+}
+.dropdown ul.hidden li {
+    margin-top: -2.5rem;
+}
+.dropdown ul li button {
+    width: 100%;
+    cursor: pointer;
+    background: var(--color-gray-600);
+}
+.dropdown button span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 2.5rem;
+}
+.dropdown ul li button {
+    outline-offset: -2px;
+}
+.dropdown ul li:first-child button, .dropdown ul li:first-child button::after {
+    border-radius: 1rem 1rem 0 0;
+    transition: border-radius 200ms;
+}
+.dropdown ul li:last-child button, .dropdown ul li:last-child button::after {
+    border-radius: 0 0 1rem 1rem;
+}
+.dropdown ul li:nth-child(2n - 1) button {
+    background: var(--color-gray-500);
+}
+.dropdown > button {
+    width: 2.5rem;
+    padding: 0.5rem;
+    border-radius: 1rem;
+    position: relative;
+    left: 0;
+}
+.dropdown > button span {
+    font-size: 2rem;
+    text-align: center;
+    margin: -0.5rem;
 }

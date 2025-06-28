@@ -51,7 +51,7 @@ export const initTempData: TempData = {
 // INIT DATA FOR DEMO MODE
 export const demoTempDataArray: TempData[] = [
     {
-        deviceID: "DEMO",
+        deviceID: "DEMO1",
         tempUnits: TempUnits.fahrenheit,
         ambientTempCelsius: 20,
         heatCelsius: 18.888889,
@@ -65,6 +65,22 @@ export const demoTempDataArray: TempData[] = [
         connectivity: Connectivity.online,
         deviceName: "My Demo Thermostat",
         ambientHumidity: 52
+    },
+    {
+        deviceID: "DEMO2",
+        tempUnits: TempUnits.celsius,
+        ambientTempCelsius: 22.222222,
+        heatCelsius: null,
+        coolCelsius: 21.111111,
+        tempMode: TempMode.cool,
+        hvacStatus: HvacStatus.cooling,
+        ecoMode: EcoMode.off,
+        ecoHeatCelsius: 13.888889,
+        ecoCoolCelsius: 26.666667,
+        fanTimer: null,
+        connectivity: Connectivity.online,
+        deviceName: "My Other Thermostat",
+        ambientHumidity: 39
     }
 ];
 

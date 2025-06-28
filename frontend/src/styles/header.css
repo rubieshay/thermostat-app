@@ -4,11 +4,13 @@ header {
     gap: 0.5rem;
     align-items: center;
     padding-top: 1rem;
-    padding-inline: calc(min(1.5rem, 0.04*var(--vw)) - 0.5rem)
+    padding-inline: calc(min(1.5rem, 0.04*var(--vw)) - 0.5rem);
+}
+header:not(:has(#device-dropdown)) h1 {
+    padding-right: 3rem;
 }
 h1 {
     width: 100%;
-    padding-right: 3rem;
     font-size: 1.5rem;
     text-align: center;
     line-height: 2.5rem;
