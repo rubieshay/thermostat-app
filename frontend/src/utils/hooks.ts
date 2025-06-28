@@ -19,6 +19,7 @@ interface UsePageVisibilityRefreshOptions {
 export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshInterval = dataRefreshTime, okToStartRefresh = false}: UsePageVisibilityRefreshOptions) => {
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const isRefreshingRef = useRef(false);
+    const appStateChangeListenerRef = useRef<PluginListenerHandle>(null)
 
     const startIntervalRefresh = useCallback(() => {
         if (isRefreshingRef.current || !dataRefreshEnabled || !okToStartRefresh) {
@@ -50,27 +51,32 @@ export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshI
 
     useEffect(() => {
 
-        const handleVisibilityChange = (event: Event) => {
-            if (document.visibilityState === "hidden" || event.type === "pagehide") {
-                stopIntervalRefresh();
+        const handleVisibilityChange = (active: boolean) => {
+            if (active) {
+              startIntervalRefresh();
+                
             } else {
-                startIntervalRefresh();
+              stopIntervalRefresh();
             }
         };
 
-        // Add event listener
-        document.addEventListener("visibilitychange", handleVisibilityChange);
-        document.addEventListener("pagehide", handleVisibilityChange)
+        const addListeners = async () => {
+          appStateChangeListenerRef.current = await App.addListener("appStateChange", ({isActive}) => {
+              handleVisibilityChange(isActive)
+          })
+//          document.addEventListener("pagehide", (event) => handleVisibilityChange(event.type === "pagehide"))
+        }
 
         // Start refresh if page is initially visible
         if (document.visibilityState !== "hidden" && okToStartRefresh) {
             startIntervalRefresh();
         }
 
+        addListeners();
+
         // Cleanup function
         return () => {
-            document.removeEventListener("visibilitychange", handleVisibilityChange);
-            document.removeEventListener("pagehide", handleVisibilityChange);
+            appStateChangeListenerRef.current?.remove();
             stopIntervalRefresh();
         };
     }, [startIntervalRefresh, stopIntervalRefresh, refreshData, onStart, onStop, refreshInterval, okToStartRefresh]);
