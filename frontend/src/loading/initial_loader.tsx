@@ -1,16 +1,30 @@
 import { useEffect, useContext, useRef } from "react";
 import { useLocation, useNavigate } from "react-router";
+import { Routes, Route } from "react-router";
 import { TempDataContext } from "../contexts/temp_data_context";
 import { APIContext } from "../contexts/api_context";
 import { demoMode } from "../utils/constants";
+import AppLoading from "./app_loading";
+import { WeatherContext } from "../contexts/weather_context";
+import { SettingsContext } from "../contexts/settings_context";
+import { useFontLoader } from "./font_loader";
+import Thermostat from "../thermostat";
+import EnterURLPage from "../enter_url_page";
+import Settings from "../settings/settings";
 
 function InitialLoader() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { loadInitialTempData } = useContext(TempDataContext);
-    const { retrieveAndValidateAPIURL, apiIsHealthy, setAPIIsHealthy, initialAPICheckComplete, setInitialAPICheckComplete } = useContext(APIContext);
+    const {loadInitialTempData, tempDataLoaded} = useContext(TempDataContext);
+    const {weatherDataLoaded} = useContext(WeatherContext);
+    const {changeInitialThemeComplete} = useContext(SettingsContext);
+    const {retrieveAndValidateAPIURL, apiIsHealthy, setAPIIsHealthy, initialAPICheckComplete, setInitialAPICheckComplete } = useContext(APIContext);
     const initialAPICheckAttempted = useRef(false);
     const initialLoadAttempted = useRef(false);
+    const fontsLoaded = useFontLoader();
+    const showLoadingIcon = useRef(false);
+
+    const readyToNav = (tempDataLoaded && weatherDataLoaded && changeInitialThemeComplete && fontsLoaded);
 
     // when initially loaded, get URL from preferences/environment 
     useEffect(() => {
@@ -33,7 +47,7 @@ function InitialLoader() {
     // if isAPIHealthy is still false and initialAPICheck is complete, navigate to url entry page
     useEffect(() => {
         if (initialAPICheckComplete && !apiIsHealthy) {
-            setInitialAPICheckComplete(false);
+            // setInitialAPICheckComplete(false);
             initialAPICheckAttempted.current = false;
             initialLoadAttempted.current = false;
             navigate("/enterurl", {replace: true});
@@ -44,28 +58,55 @@ function InitialLoader() {
     useEffect(() => {
         const loadAndNav = async() => {
             if (initialLoadAttempted.current) {
-                console.log("Already attempted initial load... staying on page");
                 return;
             }
             initialLoadAttempted.current = true;
             console.log("loading initial temp data");
             await loadInitialTempData();
-            if (location.pathname === "/") {
-                console.log("data loaded, on /, about to navigate to /app");
-                navigate("/app", { replace: true});
-            } else {
-                console.log("data is loaded, but not on root, stay where you are.");
-            }
         }
         if (apiIsHealthy && initialAPICheckComplete) {
             loadAndNav();
         }
     }, [navigate, location, loadInitialTempData, apiIsHealthy,initialAPICheckComplete]);
 
+    useEffect(() => {
+        if (readyToNav) {
+            if (location.pathname === "/") {
+                navigate("/app", {replace: true});
+            } else {
+                console.log("data loaded, not on root, stay on page");
+            }
+        }
+    },[readyToNav, location.pathname, navigate]);
 
-    return (
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            showLoadingIcon.current = false;
+        },200);
+
+        return ( () => {
+            clearTimeout(timer);
+        })
+    },[])
+
+    if (readyToNav || (!apiIsHealthy && initialAPICheckComplete && fontsLoaded)) {
+        return(
+            <Routes>
+                <Route path="/" element={<></>} />
+                <Route path="/app" element={<Thermostat/>}/>
+                <Route path="/enterurl" element={<EnterURLPage/>}/>
+                <Route path="/settings" element={<Settings/>}/>
+            </Routes>
+        );
+    } else if (showLoadingIcon.current) {
+        return (
+            <AppLoading/>
+        );
+    } else {
+        return (
         <></>
-    );
+        );
+    }
 }
 
 export default InitialLoader;

@@ -3,13 +3,14 @@ import { Preferences } from "@capacitor/preferences";
 import { type ChildrenProviderProps } from "../utils/constants";
 import { TempUnitsSetting, ThemeSetting } from "../types";
 import { SafeArea } from "@capacitor-community/safe-area";
-import { initAppLoad } from "../main";
 
 export interface SettingsContextType {
     tempUnitsSetting: TempUnitsSetting,
-    setTempUnitsSetting: (units: TempUnitsSetting) => void,
+    setTempUnitsSetting: (units: TempUnitsSetting) => Promise<void>,
     themeSetting: ThemeSetting,
-    setThemeSetting: (mode: ThemeSetting) => void,
+    setThemeSetting: (mode: ThemeSetting) => Promise<void>,
+    lastDeviceID: string | null,
+    setLastDeviceID: (deviceID: string) => Promise<void>,
     changeInitialThemeComplete: boolean
 }
 
@@ -18,6 +19,8 @@ export const initSettingsContext: SettingsContextType = {
     setTempUnitsSetting: async() => {},
     themeSetting: ThemeSetting.system,
     setThemeSetting: async() => {},
+    lastDeviceID: null,
+    setLastDeviceID: async() => {},
     changeInitialThemeComplete: false
 }
 
@@ -29,7 +32,24 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
     const [tempUnitsSetting, setTempUnitsSettingState] = useState<TempUnitsSetting>(TempUnitsSetting.system);
     const [initialSettingsLoadComplete, setInitialSettingsLoadComplete] = useState(false);
     const [changeInitialThemeComplete, setChangeInitialThemeComplete] = useState(false);
+    const [lastDeviceID, setLastDeviceIDState] = useState<string|null>(null);
     const changeThemeTimer = useRef<number | null>(null);
+
+
+    const setThemeSetting = useCallback( async (mode: ThemeSetting) => {
+        await Preferences.set({ key: "themeSetting", value: mode});
+        setThemeSettingState(mode);
+    },[]);
+
+    const setTempUnitsSetting = useCallback( async (units: TempUnitsSetting) => {
+        await Preferences.set({ key: "tempUnits", value: units});
+        setTempUnitsSettingState(units);
+    },[]);
+
+    const setLastDeviceID = useCallback( async (lastDevID: string) => {
+        await Preferences.set({key: "lastDeviceID", value: lastDevID});
+        setLastDeviceIDState(lastDevID);
+    },[])
 
     const loadSettings = useCallback(async() => {
         const {value: themeValue} = await Preferences.get({ key: "themeSetting"});
@@ -44,9 +64,14 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
         } else {
             setTempUnitsSettingState(tempUnitsValue as TempUnitsSetting);
         }
+        const {value: lastDevID} = await Preferences.get({ key: "lastDeviceID"});
+        if (lastDevID === null) {
+            setLastDeviceIDState(null);
+        } else {
+            setLastDeviceIDState(lastDevID);
+        }
         setInitialSettingsLoadComplete(true);
-        console.log("Time to load settings from app start:",new Date().getTime() - initAppLoad);
-    }, []);
+    }, [setTempUnitsSetting,setThemeSetting]);
 
     const changeTheme = useCallback(() => {
         const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -61,11 +86,6 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
             clearTimeout(changeThemeTimer.current);
         }
         setChangeInitialThemeComplete(true);
-        // if (!changeInitialThemeComplete) {
-        //     changeThemeTimer.current = window.setTimeout(() => {
-        //         setChangeInitialThemeComplete(true);
-            // }, dialTransitionDuration);
-        // }
     }, [themeSetting]);
 
     const enableSafeArea = useCallback(() => {
@@ -102,27 +122,17 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
     useEffect(() => {
         if (initialSettingsLoadComplete) {
             changeTheme();
-            console.log("changed theme");
         }
-    }, [changeTheme, themeSetting,initialSettingsLoadComplete]);
+    }, [changeTheme, themeSetting, initialSettingsLoadComplete]);
 
     useEffect(() => {
         enableSafeArea();
     }, [enableSafeArea, usedTheme])
 
-    async function setThemeSetting(mode: ThemeSetting) {
-        await Preferences.set({ key: "themeSetting", value: mode});
-        setThemeSettingState(mode);
-    }
-
-    async function setTempUnitsSetting(units: TempUnitsSetting) {
-        await Preferences.set({ key: "tempUnits", value: units});
-        setTempUnitsSettingState(units);
-    }
 
     const memoedValue = useMemo(() => ({
-        tempUnitsSetting, setTempUnitsSetting, themeSetting, setThemeSetting, changeInitialThemeComplete
-    }), [tempUnitsSetting, themeSetting, changeInitialThemeComplete])
+        tempUnitsSetting, setTempUnitsSetting, themeSetting, setThemeSetting, changeInitialThemeComplete, lastDeviceID, setLastDeviceID
+    }), [tempUnitsSetting, themeSetting, changeInitialThemeComplete, lastDeviceID,setThemeSetting,setTempUnitsSetting,setLastDeviceID])
 
     return (
         <SettingsContext.Provider value={memoedValue}>{props.children}</SettingsContext.Provider>

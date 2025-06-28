@@ -17,7 +17,6 @@ export const debounceTime: number = 3000;
 export const dataRefreshTime: number = 60000;
 export const setPointFadeDuration: number = 3000;
 export const drawerTimeoutDuration: number = 500;
-export const dialTransitionDuration: number = 400;
 export const fanTimerDisplayUpdateInterval: number = 15000;
  
 export const minDialTemps: number[] = [9, 50];
