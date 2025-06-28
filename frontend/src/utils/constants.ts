@@ -6,9 +6,9 @@ export const demoMode = ((window as any)._env_.DEMO_MODE === "TRUE" ||
                          (window as any)._env_.DEMO_MODE === "1" ||
                          (window as any)._env_.DEMO_MODE === "YES") ? true : false;
 export const defaultAPIURL = (window as any)._env_.DEFAULT_API_URL ? stripSlashFromURLIfThere((window as any)._env_.DEFAULT_API_URL) : null;
-export const dataRefreshEnabled =((window as any)._env_.DATA_REFRESH_ENABLED === "TRUE" || 
-                                  (window as any)._env_.DATA_REFRESH_ENABLED === "1" ||
-                                  (window as any)._env_.DATA_REFRESH_ENABLED === "YES") ? true : false;
+export const dataRefreshEnabled =((window as any)._env_.DATA_REFRESH_ENABLED === "FALSE" || 
+                                  (window as any)._env_.DATA_REFRESH_ENABLED === "0" ||
+                                  (window as any)._env_.DATA_REFRESH_ENABLED === "NO") ? false : true;
 /* eslint-enable @typescript-eslint/no-explicit-any */                                  
 export const appVersion = __APP_VERSION__;
 console.debug("Environment driven settings:", {demoMode, defaultAPIURL, dataRefreshEnabled, appVersion});
