@@ -120,6 +120,10 @@
     --overlay-shade: #00000099;
     --background-shadow: #1b191955;
     --overlay-error-shade: #b8604099;
+
+    --color-logo-heat: var(--color-heat-200);
+    --color-logo-cool: var(--color-cool-200);
+    --color-logo-background:  var(--color-gray-000);
 }
 
 .color-theme-light {
@@ -145,6 +149,10 @@
     --overlay-shade: #00000055;
     --background-shadow: #fff8f555;
     --overlay-error-shade: #de855299;
+
+    --color-logo-heat: var(--color-heat-600);
+    --color-logo-cool: var(--color-cool-600);
+    --color-logo-background:  var(--color-gray-700);
 }
 
 
@@ -202,11 +210,20 @@ h1, h2, h3, h4, h5, h6 {
 .icon-title h1 {
     font-size: 2rem;
 }
-.icon-title img {
-    height: 3.5rem;
-    width: 3.5rem;
-    background: var(--color-gray-000);
+.icon-title svg {
+    display: block;
+    aspect-ratio: 1;
+    max-width: 3.5rem;
+    width: 100%;
+    height: 100%;
+    background: var(--color-logo-background);
     border-radius: 25%;
+}
+.icon-title .svg-color-heat {
+    fill: var(--color-logo-heat);
+}
+.icon-title .svg-color-cool {
+    fill: var(--color-logo-cool);
 }
 ::selection {
     background: #f4f3f344;
@@ -265,8 +282,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 .loading-icon {
     display: block;
-    width: min(0.4*var(--vw), 0.4*var(--vh), 20rem);
+    max-width: min(0.4*var(--vw), 0.4*var(--vh), 20rem);
     aspect-ratio: 1;
+    width: 100%;
+    height: 100%;
     fill: var(--color-gray-200);
     animation: spin 4s linear infinite normal forwards;
     --dial-transition-time: 400ms;
