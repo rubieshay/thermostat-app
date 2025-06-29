@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useRef } from "react";
-import { useNavigate, useLocation } from 'react-router';
-import { App } from '@capacitor/app';
-import { Capacitor, type PluginListenerHandle } from '@capacitor/core';
+import { useNavigate, useLocation } from "react-router";
+import { App } from "@capacitor/app";
+import { Capacitor, type PluginListenerHandle } from "@capacitor/core";
 import { TempUnits, TempUnitsSetting, type FetchReturn } from "../types";
 import { dataRefreshTime, dataRefreshEnabled } from "./constants";
 import { TempDataContext } from "../contexts/temp_data_context";
@@ -50,7 +50,7 @@ export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshI
         } else {
             console.error("No interval to clear in stop Interval Refresh");
         }
-    }, [onStop])
+    }, [onStop]);
 
     useEffect(() => {
 
@@ -64,10 +64,10 @@ export const usePageVisibilityRefresh = ({refreshData, onStart, onStop, refreshI
         };
 
         const addListeners = async () => {
-          appStateChangeListenerRef.current = await App.addListener("appStateChange", ({isActive}) => {
-              handleVisibilityChange(isActive)
-          })
-//          document.addEventListener("pagehide", (event) => handleVisibilityChange(event.type === "pagehide"))
+            appStateChangeListenerRef.current = await App.addListener("appStateChange", ({isActive}) => {
+                handleVisibilityChange(isActive)
+            })
+            // document.addEventListener("pagehide", (event) => handleVisibilityChange(event.type === "pagehide"))
         }
 
         // Start refresh if page is initially visible
@@ -96,47 +96,47 @@ export const useActualTempUnits = (() => {
 });
 
 export const useBackButtonHandler = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+    const navigate = useNavigate();
+    const location = useLocation();
 
-  useEffect(() => {
-    // Only handle back button on native platforms
-    if (!Capacitor.isNativePlatform()) {
-      return;
-    }
+    useEffect(() => {
+        // Only handle back button on native platforms
+        if (!Capacitor.isNativePlatform()) {
+            return;
+        }
 
-    const handleBackButton = () => {
-      const currentPath = location.pathname;
-      
-      // Define your root routes where back button should exit the app
-      const rootRoutes = ['/','/enterurl'];
-      
-      console.log({currentPath, rootRoutes});
-      if (rootRoutes.includes(currentPath)) {
-        // Exit app if on root route
-        App.exitApp();
-      } else {
-        // Navigate back in history
-        navigate(-1);
-      }
-    };
+        const handleBackButton = () => {
+        const currentPath = location.pathname;
+        
+        // Define your root routes where back button should exit the app
+        const rootRoutes = ["/", "/enterurl"];
+        
+        console.log({currentPath, rootRoutes});
+            if (rootRoutes.includes(currentPath)) {
+                // Exit app if on root route
+                App.exitApp();
+            } else {
+                // Navigate back in history
+                navigate(-1);
+            }
+        };
 
-    // Add the back button listener
-    let backButtonListener: PluginListenerHandle;
-    
-    const setupListener = async () => {
-      backButtonListener = await App.addListener('backButton', handleBackButton);
-    };
-    
-    setupListener();
+        // Add the back button listener
+        let backButtonListener: PluginListenerHandle;
+        
+        const setupListener = async () => {
+        backButtonListener = await App.addListener('backButton', handleBackButton);
+        };
+        
+        setupListener();
 
-    // Cleanup on unmount
-    return () => {
-      if (backButtonListener) {
-        backButtonListener.remove();
-      }
-    };
-  }, [navigate, location.pathname]);
+        // Cleanup on unmount
+        return () => {
+            if (backButtonListener) {
+                backButtonListener.remove();
+            }
+        };
+    }, [navigate, location.pathname]);
 };
 
 export const useInitialLoader = () => {
@@ -204,18 +204,18 @@ export const useInitialLoader = () => {
                 console.log("data loaded, not on root, stay on page");
             }
         }
-    },[readyToNav, location.pathname, navigate]);
+    }, [readyToNav, location.pathname, navigate]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
             showLoadingIcon.current = false;
-        },200);
+        }, 200);
 
-        return ( () => {
+        return (() => {
             clearTimeout(timer);
-        })
-    },[])
+        });
+    }, []);
 
     return {showLoading: !(readyToNav || (!apiIsHealthy && initialAPICheckComplete && fontsLoaded && changeInitialThemeComplete))}
-  }
+}
 

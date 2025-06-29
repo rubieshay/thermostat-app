@@ -7,13 +7,13 @@ import "./styles/dial.css";
 import "./styles/tiles.css";
 import "./styles/modals.css";
 import "./styles/settings.css";
-import "./styles/view-transitions.css";
+import "./styles/view_transitions.css";
 import App from "./app";
 
 export const initAppLoad = new Date().getTime();
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
-            <App/>
+        <App/>
     </StrictMode>
 );
