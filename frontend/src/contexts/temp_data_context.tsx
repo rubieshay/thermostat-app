@@ -228,8 +228,9 @@ export const TempDataProvider: React.FC<ChildrenProviderProps> = (props: Childre
     // REFRESH TIMER
     
     const startRefreshTimer = useCallback(()=> {
-        // console.log("Starting refresh timer...");
-    }, []);
+        console.log("Refreshing data after visibility change via timer");
+        fetchTempData(false);
+    }, [fetchTempData]);
 
     const stopRefreshTimer = useCallback(()=> {
         // console.log("Stopping refresh timer...");
