@@ -28,7 +28,7 @@ function EnterURLComponent({ navLink, label } : {navLink: string | null, label: 
             await setAPIURL(inputURL);
             setAPIValidated();
             if (navLink !== null) {
-                navigate(navLink, {replace: true});
+                navigate(navLink, {replace: true,viewTransition: true});
             }
         } else {
             if (fetchReturn.error === undefined) {

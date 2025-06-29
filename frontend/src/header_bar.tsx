@@ -5,7 +5,7 @@ function HeaderBar({ navLink, navSymbol, pageTitle }: {navLink: string, navSymbo
     
     return (
         <header>
-            <NavLink to={navLink} className="icon-button material-symbols material-symbols-rounded">{navSymbol}</NavLink>
+            <NavLink to={navLink} className="icon-button material-symbols material-symbols-rounded" viewTransition>{navSymbol}</NavLink>
             <h1>{pageTitle}</h1>
             <ThermostatDropdown/>
         </header>
