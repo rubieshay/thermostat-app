@@ -375,12 +375,12 @@ function Dial() {
                         :
                         <span className="material-symbols material-symbols-rounded fan-icon fan-off" aria-label="Fan Off">{"\uec17"}</span>
                     }
-                    {tempData.ecoMode === EcoMode.on ?
-                        <span className="material-symbols material-symbols-rounded mode-icon" aria-label="Eco Mode">{"\uf8be"}</span>
+                    {tempData.tempMode === TempMode.off ?
+                        <span className="material-symbols material-symbols-rounded mode-icon" aria-label="AC Off">{"\uf16f"}</span>
                         :
-                        (tempData.tempMode === TempMode.off ?
-                            <span className="material-symbols material-symbols-rounded mode-icon" aria-label="AC Off">{"\uf16f"}</span>
-                            : 
+                        (tempData.ecoMode === EcoMode.on ?
+                            <span className="material-symbols material-symbols-rounded mode-icon" aria-label="Eco Mode">{"\uf8be"}</span>
+                            :
                             <div className="dial-buttons">
                                 <button className="material-symbols material-symbols-rounded" aria-label="Temperature Down"
                                     onClick={() => bumpTemp(-decimalPrecision[tempUnits])}>

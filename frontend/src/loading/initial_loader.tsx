@@ -67,7 +67,7 @@ function InitialLoader() {
         if (apiIsHealthy && initialAPICheckComplete) {
             loadAndNav();
         }
-    }, [navigate, location, loadInitialTempData, apiIsHealthy,initialAPICheckComplete]);
+    }, [navigate, location, loadInitialTempData, apiIsHealthy, initialAPICheckComplete]);
 
     useEffect(() => {
         if (readyToNav) {
@@ -77,19 +77,19 @@ function InitialLoader() {
                 console.log("data loaded, not on root, stay on page");
             }
         }
-    },[readyToNav, location.pathname, navigate]);
+    }, [readyToNav, location.pathname, navigate]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
             showLoadingIcon.current = false;
-        },200);
+        }, 200);
 
-        return ( () => {
+        return (() => {
             clearTimeout(timer);
-        })
-    },[])
+        });
+    }, []);
 
-    if (readyToNav || (!apiIsHealthy && initialAPICheckComplete && fontsLoaded)) {
+    if (readyToNav || (!apiIsHealthy && initialAPICheckComplete && fontsLoaded && changeInitialThemeComplete)) {
         return(
             <Routes>
                 <Route path="/" element={<></>} />
@@ -104,7 +104,7 @@ function InitialLoader() {
         );
     } else {
         return (
-        <></>
+            <></>
         );
     }
 }

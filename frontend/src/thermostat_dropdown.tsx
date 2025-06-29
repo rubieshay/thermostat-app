@@ -2,8 +2,13 @@ import { useContext, useState } from "react";
 import { TempDataContext } from "./contexts/temp_data_context";
 
 function ThermostatDropdown() {
-    const {tempDataArray, changeDeviceID} = useContext(TempDataContext);
+    const {tempDataArray, changeDeviceID, selectedDeviceID} = useContext(TempDataContext);
     const [dropdownIsOpen, setDropdownIsOpen] = useState<boolean>(false);
+
+    function handleClickOutside(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+        event.preventDefault();
+        setDropdownIsOpen(false);
+    }
 
     function handleClickDropdown(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         event.preventDefault();
@@ -25,6 +30,7 @@ function ThermostatDropdown() {
         );
     } else {
         return (
+            <>
             <div id="device-dropdown" className={"dropdown" + (dropdownIsOpen ? " active" : "")}
             aria-label="device select dropdown" style={{"--dropdown-size": tempDataArray.length} as React.CSSProperties}>
                 <button onClick={(event) => handleClickDropdown(event)}>
@@ -33,13 +39,21 @@ function ThermostatDropdown() {
                 <ul className={dropdownIsOpen ? "" : "hidden"}>
                     {tempDataArray.map((tempData) =>
                         <li key={tempData.deviceID}>
-                            <button onClick={(event) => handleDropdownChange(event, tempData.deviceID)}>
+                            <button className={selectedDeviceID === tempData.deviceID ? "selected": ""} onClick={(event) => handleDropdownChange(event, tempData.deviceID)}>
                                 <span>{tempData.deviceName}</span>
+                                {selectedDeviceID === tempData.deviceID ?
+                                    <span className="material-symbols material-symbols-rounded">{"\ue5ca"}</span>
+                                    :
+                                    <></>
+                                }
                             </button>
                         </li>
                     )}
                 </ul>
             </div>
+            <div className={"dropdown-cover" + (dropdownIsOpen ? " active" : "")} aria-hidden="true"
+            onClick={(event) => handleClickOutside(event)}></div>
+            </>
         );
     }
 }
