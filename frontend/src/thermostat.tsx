@@ -37,8 +37,8 @@ function Thermostat() {
 
     return (
         <>
-            <HeaderBar navLink="/settings" navSymbol={"\ue8b8"} pageTitle={(tempData && tempData.connectivity === Connectivity.online && tempData.deviceName !== null) ? tempData.deviceName : "Thermostat Not Found"}/>
-            <main>
+            <HeaderBar navLink={"/settings"} navSymbol={"\ue8b8"} pageTitle={(tempData && tempData.connectivity === Connectivity.online && tempData.deviceName !== null) ? tempData.deviceName : "Thermostat Not Found"} hasThermostatDropdown={true}/>
+            <main id="thermostat-page">
                 <Dial/>
                 <Tiles setModalDrawerType={setModalDrawerType}/>
             </main>
