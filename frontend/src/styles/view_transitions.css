@@ -1,24 +1,42 @@
-::view-transition-old(root) {
-    animation: fade-out 1s ease-out;
-}
-
-::view-transition-new(root) {
-    animation: fade-in 1s ease-in;
-}
-
-@keyframes fade-out {
-    to { 
-        opacity: 0;
-        transform: scale(0.9);
+@keyframes view-settings-out {
+    to {
+        transform: translate(-100vw);
     }
 }
-
-@keyframes fade-in {
-    from { 
-        opacity: 0;
-        transform: scale(1.1);
+@keyframes view-settings-in {
+    from {
+        transform: translate(-100vw);
     }
 }
-/* @view-transition {
-    navigation: auto;
-} */
+@keyframes view-thermostat-out {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+@keyframes view-thermostat-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+html:has(* #settings-page)::view-transition-old(root) {
+    animation: view-thermostat-out 800ms ease-in-out;
+    z-index: 1;
+}
+html:has(* #settings-page)::view-transition-new(root) {
+    animation: view-settings-in 800ms ease-in-out;
+    z-index: 2;
+}
+html:has(* #thermostat-page)::view-transition-old(root) {
+    animation: view-settings-out 800ms ease-in-out;
+    z-index: 2;
+}
+html:has(* #thermostat-page)::view-transition-new(root) {
+    animation: view-thermostat-in 800ms ease-in-out;
+    z-index: 1;
+}
