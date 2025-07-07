@@ -108,7 +108,7 @@ export const setFanTimerSchema = {
         },
         durationSeconds: {
             type: "number",
-            minimum: 1,
+            minimum: 0,
             maximum: 43200
         }
     },
