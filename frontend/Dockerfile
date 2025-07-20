@@ -10,7 +10,7 @@ WORKDIR /usr/app/frontend
 COPY frontend/package*.json ./
 
 # Install dependencies
-RUN npm ci --silent
+RUN npm ci --silent --include=optional
 
 # Copy source code
 COPY frontend/. .
