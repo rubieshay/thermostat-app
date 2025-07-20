@@ -69,6 +69,7 @@ dialog#error-dialog::backdrop {
 
 dialog.modal-drawer {
     width: var(--vw);
+    padding-bottom: var(--safe-area-inset-bottom);
     background: var(--color-gray-800);
     border-radius: 1rem 1rem 0 0;
     bottom: 0;

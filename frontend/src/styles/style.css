@@ -91,6 +91,11 @@
 /* GLOBAL COLOR AND SIZE VARIABLES */
 
 :root {
+    --safe-area-inset-top: var(--android-safe-area-top, env(safe-area-inset-top));
+    --safe-area-inset-left: var(--android-safe-area-left, env(safe-area-inset-left));
+    --safe-area-inset-right: var(--android-safe-area-right, env(safe-area-inset-right));
+    --safe-area-inset-bottom: var(--android-safe-area-bottom, env(safe-area-inset-bottom));
+
     /* This is entire vh and vw, not 1/100th */
     --vh: calc(100svh - var(--safe-area-inset-top) - var(--safe-area-inset-bottom));
     --vw: calc(100svw - var(--safe-area-inset-left) - var(--safe-area-inset-right));

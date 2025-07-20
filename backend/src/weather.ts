@@ -2,6 +2,7 @@ import { FetchReturn, TempMessage, TempMessageType } from "./types";
 import { weatherData, weatherLatitude, weatherLongitude } from "./index";
 import { arraysEqualIgnoreOrder } from "./utils";
 import { fastify } from "./index";
+import log from './logger';
 
 const weatherBaseURL = "https://api.weather.gov/"
 
@@ -26,7 +27,7 @@ async function getStationsFromLatLong(): Promise<FetchReturn> {
         weatherData.observationStationsURL = data.properties.observationStations;
         weatherData.forecastURL = data.properties.forecast;
         weatherData.gridId = data.properties.gridId;
-        // console.log("Retrieved stations URL, forecast URL, and gridID:" + JSON.stringify(weatherData));
+        log.trace("Retrieved stations URL, forecast URL, and gridID:" + JSON.stringify(weatherData));
     } catch (error) {
         // Handle network errors or errors thrown by the if statement above
         if (error instanceof Error) {
@@ -69,12 +70,12 @@ async function getObservationStations(): Promise<FetchReturn> {
         }
         const data = await response.json(); // Or response.text() for text responses
         fetchReturn.success = true;
-        // console.log("Got observations station data:",JSON.stringify(data.features[0]));
+        log.trace("Got observations station data:",JSON.stringify(data.features[0]));
         weatherData.observationStation = data.features[0].properties.stationIdentifier;
         const cityAirportName = data.features[0].properties.name;
         weatherData.observationCity = cityAirportName.split(",")[0]; 
         weatherData.observationURL = encodeURI(weatherBaseURL + "stations/" + weatherData.observationStation + "/observations/latest");
-        // console.log("New observation station data retrieved:" + JSON.stringify(weatherData));
+        log.trace("New observation station data retrieved:" + JSON.stringify(weatherData));
     } catch (error) {
         // Handle network errors or errors thrown by the if statement above
         if (error instanceof Error) {
@@ -103,7 +104,7 @@ export async function getCurrentObservation(): Promise<FetchReturn> {
     fetchReturn = await checkAndGetObservationStations();
     if (!fetchReturn.success) {return fetchReturn;};
     if (weatherData.lastCheckTime !== null && new Date() < (new Date(weatherData.lastCheckTime.getTime() + 1000*(weatherDataExpireDurationSecs)))) {
-        console.log("The data is fresh, no need to retrieve.");
+        log.debug("The data is fresh, no need to retrieve.");
         fetchReturn.httpCode = 302;
         return fetchReturn;
     }
@@ -126,7 +127,7 @@ export async function getCurrentObservation(): Promise<FetchReturn> {
         weatherData.currentTemperature = data.properties.temperature.value;
         weatherData.currentRelativeHumidity = data.properties.relativeHumidity.value;
         weatherData.currentWeatherIconURL = data.properties.icon;
-        // console.log("New weather data retrieved:" + JSON.stringify(weatherData));
+        log.trace("New weather data retrieved:",JSON.stringify(weatherData,null,3));
     } catch (error) {
         // Handle network errors or errors thrown by the if statement above
         if (error instanceof Error) {
@@ -145,13 +146,13 @@ async function broadcastNewWeatherData() {
             weatherData: weatherData
         }
     }
-    console.debug("Received an update to weather data, broadcasting to clients...");
+    log.debug("Received an update to weather data, broadcasting to clients...");
     fastify.websocketServer.clients.forEach((client) => {
         if (client.readyState === client.OPEN) {
             try {
                 client.send(JSON.stringify(tempMessage));
             } catch (error) {
-                console.error("Error sending data to client:", error);
+                log.error("Error sending data to client:", error);
             }
         }
     })

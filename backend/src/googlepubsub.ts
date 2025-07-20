@@ -3,7 +3,7 @@ import { Message, PubSub, StatusError, Subscription } from "@google-cloud/pubsub
 import { checkAndGetDeviceInfo, getDeviceInfo, tempDataInfo, updateTempDataInfoFull } from "./googlesdm";
 import { TempMessageType, TempMode, TempMessage } from "./types";
 import { fastify } from "./index";
-import { getDefaultAutoSelectFamily } from "net";
+import log from './logger';
 
 let pubSub : PubSub 
 let thermoSub : Subscription
@@ -13,13 +13,13 @@ let tempInterval: NodeJS.Timeout;
 
 
 export async function getDataAndSubscribe() {
-    console.debug("Executing initial fetch of data in to backend...");
+    log.debug("Executing initial fetch of data in to backend...");
     let fetchReturn = await checkAndGetDeviceInfo(true);
     if (fetchReturn.success) {
         if (demoMode) {
-            console.debug("Running in demo mode, using demo data, no event subscription needed");
+            log.info("Running in demo mode, using demo data, no event subscription needed");
         } else {
-            console.debug("Retrieved device data... Starting subscription");
+            log.debug("Retrieved device data... Starting subscription");
             await startSubscription();
             await startTempDataRefreshTimer();
         }
@@ -41,12 +41,12 @@ export async function cleanupTempData() {
 }
 
 async function startSubscription() {
-    console.debug("Starting Pub/Sub subscription for thermostat events...");
+    log.info("Starting Pub/Sub subscription for thermostat events...");
     pubSub = new PubSub({projectId: googlePubSubProjectId}); 
     thermoSub = pubSub.subscription(subscriptionId);
 
     thermoSub.on('error', async (e: StatusError) => {
-        console.error("Error in pub/sub subscription. Creating new one if doesn't exist");
+        log.error("Error in pub/sub subscription. Normal if last run exited properly. Creating new one if doesn't exist");
         // Resource Not Found
         if (e.code === 5) {
             await pubSub.createSubscription(
@@ -58,7 +58,7 @@ async function startSubscription() {
         // Refresh our subscriber object and re-attach the message handler.
         thermoSub = pubSub.subscription(subscriptionId);
         thermoSub.on('message', thermostatEventHandler);
-        console.debug("Successfully created new subscription");
+        log.info("Successfully created new subscription");
         }
     });
     thermoSub.on('message', thermostatEventHandler);
@@ -66,10 +66,10 @@ async function startSubscription() {
 
 async function removeSubscription() {
     if (demoMode) {
-        console.debug("Running in demo mode, not removing subscription");
+        log.debug("Running in demo mode, not removing subscription");
         return;
     }
-    console.debug("Subscription " + subscriptionId + " removed from pub/sub");
+    log.info("Subscription " + subscriptionId + " removed from pub/sub");
     await pubSub.subscription(subscriptionId).delete();
 }
 
@@ -83,8 +83,8 @@ const thermostatEventHandler = async (message: Message) => {
             await checkAndGetDeviceInfo(true);
         }
     } catch(error) {
-        console.error("Error parsing message data as JSON:", error);
-        console.error("Message data was:", messageDataStr);
+        log.error("Error parsing message data as JSON:", error);
+        log.error("Message data was:", messageDataStr);
         jsonEventData = {};
     }    
     // "Ack" (acknowledge receipt of) the message
@@ -111,25 +111,27 @@ async function updateEventData(eventData: Object): Promise<boolean> {
     //     }
     //   }
 
+    log.trace("received event data from google:",JSON.stringify(eventData,null,3));
+
     let newTempDataInfo = structuredClone(tempDataInfo);
     if (!("resourceUpdate" in eventData)) {
-        console.error("Event data does not contain resourceUpdate, ignoring event");
+        log.error("Event data does not contain resourceUpdate, ignoring event");
         return false;
     }
     const resourceUpdate: any = eventData["resourceUpdate"];
     if (!("name" in resourceUpdate)) {
-        console.error("Event data resourceUpdate does not contain name, ignoring event");
+        log.error("Event data resourceUpdate does not contain name, ignoring event");
         return false;
     }
     const deviceUUIDName: string = resourceUpdate["name"];
     if (!("traits" in resourceUpdate)) {
-        console.error("Event data resourceUpdate does not contain traits, ignoring event");
+        log.error("Event data resourceUpdate does not contain traits, ignoring event");
         return false;
     }
     let thermostatDeviceID = deviceUUIDName.substring(deviceUUIDName.lastIndexOf("/")+1);
     const thermostatIndex = newTempDataInfo.findIndex((device) => device.deviceID === thermostatDeviceID);
     if (thermostatIndex === -1) {
-        console.error("Event data resourceUpdate does not match any known devices. Getting complete device info refresh");
+        log.error("Event data resourceUpdate does not match any known devices. Getting complete device info refresh");
         return true;
     }
     let traits = resourceUpdate.traits;
@@ -149,16 +151,15 @@ async function updateEventData(eventData: Object): Promise<boolean> {
         }
     }
     if ("sdm.devices.traits.Fan" in traits) {
-        if ("timerMode" in traits["sdm.devices.traits.Fan"] && 
-            "timerTimeout" in traits["sdm.devices.traits.Fan"]) {
-                let timerMode = traits["sdm.devices.traits.Fan"]["timerMode"];
+        if ("timerMode" in traits["sdm.devices.traits.Fan"]) {
+            const timerMode = traits["sdm.devices.traits.Fan"]["timerMode"];
+            if (timerMode === "OFF") {
+                newTempDataInfo[thermostatIndex].fanTimer = null;
+            } else if ("timerTimeout" in traits["sdm.devices.traits.Fan"]) {
                 let timerTimeout = traits["sdm.devices.traits.Fan"]["timerTimeout"];
-                if (timerMode === "OFF") {
-                    newTempDataInfo[thermostatIndex].fanTimer = null;
-                } else {
-                    newTempDataInfo[thermostatIndex].fanTimer = timerTimeout
-                }
-        };
+                newTempDataInfo[thermostatIndex].fanTimer = timerTimeout;
+            }
+        }
     }
     if ("sdm.devices.traits.ThermostatMode" in traits) {
         if ("mode" in traits["sdm.devices.traits.ThermostatMode"]) {
@@ -220,13 +221,13 @@ async function broadcastNewTempData() {
             tempData: tempDataInfo
         }
     }
-    console.debug("Received an update to thermostat data, broadcasting to clients...");
+    log.debug("Received an update to thermostat data, broadcasting to clients...");
     fastify.websocketServer.clients.forEach((client) => {
         if (client.readyState === client.OPEN) {
             try {
                 client.send(JSON.stringify(tempMessage));
             } catch (error) {
-                console.error("Error sending data to client:", error);
+                log.error("Error sending data to client:", error);
             }
         }
     })

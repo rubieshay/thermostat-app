@@ -1,8 +1,8 @@
-import { createContext, useState, useMemo, useCallback, useEffect, useRef} from "react";
+import { createContext, useState, useMemo, useCallback, useEffect} from "react";
 import { Preferences } from "@capacitor/preferences";
 import { type ChildrenProviderProps } from "../utils/constants";
 import { TempUnitsSetting, ThemeSetting } from "../types";
-import { SafeArea } from "@capacitor-community/safe-area";
+import { SafeArea } from '../plugins/safe-area';
 
 export interface SettingsContextType {
     tempUnitsSetting: TempUnitsSetting,
@@ -28,13 +28,34 @@ export const SettingsContext = createContext(initSettingsContext);
 
 export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: ChildrenProviderProps) => {
     const [themeSetting, setThemeSettingState] = useState<ThemeSetting>(ThemeSetting.system);
-    const [usedTheme, setUsedTheme] = useState<ThemeSetting>(ThemeSetting.dark);
+    const [systemDark, setSystemDark] = useState<boolean>(true);    
     const [tempUnitsSetting, setTempUnitsSettingState] = useState<TempUnitsSetting>(TempUnitsSetting.system);
     const [initialSettingsLoadComplete, setInitialSettingsLoadComplete] = useState(false);
     const [changeInitialThemeComplete, setChangeInitialThemeComplete] = useState(false);
     const [lastDeviceID, setLastDeviceIDState] = useState<string|null>(null);
-    const changeThemeTimer = useRef<number | null>(null);
 
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        // Create media query for dark mode
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+        // Set initial state
+        setSystemDark(mediaQuery.matches);
+
+        // Handler for media query changes
+        const handleChange = (e: MediaQueryListEvent) => {
+            console.debug("media query change, setting systemDark to:", e.matches);
+            setSystemDark(e.matches);
+        };
+
+        // Add event listener
+        mediaQuery.addEventListener('change', handleChange);
+
+        // Cleanup function
+        return () => {
+            mediaQuery.removeEventListener('change', handleChange);
+        };
+    }, []);
 
     const setThemeSetting = useCallback( async (mode: ThemeSetting) => {
         await Preferences.set({ key: "themeSetting", value: mode});
@@ -73,62 +94,32 @@ export const SettingsContextProvider: React.FC<ChildrenProviderProps> = (props: 
         setInitialSettingsLoadComplete(true);
     }, [setTempUnitsSetting,setThemeSetting]);
 
-    const changeTheme = useCallback(() => {
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if ((themeSetting === ThemeSetting.system && prefersDark) || themeSetting === ThemeSetting.dark) {
-            setUsedTheme(ThemeSetting.dark);
+    const changeTheme = useCallback(async () => {
+        if ((themeSetting === ThemeSetting.system && systemDark) || themeSetting === ThemeSetting.dark) {
             document.body.classList.remove("color-theme-light");
+            await SafeArea.initialize();
+            await SafeArea.changeSystemBarsIconsAppearance({isLight: false});
+
         } else {
-            setUsedTheme(ThemeSetting.light);
             document.body.classList.add("color-theme-light");
-        }
-        if (changeThemeTimer.current) {
-            clearTimeout(changeThemeTimer.current);
+            await SafeArea.initialize();
+            await SafeArea.changeSystemBarsIconsAppearance({isLight: true});
+
         }
         setChangeInitialThemeComplete(true);
-    }, [themeSetting]);
-
-    const enableSafeArea = useCallback(() => {
-        // both are transparent and created with css because the custom color bars doesn't appear to work
-        if (usedTheme === ThemeSetting.dark) {
-            SafeArea.enable({
-                config: {
-                    customColorsForSystemBars: true,
-                    statusBarColor: "#00000000",
-                    statusBarContent: "light",
-                    navigationBarColor: "#00000000",
-                    navigationBarContent: "light",
-                },
-            });
-        } else {
-            SafeArea.enable({
-                config: {
-                    customColorsForSystemBars: true,
-                    statusBarColor: "#ffffff00",
-                    statusBarContent: "dark",
-                    navigationBarColor: "#ffffff00",
-                    navigationBarContent: "dark",
-                },
-            });
-        }
-    }, [usedTheme]);
+    }, [themeSetting,systemDark]);
 
     useEffect(() => {
         if (!initialSettingsLoadComplete) {
             loadSettings();
         };
-    }, [initialSettingsLoadComplete, loadSettings, changeTheme, enableSafeArea]);
+    }, [initialSettingsLoadComplete, loadSettings, changeTheme ]);
 
     useEffect(() => {
         if (initialSettingsLoadComplete) {
             changeTheme();
         }
     }, [changeTheme, themeSetting, initialSettingsLoadComplete]);
-
-    useEffect(() => {
-        enableSafeArea();
-    }, [enableSafeArea, usedTheme])
-
 
     const memoedValue = useMemo(() => ({
         tempUnitsSetting, setTempUnitsSetting, themeSetting, setThemeSetting, changeInitialThemeComplete, lastDeviceID, setLastDeviceID

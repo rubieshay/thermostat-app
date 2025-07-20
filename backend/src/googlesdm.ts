@@ -5,6 +5,7 @@ import { Connectivity, FetchReturn, TempMode, HvacStatus, EcoMode,
         demoTempDataArray,
         TempDataArray} from "./types"; 
 import { TempCommands, deviceTypeThermostat, sleep } from "./utils"
+import log from './logger';
 
 export let tempDataInfo: TempDataArray = [];
 
@@ -64,7 +65,7 @@ export async function getAccessToken() : Promise<FetchReturn> {
         accessToken = data.access_token; // Assuming the response contains an access token
         accessTokenExpireSeconds = data.expires_in; // Assuming the response contains an expiration time in seconds
         accessTokenExpirationTime = (new Date(new Date().getTime() + 1000*(accessTokenExpireSeconds - TokenExpireBufferSeconds)))
-        console.debug("New Access Token retrieved, Expiration Date with buffer:" + accessTokenExpirationTime);
+        log.debug("New Access Token retrieved, Expiration Date with buffer:" + accessTokenExpirationTime);
     } catch (error) {
         // Handle network errors or errors thrown by the if statement above
         if (error instanceof Error) {
@@ -84,14 +85,14 @@ export async function checkAndGetDeviceInfo(forceFlush: boolean) : Promise<Fetch
     if (forceFlush || dataCacheExpirationTime === null) {
         let fetchReturn = await getExclusiveDeviceInfo();
         updateCachedData();
-        console.debug("Set initial cached Data or forced flush of data-- not previously set");
+        log.debug("Cached data forced flush (or initial retrieve)");
         return fetchReturn;
     }
     // check if cached version is recent enough;
     if ((new Date()) > dataCacheExpirationTime) {
         let fetchReturn = await getExclusiveDeviceInfo();
         updateCachedData();
-        console.debug("Cached data not recent enough - refreshing");
+        log.debug("Cached data not recent enough - refreshing");
         return fetchReturn
     } else {
         let fetchReturn: FetchReturn = {success: true, httpCode: 302}
@@ -136,6 +137,7 @@ export async function getDeviceInfo() : Promise<FetchReturn> {
             fetchReturn.error = "No devices found or invalid response format";
             return fetchReturn;
         }
+        log.trace("Retrieved data manually from google:",JSON.stringify(data,null,3));
         // Loop over all devices of type Thermostat, derive info and add to tempData array
         tempDataInfo = [];
         data.devices.filter((device: any) => (device.type === deviceTypeThermostat)).forEach((device:any) => {

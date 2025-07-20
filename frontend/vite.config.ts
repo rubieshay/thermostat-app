@@ -11,12 +11,14 @@ const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'));
 const envWatcherPlugin = () => {
   return {
     name: 'env-watcher',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     configureServer(server: any) {
       const envPath = path.resolve(process.cwd(), '.env')
       
       // Watch the .env file
       server.watcher.add(envPath)
       
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       server.watcher.on('change', (file: any) => {
         if (file === envPath) {
           console.log('🔄 .env file changed, running custom script...')

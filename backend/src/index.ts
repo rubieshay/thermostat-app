@@ -14,6 +14,9 @@ import { originInCorsList, splitURLsByCommaToArray } from "./utils";
 import { Worker } from "worker_threads";
 import * as path from "path";
 import { MessageTypes, ThreadDataResponseMessage, ThreadRequestDataMessage, ThreadShutdownMessage, ThreadStartupMessage } from "./backendtypes";
+import log from './logger';
+import { currentLogLevel } from './logger';
+import { LogLevelDesc } from "loglevel";
 
 export const googleClientId  = process.env.CLIENT_ID || "";
 export const googleClientSecret = process.env.CLIENT_SECRET || "";
@@ -33,14 +36,14 @@ const dbClientConf = (process.env.DB_CLIENT_CONF === null || process.env.DB_CLIE
 
 const httpPort = Number(process.env.PORT) || 3000;
 
-console.log("Environmental Info:",JSON.stringify({demoMode, environment,dbLogging,dbClientConf}));
+log.debug("Environmental Info:",JSON.stringify({demoMode, environment,dbLogging,dbClientConf}));
 
 export let weatherData: WeatherData = structuredClone(initWeatherData);
 
 export const sharedMutex = new Mutex();
 
 export const fastify = Fastify({
-    logger: true
+    logger: (currentLogLevel === "DEBUG" || currentLogLevel === "TRACE")
 })
 
 fastify.register(fastifyWebSockets);
@@ -66,14 +69,14 @@ fastify.register( async function (fastify) {
     fastify.get("/ws", { websocket: true,},
         (socket, req) => {
             // TODO : initial connect action -- start regular thermostat polling
-            console.debug("Initial WS Connect");
+            log.debug("Initial WS Connect");
             let statusMessage: TempMessage = { type: TempMessageType.statusUpdate, data: { message: "Connected to Fastify WebSocket" } };
             socket.send(JSON.stringify(statusMessage));
             socket.on("message", (msg: string) => {
-                console.error("Received message from client, no actions possible: :",msg)
+                log.error("Received message from client, no actions possible: :",msg)
             });
             socket.on("close", () => {
-                console.debug("WS closed by client");
+                log.debug("WS closed by client");
                 //TODO : stop regular thermostat polling
             })
         }
@@ -89,7 +92,7 @@ fastify.get<{ Querystring: InfoQueryString }>("/info", {schema: {querystring: in
     let fetchReturn: FetchReturn;
     fetchReturn = await checkAndGetDeviceInfo(force_flush);
     if (!fetchReturn.success) {
-        console.error("Got an error in getDeviceInfo:", fetchReturn.error);
+        log.error("Got an error in getDeviceInfo:", fetchReturn.error);
         if (!fetchReturn.httpCode) {fetchReturn.httpCode = 500;}
         return reply.status(fetchReturn.httpCode).send({ error: fetchReturn.error || "Failed to get device info" });
     }
@@ -100,7 +103,7 @@ fastify.get("/weather", async (request, reply) => {
     let fetchReturn: FetchReturn;
     fetchReturn = await getCurrentObservation();
     if (!fetchReturn.success) {
-        console.error("Got an error in getObservation:", fetchReturn.error);
+        log.error("Got an error in getObservation:", fetchReturn.error);
         return reply.status(500).send({ error: fetchReturn.error || "Failed to get weather" });
     }
     reply.send(weatherData);
@@ -189,35 +192,35 @@ async function initializeDBLogging() {
             }
         });
         worker.on("error", (error: Error) => {
-            console.log("worker thread error:",error);
+            log.error("worker thread error:",error);
         });
         worker.on("exit", (code) => {
-            console.error("Worker thread exited with code:", code);
+            log.error("Worker thread exited with code:", code);
         })
-        console.log("Worker Thread for DB Logging created. Sending startup message...");
+        log.info("Worker Thread for DB Logging created. Sending startup message...");
         const startupMessage: ThreadStartupMessage = {type: MessageTypes.startup, data: { tempDataInfo, weatherData}};
         worker.postMessage(startupMessage);
 
     } else {
-        console.log("Not logging data, deactivated.");
+        log.info("Not logging data, deactivated.");
     }
 }
 
 const start = async () => {
-    console.log("Executing main startup process...");
+    log.info("Executing main startup process...");
     try {
-        console.log("Getting thermostat data and subscribing...");
+        log.info("Getting thermostat data and subscribing...");
         await getDataAndSubscribe();
-        console.log("Starting fastify listen service on port: ",httpPort);
+        log.info("Starting fastify listen service on port: ",httpPort);
         await fastify.listen({ port: httpPort, host: "0.0.0.0" });
         if (demoMode) {
-            console.log("Getting demo weather data...");
+            log.info("Getting demo weather data...");
             weatherData = structuredClone(initWeatherData);
         } else {
-            console.log("Initializing weather service data retrieval...");
+            log.info("Initializing weather service data retrieval...");
             await initializeWeatherAndRefresh();
         }
-        console.log("Setting up worker for database logging...");
+        log.info("Setting up worker for database logging...");
         await initializeDBLogging();
     } catch (err) {
         fastify.log.error(err);
@@ -238,23 +241,23 @@ async function cleanUp() {
 }
 
 process.on('SIGINT', async () => {
-     console.log('Ctrl+C pressed. Cleaning up...');
+     log.info('Ctrl+C pressed. Cleaning up...');
      await cleanUp();
      process.exit(0); // Exit with success code 0
    });
 
 process.on('SIGUSR2', async () => {
-     console.log('USR2 signal - possibly restarting with nodemon. Cleaning up...');
+     log.info('USR2 signal - possibly restarting with nodemon. Cleaning up...');
      await cleanUp();
      process.exit(0); // Exit with success code 0
    });
 
 process.on('SIGTERM', async () => {
-     console.log('Received SIGTERM. Cleaning up...');
+     log.info('Received SIGTERM. Cleaning up...');
      await cleanUp();
      process.exit(0); // Exit with success code 0
    });
 
 process.on('exit', async (code) => {
-  console.log(`About to exit with code: ${code}`);
+  log.info(`About to exit with code: ${code}`);
 });

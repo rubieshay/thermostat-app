@@ -2,13 +2,14 @@ import { parentPort, workerData } from "worker_threads";
 import { MessageTypes, ThreadData, ThreadDataResponseMessage, ThreadRequestDataMessage } from "./backendtypes";
 import { Sender } from "@questdb/nodejs-client";
 import { FanMode, HvacStatus, TempData } from "./types";
+import log from "./logger";
 
 const logIntervalSeconds = 60;
 
 let dbOK = true;
 
 if (!workerData) {
-    console.error("No worker data received...");
+    log.error("No worker data received...");
 }
 
 let {dbClientConf} = workerData;
@@ -16,15 +17,15 @@ let {dbClientConf} = workerData;
 let sender: Sender|null|any = null;
 
 async function initializeDB() {
-    console.log("initializing DB, opening");
-    console.log("passed DB conf is: ",dbClientConf);
+    log.debug("initializing DB, opening");
+    log.debug("passed DB conf is: ",dbClientConf);
     try {
         sender = Sender.fromConfig(dbClientConf);
     } catch(error) {
-        console.error("Could not initializeDB");
+        log.error("Could not initializeDB");
         dbOK = false;
     }
-//    console.log("QuestDB config is:",sender);
+    // log.trace("QuestDB config is:",sender);
 }
 
 function getSimplifiedTempData(tempData: TempData) {
@@ -54,7 +55,7 @@ function getSecondsFromDateTime(UTCTimeString: string) : number {
  
 async function logEntryToDB(data: ThreadData) {
     if (!dbOK) {return};
-    console.log("Logging entry to database...");
+    log.debug("Logging entry to database...");
     if (!sender) {return};
     for (const logTempData of data.tempDataInfo) {
         const logData = getSimplifiedTempData(logTempData);
@@ -86,7 +87,7 @@ async function logEntryToDB(data: ThreadData) {
             await sender.flush();
         }
         catch (error) {
-            console.error("Unable to log to database...",error);
+            log.error("Unable to log to database...",error);
         }
     }
 }
@@ -115,22 +116,22 @@ if (parentPort) {
 }
 
 async function cleanup() {
-    console.log("Cleaning up dblogging worker thread...");
+    log.debug("Cleaning up dblogging worker thread...");
     clearInterval(logInterval);
     if (sender && dbOK) {
-        console.log("Closing out database...");
+        log.debug("Closing out database...");
         await sender.close();
     }
 }
 
 process.on('SIGTERM', async () => {
-    console.log("Received terminate message on worker thread. Ending.");
+    log.info("Received terminate message on worker thread. Ending.");
     await cleanup();
     process.exit(0);
 });
 
 process.on('SIGINT', async () => {
-    console.log("Received interrupt Ctrl-C on worker thread. Stopping.");
+    log.info("Received interrupt Ctrl-C on worker thread. Stopping.");
     await cleanup();
     process.exit(0);
 });
