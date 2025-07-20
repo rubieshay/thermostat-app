@@ -60,6 +60,9 @@ jobs:
         echo "DEFAULT_API_URL=${{ secrets.DEFAULT_API_URL }}" > frontend/.env
         echo "DEMO_MODE=0" >> frontend/.env
         echo "DATA_REFRESH_ENABLED=1" >> frontend/.env
+    
+    - name: Install rollup separately
+      run: npm install @rollup/rollup-linux-x64-gnu --save-optional    
         
     - name: Install dependencies
       working-directory: ./frontend
