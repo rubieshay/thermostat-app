@@ -9,8 +9,11 @@ WORKDIR /usr/app/frontend
 # Copy package files first (for better layer caching)
 COPY frontend/package*.json ./
 
+# Avoid error about this as a missing package seen in github actions environments
+RUN npm install @rollup/rollup-linux-x64-gnu --save-optional
+
 # Install dependencies
-RUN npm ci --silent --include=optional
+RUN npm ci --silent
 
 # Copy source code
 COPY frontend/. .
