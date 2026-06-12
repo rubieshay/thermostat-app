@@ -121,6 +121,7 @@ export async function getCurrentObservation(): Promise<FetchReturn> {
             return fetchReturn;
         }
         const data = await response.json(); // Or response.text() for text responses
+        log.trace("Got observation data:",JSON.stringify(data,null,3));
         fetchReturn.success = true;
         weatherData.lastCheckTime = new Date();
         weatherData.currentTextDescription = data.properties.textDescription;
