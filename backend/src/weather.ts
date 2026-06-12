@@ -99,29 +99,26 @@ async function checkAndGetObservationStations(): Promise<FetchReturn> {
     }
 }
 
-export async function getCurrentObservation(): Promise<FetchReturn> {
+export async function checkAndGetCurrentObservation(url: string,withQC: boolean): Promise<FetchReturn> {
     let fetchReturn: FetchReturn = {success: false};
-    fetchReturn = await checkAndGetObservationStations();
-    if (!fetchReturn.success) {return fetchReturn;};
-    if (weatherData.lastCheckTime !== null && new Date() < (new Date(weatherData.lastCheckTime.getTime() + 1000*(weatherDataExpireDurationSecs)))) {
-        log.debug("The data is fresh, no need to retrieve.");
-        fetchReturn.httpCode = 302;
-        return fetchReturn;
-    }
-    if (weatherData.observationURL === null) {
-        fetchReturn.httpCode = 404;
-        fetchReturn.error = "Observations URL is null";
-        return fetchReturn;
-    }
-       try {
-        const response = await fetch(weatherData.observationURL!);
+    const obsURL = withQC ? encodeURI(url + "?require_qc=true") : url;
+    try {
+        const response = await fetch(obsURL);
         if (!response.ok) {
             fetchReturn.httpCode = response.status;
             fetchReturn.error = "Get Observation Failed:"+response.statusText;
             return fetchReturn;
         }
         const data = await response.json(); // Or response.text() for text responses
-        log.trace("Got observation data:",JSON.stringify(data,null,3));
+        log.trace("Got observation data for url " + obsURL + " and qc:" + withQC + ":", JSON.stringify(data, null, 3));
+        if (data.properties.temperature.value === null || data.properties.relativeHumidity.value === null || 
+            data.properties.temperature.qualityControl !== "V" ||
+            data.properties.relativeHumidity.qualityControl !== "V") {
+                fetchReturn.httpCode = 204;
+                fetchReturn.error = "Observation data is not valid or does not have quality control values of 'V'";
+                log.trace("Observation data is not valid or does not have quality control values of 'V'");
+                return fetchReturn;
+        }    
         fetchReturn.success = true;
         weatherData.lastCheckTime = new Date();
         weatherData.currentTextDescription = data.properties.textDescription;
@@ -136,6 +133,28 @@ export async function getCurrentObservation(): Promise<FetchReturn> {
         } else {
             fetchReturn.error = "Get Observations Unknown fetch error";
         }
+    }
+    return fetchReturn;
+}
+
+export async function getCurrentObservation(): Promise<FetchReturn> {
+    let fetchReturn: FetchReturn = {success: false};
+    fetchReturn = await checkAndGetObservationStations();
+    if (!fetchReturn.success) {return fetchReturn;};
+    if (weatherData.lastCheckTime !== null && new Date() < (new Date(weatherData.lastCheckTime.getTime() + 1000*(weatherDataExpireDurationSecs)))) {
+        log.debug("The data is fresh, no need to retrieve.");
+        fetchReturn.httpCode = 302;
+        return fetchReturn;
+    }
+    if (weatherData.observationURL === null) {
+        fetchReturn.httpCode = 404;
+        fetchReturn.error = "Observations URL is null";
+        return fetchReturn;
+    }
+    fetchReturn = await checkAndGetCurrentObservation(weatherData.observationURL, true);
+    if (!fetchReturn.success) {
+        log.warn("Failed to get observation with quality control, trying again without quality control...");
+        fetchReturn = await checkAndGetCurrentObservation(weatherData.observationURL, false);
     }
     return fetchReturn;
 }
